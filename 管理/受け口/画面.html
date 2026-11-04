@@ -444,7 +444,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-
   /* ---------- ページの文章 ---------- */
 
   function tagName(t) { return TAGS[t] || '文'; }
-  function oneLine(s, n) { s = s.replace(/\*\*/g, '').replace(/\s*\n\s*/g, ' '); return s.length > n ? s.slice(0, n) + '…' : s; }
+  function oneLine(s, n) { s = s.replace(/\*\*/g, '').replace(/【スマホ改行】|【パソコン改行】/g, '\n').replace(/\s*\n\s*/g, ' '); return s.length > n ? s.slice(0, n) + '…' : s; }
   function findText(texts, key) {
     var hit = null;
     texts.pages.forEach(function (p) { p.parts.forEach(function (pt) { pt.texts.forEach(function (x) { if (x.key === key) hit = { page: p, part: pt, item: x }; }); }); });
@@ -455,6 +455,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-
     var one = ONE_LINE[x.tag];
     var s = one ? '改行はできません（' + one + '字まで）。' : '改行したところは、ページでも改行します。**で囲んだところ** は太字になります。';
     if (x.text.indexOf('{{TEL}}') >= 0) s += '{{TEL}} のところには、お店の電話番号が入ります。';
+    if (/【スマホ改行】|【パソコン改行】/.test(x.text)) s += '【スマホ改行】はスマホだけ、【パソコン改行】はパソコンだけの改行です（「ページで直す」で入れたもの）。';
     return s;
   }
   function textRows(x) { return Math.min(14, Math.max(ONE_LINE[x.tag] ? 2 : 3, Math.ceil(x.text.length / 24) + (x.text.match(/\n/g) || []).length)); }
@@ -598,8 +599,29 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-
      ・知らせを受けるのは、そのページの場所（ホームページ）からだけ */
   var DEVICE = { sp: 390, pc: 1280 };
   var pe = null;          // ページで直している途中のこと { frame, pv, ed, keys, orig, cur, piece, box, dirty }
-  var MARK = '';    // 打っている所の印（直す欄を作り直すあいだだけ使う）
-  var ZW = '​';      // 空の文や、改行の後ろに置く、見えない字（打つ所を作るため。保存しない）
+  var MARK = '\uE000';    // 打っている所の印（直す欄を作り直すあいだだけ使う）
+  var ZW = '\u200B';      // 空の文や、改行の後ろに置く、見えない字（打つ所を作るため。保存しない）
+  // スマホだけ・パソコンだけの改行（2026-11-04 ko-dai さんの指示：「改行だけ別々」）。文の中の印は 作る.py の SP_BR・PC_BR と同じ。ふつうの改行 \n は両方
+  //   直す欄では、いま選んでいる端末（st.tdev）の改行だけを <br> で見せ、もう片方の改行は見えない印（m-hide）にして残す。両方の改行は、<br> と m-hide の組
+  //   Enter で入れる改行は、いま選んでいる端末だけのもの。両方の改行を片方の形で消すと、もう片方だけの改行になる
+  var BR_TOK = { sp: '【スマホ改行】', pc: '【パソコン改行】' };
+  var BR_RE = /(\n|【スマホ改行】|【パソコン改行】)/;
+  function devNow() { return st.tdev === 'pc' ? 'pc' : 'sp'; }
+  function devOther() { return devNow() === 'pc' ? 'sp' : 'pc'; }
+  /** 改行の印の並び（となり合う スマホ＋パソコン は、両方の改行 \n にまとめる） */
+  function brJoin(list) {
+    var sp = list.filter(function (d) { return d === 'sp'; }).length, pc = list.length - sp, both = Math.min(sp, pc);
+    return new Array(both + 1).join('\n') + new Array(sp - both + 1).join(BR_TOK.sp) + new Array(pc - both + 1).join(BR_TOK.pc);
+  }
+  /** 打つ所の印を外したあと、となり合った スマホ＋パソコン の改行の印を、両方の改行にまとめ直す */
+  function brTidy(s) { return s.replace(/【スマホ改行】【パソコン改行】|【パソコン改行】【スマホ改行】/g, '\n'); }
+  /** 打つ所を数えるための、いまの端末で見える字の数（** は数えない。いまの端末の改行は1字、もう片方の改行は0字） */
+  function visLen(s) {
+    var d = devNow();
+    return s.replace(/\*\*/g, '').split(BR_RE).reduce(function (n, p, j) {
+      return n + (!(j % 2) ? p.length : (p === '\n' || p === BR_TOK[d]) ? 1 : 0);
+    }, 0);
+  }
   var CS_OK = /^(fontFamily|fontSize|fontWeight|fontStyle|letterSpacing|lineHeight|wordBreak|overflowWrap|lineBreak|textAlign|textTransform|fontFeatureSettings|color|whiteSpace|textDecorationLine|verticalAlign|display|paddingLeft|paddingRight|marginLeft|marginRight|backgroundColor|borderRadius)$/;
 
   function siteOrigin() { if (LOCAL) return location.origin; try { return new URL(CONF.site).origin; } catch (e) { return ''; } }
@@ -702,7 +724,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-
     };
     dev.addEventListener('change', function () {
       st.tdev = dev.read(); pe.fit();
-      if (pe.keys.length && !pe.dirty) toFrame({ type: 'pick', key: pe.keys[0], want: true });   // 幅が変わったので、枠の形を聞き直す
+      if (pe.keys.length) toFrame({ type: 'pick', key: pe.keys[0], want: true });   // 幅が変わったので、枠の形を聞き直す（直す欄も、その端末の改行で作り直す）
     });
     window.addEventListener('message', pe.onMsg);
     window.addEventListener('resize', pe.fit);
@@ -781,7 +803,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-
     pe.ed.appendChild(h('p', { class: 'hint where', text: first.page.name + ' ＞ ' + first.part.name + '（' + keyName(keys[0]) + (keys.length > 1 ? '・枠ごと' : '') + (allMenu ? '・メニューのタブと同じもの' : '') + '）' }));
     pe.ed.appendChild(h('div', { class: 'm-ed-wrap' }, [mirror]));
     pe.ed.appendChild(h('p', { class: 'hint', text: (pe.piece.st ? 'この欄は、ページの枠と同じ幅・同じ字の形と大きさです。改行の場所も、ページと同じになります。' : '') +
-      '打ったそばから、上のページの字が変わります。' + (allMenu ? (keys.some(function (k) { return lookup(k).menu.rule[3]; }) ? 'Enter で改行（説明だけ）。' : '') + 'メニューの字は、メニューのタブで直したのと同じに保存されます。' : 'Enter で改行。太字にしたい字は、選んで「太字」を押します（もう一度押すと外れます）。') +
+      '打ったそばから、上のページの字が変わります。' + (allMenu ? (keys.some(function (k) { return lookup(k).menu.rule[3]; }) ? 'Enter で改行（説明だけ。上で選んでいる「スマホ」か「パソコン」の形だけに入ります）。' : '') + 'メニューの字は、メニューのタブで直したのと同じに保存されます。' : 'Enter で改行（上で選んでいる「スマホ」か「パソコン」の形だけに入ります。両方に入れたいときは、両方の形で入れます）。太字にしたい字は、選んで「太字」を押します（もう一度押すと外れます）。') +
       (chips || keys.some(function (k) { return pe.cur[k].indexOf('{{TEL}}') >= 0; }) ? '色の付いた字（電話番号など）は、ここでは打ち直せません。' : '') }));
     pe.ed.appendChild(h('div', { class: 'ed-ft' }, [allMenu ? null : bold, button('元に戻す', '', undo), button('保存する', 'btn-main', save)]));
     mirrorWire(mirror);
@@ -817,8 +839,13 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-
         (isMenuKey(p.k) ? [text] : text.split(/\*\*([\s\S]+?)\*\*/)).forEach(function (piece, i) {   // メニューの字は ** を太字にしない
           var to = r;
           if (i % 2) { to = document.createElement('b'); r.appendChild(to); }
-          piece.split('\n').forEach(function (line, j) {
-            if (j) to.appendChild(document.createElement('br'));
+          piece.split(BR_RE).forEach(function (line, j) {
+            if (j % 2) {     // 改行：いまの端末のものは <br>、もう片方のものは見えない印
+              var d = devNow(), o = devOther();
+              if (line === '\n' || line === BR_TOK[d]) { var br = document.createElement('br'); br.dataset.d = d; to.appendChild(br); }
+              if (line === '\n' || line === BR_TOK[o]) { var hd = h('span', { class: 'm-hide' }); hd.contentEditable = 'false'; hd.dataset.d = o; to.appendChild(hd); }
+              return;
+            }
             // {{TEL}} は、お店の電話番号を、色を付けた打てない字にして出す（消すことはできる）
             line.split(/\{\{(TEL)\}\}/).forEach(function (bit, n) {
               if (!(n % 2)) return putText(to, bit);
@@ -829,7 +856,8 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-
             });
           });
         });
-        if (!text || /\n$/.test(text)) r.appendChild(document.createTextNode(ZW));   // 空の文・終わりの改行のあとにも、打つ所を
+        var tail = text.replace(/\*\*$/, '').split(BR_RE);   // 空の文・いまの端末の改行で終わる文には、そのあとにも打つ所を
+        if (!text || (tail.length > 1 && tail[tail.length - 1] === '' && (tail[tail.length - 2] === '\n' || tail[tail.length - 2] === BR_TOK[devNow()]))) r.appendChild(document.createTextNode(ZW));
         if (caret && caret.k === p.k) spot = r;
         box.appendChild(r);
       } else {
@@ -846,12 +874,16 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-
   /** 直す欄から、文ごとの今の字を読む（**太字**・改行は \n。見えない字は外す） */
   function mirrorRead(box) {
     var items = [];
+    var dnow = devNow();
     (function walk(node, k, b) {
       for (var x = node.firstChild; x; x = x.nextSibling) {
-        if (x.nodeType === 3) items.push({ k: k, t: x.nodeValue, b: b });
+        if (x.nodeType === 3) {      // 打って入れた改行（Enter・貼りつけ）は、いまの端末だけの改行
+          x.nodeValue.split('\n').forEach(function (t, j) { if (j) items.push({ k: k, br: dnow, b: b }); if (t) items.push({ k: k, t: t, b: b }); });
+        }
         else if (x.nodeType !== 1 || x.nodeName === 'WBR') continue;
+        else if (x.classList.contains('m-hide')) items.push({ k: k, br: x.dataset.d === 'pc' ? 'pc' : 'sp', b: b });
         else if (x.classList.contains('m-chip')) items.push(x.dataset.v ? { k: k, t: '{{' + x.dataset.v + '}}', b: b } : { chip: true });
-        else if (x.nodeName === 'BR') items.push({ k: k, t: '\n', b: b });
+        else if (x.nodeName === 'BR') items.push({ k: k, br: x.dataset.d === 'pc' ? 'pc' : x.dataset.d === 'sp' ? 'sp' : dnow, b: b });
         else walk(x, x.classList.contains('mk') ? x.dataset.k : k, b || /^(B|STRONG)$/.test(x.nodeName) || /^(bold|[6-9]00)$/.test(x.style.fontWeight));
       }
     })(box, null, false);
@@ -861,14 +893,18 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-
     for (var i = items.length - 1, next = null; i >= 0; i--) { if (items[i].chip) continue; if (items[i].k) next = items[i].k; else items[i].k = next; }
     var out = {};
     pe.keys.forEach(function (k) {
-      var s = '', bold = false;
+      var s = '', bold = false, brs = [];
+      function flush() { if (brs.length) { s += brJoin(brs); brs = []; } }
       items.forEach(function (it) {
         if (it.chip || it.k !== k) return;
-        var t = it.t.split(ZW).join('').replace(/ /g, ' ');
+        if (it.br) { brs.push(it.br); return; }
+        var t = it.t.split(ZW).join('').replace(/\u00A0/g, ' ');
         if (!t) return;
+        flush();
         if (it.b !== bold && !isMenuKey(k)) { s += '**'; bold = it.b; }   // メニューの字には太字の印を付けない
         s += t;
       });
+      flush();
       if (bold) s += '**';
       out[k] = s.replace(/\*\*\*\*/g, '');
     });
@@ -910,7 +946,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-
     var got = mirrorRead(box), caret = null;
     Object.keys(got).forEach(function (k) {
       var i = got[k].indexOf(MARK);
-      if (i >= 0) { caret = { k: k, pos: got[k].slice(0, i).replace(/\*\*/g, '').length }; got[k] = got[k].split(MARK).join(''); }
+      if (i >= 0) { caret = { k: k, pos: visLen(got[k].slice(0, i)) }; got[k] = brTidy(got[k].split(MARK).join('')); }
     });
     if (mark && mark.parentNode) mark.parentNode.removeChild(mark);
     pe.cur = got;

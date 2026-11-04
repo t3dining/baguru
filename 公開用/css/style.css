@@ -16,6 +16,9 @@
 }
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none !important}   /* hidden を付けたものは、ほかの display より強く隠す */
+/* スマホだけ・パソコンだけの改行（作る.py の breaks。管理画面の「ページで直す」で、端末ごとに入れたもの） */
+@media (max-width:820px){ br.br-pc{display:none} }
+@media (min-width:821px){ br.br-sp{display:none} }
 html{-webkit-text-size-adjust:100%; scroll-behavior:smooth; scroll-padding-top:calc(var(--hd) + 12px)}
 /* 文の途中では改行しない。改行するのは、作る.py が入れた文節の切れ目（<wbr>）だけ。
    それでも入りきらない長い語は、はみ出さないように折る（overflow-wrap） */

@@ -291,7 +291,7 @@ def mt(ref, s, br=False):
     ref は「群の id.品の番号（menu.json の並び。お休みの品も数える）.欄」。br：改行を <br> にする（説明だけ）"""
     body = tx(s)
     if br:
-        body = body.replace('\n', '<br>')
+        body = breaks(body)
     return '<!--m:%s-->%s<!--/m-->' % (ref, body)
 
 
@@ -481,8 +481,19 @@ def text_of(key):
     return s.replace('{{', '{⁠{')
 
 
+# スマホだけ・パソコンだけの改行（2026-11-04 ko-dai さんの指示：「改行だけ別々」）。管理画面の「ページで直す」で、選んでいる端末の形で Enter を押すと入る。
+# 文の中では次の印。ページでは <br class="br-sp">・<br class="br-pc"> にし、css/style.css が幅 820px で出し分ける（ふつうの改行 \n は両方）
+# ★同じ印を js/edit.js・管理/画面/kanri.js でも使う。変えるときは3つとも
+SP_BR, PC_BR = '【スマホ改行】', '【パソコン改行】'
+
+
+def breaks(s):
+    """エスケープした文の改行を <br> にする（スマホだけ・パソコンだけの改行も）"""
+    return s.replace(SP_BR, '<br class="br-sp">').replace(PC_BR, '<br class="br-pc">').replace('\n', '<br>')
+
+
 def rich(s):
-    return re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', tx(s), flags=re.S).replace('\n', '<br>')
+    return breaks(re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', tx(s), flags=re.S))
 
 
 def put_texts(s):

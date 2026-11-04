@@ -79,20 +79,24 @@
   }
 
   /** 文を入れかえる：** で囲んだところは <b>、改行は <br>（作る.py の rich と同じ）。メニューの字（m:）は ** を太字にしない（作る.py の mt と同じ） */
+  // スマホだけ・パソコンだけの改行の印（作る.py の SP_BR・PC_BR と同じ）。<br class="br-sp">・<br class="br-pc"> にし、css/style.css が幅で出し分ける
+  var SP_BR = '【スマホ改行】', PC_BR = '【パソコン改行】';
+  function putLines(box, text) {
+    text.split(/(\n|【スマホ改行】|【パソコン改行】)/).forEach(function (part, j) {
+      if (!(j % 2)) return putText(box, part);
+      var br = document.createElement('br');
+      if (part === SP_BR) br.className = 'br-sp'; else if (part === PC_BR) br.className = 'br-pc';
+      box.appendChild(br);
+    });
+  }
   function render(span, text, plain) {
     text = String(text).replace(/\{\{TEL\}\}/g, tel);
     while (span.firstChild) span.removeChild(span.firstChild);
-    if (plain) {
-      text.split('\n').forEach(function (line, j) { if (j) span.appendChild(document.createElement('br')); putText(span, line); });
-      return;
-    }
+    if (plain) return putLines(span, text);
     text.split(/\*\*([\s\S]+?)\*\*/).forEach(function (piece, i) {
       var box = span;
       if (i % 2) { box = document.createElement('b'); span.appendChild(box); }
-      piece.split('\n').forEach(function (line, j) {
-        if (j) box.appendChild(document.createElement('br'));
-        putText(box, line);
-      });
+      putLines(box, piece);
     });
   }
 
