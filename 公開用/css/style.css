@@ -111,20 +111,22 @@ address{font-style:normal}
   .gnav-extra{display:block; margin-top:22px}
   .gnav-hours{margin:12px 0 0; font-size:14px; color:var(--muted-d)}
 }
-/* スマホを横にしたとき（高さが低い）は、ヘッダーを細くして中身を見やすく */
+/* スマホを横にしたとき（高さが低い）は、ヘッダーを細くして中身を見やすく
+   ★管理画面の「ページで直す」の中（.bg-edit。js/edit.js が付ける）では使わない。スマホの管理画面では、ページの枠が横長（390×310 ほど）になり、
+     ここに当たって「電話」「MENU」の字が縦に並んでしまった（2026-11-04）。中で見せたいのは、たてに持ったスマホの形 */
 @media (orientation:landscape) and (max-height:520px){
-  :root{--hd:56px}
-  .logo img{width:42px; height:42px}
-  .logo-s{font-size:11px}
-  .logo-b{font-size:21px}
-  .hd-tel,.nav-toggle{height:42px}
-  .hd-tel{flex-direction:row; width:auto; padding:0 14px; gap:6px}
-  .hd-tel-l{font-size:13px}
-  .nav-toggle{flex-direction:row; width:auto; padding:0 12px; gap:8px}
-  .sample{font-size:11px; padding:2px 12px}
+  :root:not(.bg-edit){--hd:56px}
+  :root:not(.bg-edit) .logo img{width:42px; height:42px}
+  :root:not(.bg-edit) .logo-s{font-size:11px}
+  :root:not(.bg-edit) .logo-b{font-size:21px}
+  :root:not(.bg-edit) .hd-tel,:root:not(.bg-edit) .nav-toggle{height:42px}
+  :root:not(.bg-edit) .hd-tel{flex-direction:row; width:auto; padding:0 14px; gap:6px}
+  :root:not(.bg-edit) .hd-tel-l{font-size:13px}
+  :root:not(.bg-edit) .nav-toggle{flex-direction:row; width:auto; padding:0 12px; gap:8px}
+  :root:not(.bg-edit) .sample{font-size:11px; padding:2px 12px}
 }
 @media (orientation:landscape) and (max-height:520px) and (max-width:767px){
-  .gnav li > a{padding:11px 4px; font-size:16px}
+  :root:not(.bg-edit) .gnav li > a{padding:11px 4px; font-size:16px}
 }
 @media (max-width:400px){
   .hd-in{gap:10px}

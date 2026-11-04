@@ -14,6 +14,8 @@
 
   var up = window.parent;
   if (up === window) return;
+  // 管理画面の中で開いている印。ページの「スマホを横にしたとき」の形を使わない（css/style.css）。中の枠が横長でも、たてに持ったスマホの形で見せる
+  document.documentElement.classList.add('bg-edit');
   // Google の受け口が出す管理画面の場所（n-…-0lu-script.googleusercontent.com の形。2026-11-04 に本物で確かめた。前は「.script.」の形だけを受けていて、打った文がページに出なかった）
   var FROM = /^https:\/\/[a-z0-9-]+[.-]script\.googleusercontent\.com$/;
   var JA = /[぀-ヿ㐀-鿿！-｠]/;
