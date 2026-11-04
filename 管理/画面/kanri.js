@@ -325,7 +325,8 @@
 
   function siteOrigin() { if (LOCAL) return location.origin; try { return new URL(CONF.site).origin; } catch (e) { return ''; } }
   function siteFile(p) { return (LOCAL ? '../' : (CONF.site || '') + '/') + p; }
-  function pageUrl(id) { return siteFile((id === 'common' ? 'index' : id) + '.html?edit=1'); }
+  // t=…：GitHub のページはブラウザが10分そのまま使う（cache-control: max-age=600）。開くたびに最新を読むよう、毎回ちがうアドレスにする
+  function pageUrl(id) { return siteFile((id === 'common' ? 'index' : id) + '.html?edit=1&t=' + Date.now()); }
   function toFrame(msg) { if (pe && pe.frame.contentWindow) { msg.bg = 'kanri'; pe.frame.contentWindow.postMessage(msg, siteOrigin()); } }
 
   /* 文節に分ける BudouX（ホームページの js/budoux-ja.json）。作る.py の phrases・edit.js と同じ計算 */
