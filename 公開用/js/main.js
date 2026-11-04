@@ -35,7 +35,17 @@
       try { u = new URL(a.getAttribute('href'), location.href); } catch (x) { return; }
       if (/^(tel|mailto|sms):$/.test(u.protocol)) { a.target = '_top'; return; }
       if (!/^https?:$/.test(u.protocol) || u.href.indexOf(siteRoot) === 0) return;   // ホームページの中は、枠の中のまま
-      if (u.hostname === 't3dining.github.io' && u.pathname.indexOf('/baguru-app/') === 0) { a.target = '_top'; return; }
+      if (u.href.indexOf(OWNER_URL) === 0) { a.target = '_top'; return; }   // Owner のページ（下で替えたあとの、2回目に押したときも）
+      if (u.hostname === 't3dining.github.io' && u.pathname.indexOf('/baguru-app/') === 0) {
+        // 公式アプリは、Owner の中で公式アプリをはめ込むページ（app.html?to=アプリの中のページ）で開く（2026-11-05。バグるOwner のセッションが決めた形）。
+        // from=owner は app.html が付け、openExternalBrowser は LINE の中から開くときの印なので、to には入れない。# はそのまま渡る
+        u.searchParams.delete('from');
+        u.searchParams.delete('openExternalBrowser');
+        var to = u.pathname.slice('/baguru-app/'.length) + u.search;
+        a.href = OWNER_URL + 'app.html' + (to ? '?to=' + encodeURIComponent(to) : '') + u.hash;
+        a.target = '_top';
+        return;
+      }
       a.target = '_blank';
       a.rel = 'noopener';
     }, true);
