@@ -84,13 +84,24 @@
     return plenty(s) ? '○' : '△';
   }
 
+  // 選べる人数は15名まで（公式アプリと同じ。2026-11-04 ko-dai さんの指示。横5×縦3。16名以上はお電話で）。受け口の「1組の最大人数」がこれより少なければ、そちらに合わせる
+  var PEOPLE_MAX = 15;
+  function peopleMax() { return Math.min(PEOPLE_MAX, Number(state.avail.maxPeople) || PEOPLE_MAX); }
+
   function renderPeople() {
-    var max = state.avail.maxPeople, h = '';
+    var max = peopleMax(), h = '', tel = (window.BAGURU && window.BAGURU.tel) || '';
+    if (state.people > max) state.people = 0;
     for (var n = 1; n <= max; n++) {
       h += '<label class="chip"><input type="radio" name="people" value="' + n + '"' + (state.people === n ? ' checked' : '') + '><span>' + n + '名</span></label>';
     }
     $('r-people').innerHTML = h;
-    $('r-people-note').textContent = (max + 1) + '名以上のご予約は、お電話でお受けします。';
+    // 「16名以上のご予約は、お電話（0565-85-7955）でお問い合わせください。」（公式アプリと同じ文。電話番号は押すとかけられる）
+    var note = $('r-people-note'), a = document.createElement('a');
+    note.textContent = (max + 1) + '名以上のご予約は、';
+    a.href = 'tel:' + tel.replace(/-/g, '');
+    a.textContent = 'お電話（' + tel + '）';
+    note.appendChild(a);
+    note.appendChild(document.createTextNode('でお問い合わせください。'));
   }
 
   // 年月（'2026-10'）を n か月動かす
