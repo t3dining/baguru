@@ -49,6 +49,10 @@ COMING_SOON = False   # 2026-11-04 夕方に外した（ko-dai さんの指示�
 PREVIEW = 'naka-f90249acdb'
 BASE_URL = SITE_URL + '/' + PREVIEW if COMING_SOON else SITE_URL   # 中身のページの場所（canonical・OGP・管理画面が開くページ）
 ORDER_URL = 'https://t3dining.github.io/baguru-app/takeout.html#menu'  # ★モバイルオーダーの受け口（会社の GitHub の店舗アプリの、注文だけの画面。order.html はお店のタブレットの画面なので、つながない）
+# 公式アプリ（会社の GitHub の店舗アプリ）。ページ/app.html の「アプリを開く」と QR。?openExternalBrowser=1 は、LINE の中で押しても、ふだんのブラウザで開くための印（お店の POP の QR と同じ）
+APP_URL = 'https://t3dining.github.io/baguru-app/?openExternalBrowser=1'
+# 上の APP_URL の QR の形（0 と 1 の並び・誤り訂正 M）。店舗アプリ/バグる/POP/作る.py の MAT_APP と同じもの（アプリと同じ道具 qrcode-generator で作った）。★APP_URL を変えたら作り直す
+APP_QR = """111111101110010010011001001111111 100000101010110010001001001000001 101110100101100010010011101011101 101110101101001101011011001011101 101110100010101001010110101011101 100000100011101000110010101000001 111111101010101010101010101111111 000000001010100001111011100000000 101101110011101011110100001001011 111101001010101011111101001101101 101000101000101000101011110111001 110110001100011110111010001101000 001011100011100111000011110011010 010010010010000101100101100000110 110010100100010001010100001101000 001001000101011110101101011011100 001010101010111100010110011011100 000101011111001100001011101011001 010100101110010111001110111110110 101000000101100111101011110010000 011001100101110101100100000001110 110100001111000001011111011100101 001110110110011000100111111000011 011001011000111110010000110011010 101000111001111101000000111111011 000000001010000101010001100011010 111111101110111001011111101010000 100000101011001010011101100011110 101110100100011110101111111110111 101110101011111101001111110100001 101110101101000110100010111100100 100000100101001011110001101110001 111111101010001011100101010011100"""
 # ★ネット予約・お問い合わせ・応募の受け口。会社の Google アカウントのウェブアプリ（2026-10-28 に置いた）。URLは秘密ではない（守っているのは合言葉）
 #   受け口のコードは 店舗アプリ/バグる/予約ボード/受け口/コード.gs（予約ボードと同じ受け口）。URLを変えたら 店舗アプリ/バグる/予約ボード/board/config.js も直す
 #   Mac の「にせの受け口」で試すときは '/api/reserve' にする（確認用に開く.command で動く）
@@ -69,6 +73,7 @@ VARS = {
     'TEL': SHOP['tel'],
     'TEL_LINK': 'tel:' + SHOP['tel'].replace('-', ''),
     'ORDER_URL': ORDER_URL,
+    'APP_URL': APP_URL,
     'MAP_EMBED': 'https://www.google.com/maps?q=%s&output=embed&hl=ja' % _q,
     'MAP_LINK': 'https://www.google.com/maps/search/?api=1&query=%s' % _q,
     'INSTAGRAM': SHOP['instagram'],
@@ -110,6 +115,7 @@ PAGES = {
     'recruit': dict(en='RECRUIT', img='ph-recruit.jpg'),
     'contact': dict(en='CONTACT', img='ph-contact.jpg'),
     'privacy': dict(en='PRIVACY', img='ph-contact.jpg'),
+    'app': dict(en='APP', img='ph-app.jpg'),
 }
 
 # 写真：(作る名前, もとの写真, 幅, 高さ, 切り抜く枠 or None)
@@ -141,6 +147,7 @@ IMAGES = [
     ('ph-access.jpg', '店内と外観/外観04.jpg', 1100, 440, (0, 360, 2000, 1160)),
     ('ph-recruit.jpg', '商品写真/鉄板炭焼ハンバーグ④.jpg', 1600, 640, None),
     ('ph-contact.jpg', '商品写真/超粗びきハンバーグ⑦.jpg', 1600, 640, None),
+    ('ph-app.jpg', '商品写真/鉄板炭焼ハンバーグ①.jpg', 1600, 640, None),
     ('recruit.jpg', '商品写真/超粗びきハンバーグ③.jpg', 1100, 733, None),
     # 店内と外観（2026-10-29 お店からもらった写真。店内09 は左下に順番待ちの紙が写るので、そこを切る）
     ('in-main.jpg', '店内と外観/店内02.jpg', 1200, 900, None),
@@ -264,7 +271,17 @@ def fix_imgs(s):
     return re.sub(r'<img [^>]*>', rep, s)
 
 
+def qr_svg(rows, label):
+    """0 と 1 の並びを、にじまない SVG の QR にする（まわりに白い余白4つ分）"""
+    rows = rows.split()
+    n = len(rows)
+    d = ''.join('M%d %dh1v1h-1z' % (x, y) for y, row in enumerate(rows) for x, c in enumerate(row) if c == '1')
+    return ('<svg class="qr" viewBox="-4 -4 %d %d" shape-rendering="crispEdges" role="img" aria-label="%s">'
+            '<rect x="-4" y="-4" width="%d" height="%d" fill="#fff"/><path d="%s" fill="#000"/></svg>') % (n + 8, n + 8, label, n + 8, n + 8, d)
+
+
 def fill(s):
+    s = s.replace('{{APP_QR}}', qr_svg(APP_QR, '公式アプリを開くQRコード'))
     for k, v in VARS.items():
         s = s.replace('{{%s}}' % k, html.escape(v, quote=True))
     left = re.findall(r'\{\{[A-Z_]+\}\}', s)
@@ -588,6 +605,9 @@ SPRITE = '''<svg width="0" height="0" style="position:absolute" aria-hidden="tru
 <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></symbol>
 <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
 <symbol id="i-ig" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></symbol>
+<symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3.5v11M8 7.5l4-4 4 4"/><path d="M8.5 10.5H6.5a1 1 0 0 0-1 1V20a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-8.5a1 1 0 0 0-1-1h-2"/></symbol>
+<symbol id="i-addbox" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8.5v7M8.5 12h7"/></symbol>
+<symbol id="i-kebab" viewBox="0 0 24 24"><circle cx="12" cy="5.5" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="18.5" r="1.4" fill="currentColor"/></symbol>
 <symbol id="i-nosmoke" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></symbol>
 </svg>'''
 
@@ -612,6 +632,7 @@ def header(page):
       <ul>%s</ul>
       <div class="gnav-extra">
         <a class="btn btn-ember btn-wide" href="{{TEL_LINK}}">%s電話する {{TEL}}</a>
+        <a class="gnav-app" href="app.html"><img src="img/app-icon.png" width="40" height="40" alt=""><span><b>公式アプリ</b><small>注文・予約・スタンプカード</small></span></a>
         <p class="gnav-hours">本日の営業：<span data-today>平日 11:00–15:00 / 17:00–22:30</span></p>
         <p class="gnav-hours">定休日：<span data-days="dows">火曜日</span><span data-days="note">（祝日・GW・お盆・年末年始は営業）</span></p>
       </div>
@@ -638,7 +659,7 @@ def page_hero(page):
 
 
 def footer():
-    links = ''.join('<li><a href="%s.html">%s</a></li>' % (k, ja) for k, ja, _ in NAV)
+    links = ''.join('<li><a href="%s.html">%s</a></li>' % (k, ja) for k, ja, _ in NAV + [('app', '公式アプリ', 'APP')])
     group = ''.join('<li><a href="%s" target="_blank" rel="noopener"><span class="ft-group-logo"><img src="img/group-%s" alt=""></span>%s</a></li>' % (url, logo, ja)
                     for ja, url, logo in GROUP_SHOPS)
     year = datetime.date.today().year
@@ -751,7 +772,8 @@ def add_wbr(page):
 
 
 # ページごとに足す JavaScript（ネット予約のフォームはご予約のページ、お問い合わせ・応募のフォームはお問い合わせと採用のページ）
-PAGE_JS = {'reserve': ['js/api.js', 'js/reserve.js'],      # js/config.js と js/main.js は、どのページにも入る
+PAGE_JS = {'app': ['js/app-guide.js'],
+           'reserve': ['js/api.js', 'js/reserve.js'],      # js/config.js と js/main.js は、どのページにも入る
            'contact': ['js/api.js', 'js/contact.js'],
            'recruit': ['js/api.js', 'js/contact.js']}
 

@@ -206,6 +206,7 @@ def main():
     order = [k for k, _, _ in T.NAV] + [k for k in T.PAGES if k not in [n for n, _, _ in T.NAV]]
     names = {k: ja for k, ja, _ in T.NAV}
     names['privacy'] = '個人情報の扱い'
+    names['app'] = '公式アプリ'
     pages, used, new_count, writes = [], set(), 0, {}
 
     for page in order:

@@ -208,7 +208,7 @@
     ['.steps > li', 'rv-left'], ['.chapter > div, .mh > div', ''], ['.cards > .card', ''], ['.duo > .duo-item', ''],
     ['.band-in', ''], ['.news-list > li', ''], ['.news-art', ''], ['.access > .map', 'rv-left'], ['.access .info > div', 'rv-right'],
     ['.crew-in', ''], ['.flow > li', ''], ['.points > .point', ''], ['.notice', ''], ['.faq details', ''], ['.grid5 > .mini', ''],
-    ['.order', ''], ['.rc-pay > div', ''], ['.req', ''], ['.port > *', ''], ['.seat-list', '']
+    ['.order', ''], ['.app-top', ''], ['.installs > .install', ''], ['.app-strip-in', ''], ['.rc-pay > div', ''], ['.req', ''], ['.port > *', ''], ['.seat-list', '']
   ];
   var pending = [];
   function reveal() {

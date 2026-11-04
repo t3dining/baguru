@@ -955,3 +955,69 @@ a,button,label,summary{-webkit-tap-highlight-color:transparent}
 .bbar a.is-ember:active{background:var(--ember2)}
 .nav-toggle:active,.hd-tel:active{transform:translateY(1px)}
 .faq summary:active{background:rgba(0,0,0,.04)}
+
+/* ---------- 公式アプリ（app.html・ホームの帯・スマホのメニュー） ---------- */
+.app-top{display:grid; grid-template-columns:auto 1fr auto; gap:36px; align-items:center; background:var(--coal); color:#fff; border-radius:var(--r); padding:40px 44px; border-top:6px solid var(--ember)}
+.app-icon{width:120px; height:120px; border-radius:27px; box-shadow:0 10px 28px rgba(0,0,0,.45)}
+.app-top h2{font-size:clamp(26px,3.6vw,38px); margin-bottom:10px}
+.app-top p{color:#dcd1c3; margin:0}
+.app-top .btns{margin-top:22px}
+.app-top small{display:block; margin-top:12px; color:var(--muted-d); font-size:12.5px}
+.app-qr{margin:0; width:196px; text-align:center}
+.app-qr .qr{display:block; width:168px; height:168px; margin:0 auto; border-radius:var(--r)}
+.app-qr figcaption{margin-top:10px; font-size:12.5px; line-height:1.6; color:var(--muted-d)}
+.app-iab{display:flex; gap:10px; align-items:flex-start; background:#fff3e6; border:1px solid var(--flame); border-radius:var(--r); padding:14px 16px; margin:0 0 18px; font-size:14.5px; line-height:1.7}
+.app-iab .i{color:var(--ember); margin-top:4px}
+.installs{display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start}
+.install{background:#fff; border:1px solid var(--line); border-top:4px solid var(--coal); border-radius:var(--r); padding:24px 26px 20px}
+.install.is-you{border-top-color:var(--ember)}
+.install h3{display:flex; align-items:baseline; flex-wrap:wrap; gap:4px 10px; font-size:24px; margin-bottom:8px}
+.install h3 span{font-size:14px; font-weight:700; color:var(--muted)}
+.install.is-you h3::after{content:"お使いの端末"; margin-left:auto; align-self:center; font-size:12px; font-weight:900; color:#fff; background:var(--ember); padding:2px 10px; border-radius:2px; letter-spacing:.04em}
+.ins-steps{counter-reset:st}
+.ins-steps li{counter-increment:st; display:flex; gap:14px; align-items:center; padding:14px 0; border-bottom:1px solid var(--line)}
+.ins-steps li:last-child{border-bottom:0}
+.ins-steps li::before{content:counter(st); flex:none; width:34px; height:34px; display:grid; place-items:center; background:var(--coal); color:#fff; font-family:var(--en); font-size:17px; line-height:1; border-radius:50%}
+.ins-steps p{flex:1; margin:0; line-height:1.65}
+.ins-steps b{color:var(--ember2)}
+.ins-steps small{display:block; margin-top:4px; font-size:13px; color:var(--muted); line-height:1.6}
+.ins-ic{flex:none; width:44px; height:44px; display:grid; place-items:center; border-radius:10px; background:var(--brick); color:#0a7cff}   /* iPhone の共有ボタンと同じ青 */
+.install[data-os="android"] .ins-ic{color:var(--text)}
+.ins-ic .i{width:24px; height:24px}
+.ins-app{flex:none; width:44px; height:44px; border-radius:10px}
+.ins-note{margin:12px 0 0; padding-top:12px; border-top:1px dashed var(--line); font-size:13px; color:var(--muted); line-height:1.6}
+.app-go{margin-top:26px}
+@media (max-width:820px){
+  .app-top{grid-template-columns:1fr; justify-items:center; text-align:center; gap:16px; padding:30px 20px}
+  .app-icon{width:96px; height:96px; border-radius:22px}
+  .app-top .btns{justify-content:center}
+  .app-top .btn{flex:1 1 100%}
+  .app-qr{display:none}
+  .installs{grid-template-columns:1fr; gap:16px}
+  .install{padding:20px 16px 14px}
+  .install h3{font-size:21px}
+}
+/* ホーム（テイクアウトの帯の下） */
+.app-strip{background-color:var(--brick); background-image:var(--brick-bg); padding:44px 0}
+.app-strip-in{display:grid; grid-template-columns:auto 1fr auto; gap:28px; align-items:center}
+.app-strip img{width:88px; height:88px; border-radius:20px; box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.app-strip .sh-en{margin-bottom:4px}
+.app-strip .sh-en::before{display:none}
+.app-strip h2{font-size:clamp(22px,3vw,30px); margin-bottom:6px}
+.app-strip p:not(.sh-en){margin:0; color:var(--muted); font-size:15px}
+@media (max-width:820px){
+  .app-strip{padding:36px 0}
+  .app-strip-in{grid-template-columns:auto 1fr; gap:14px 16px}
+  .app-strip img{width:68px; height:68px; border-radius:16px}
+  .app-strip p:not(.sh-en){grid-column:1 / -1}
+  .app-strip-in > div{display:contents}
+  .app-strip .sh-en{grid-column:2; grid-row:1; align-self:end}
+  .app-strip h2{grid-column:2; grid-row:2; align-self:start; margin:0}
+  .app-strip img{grid-row:1 / 3}
+  .app-strip .btn{grid-column:1 / -1}
+}
+/* スマホのメニューの中 */
+.gnav-app{display:flex; align-items:center; gap:12px; margin-top:12px; padding:10px 12px; border:1px solid var(--line-d); border-radius:var(--r); text-decoration:none; color:var(--on-dark)}
+.gnav-app img{width:40px; height:40px; border-radius:9px}
+.gnav-app b{display:block; font-size:16px; line-height:1.4}
+.gnav-app small{display:block; font-size:12.5px; color:var(--muted-d); line-height:1.4}
