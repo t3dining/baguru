@@ -108,6 +108,11 @@ def clean_item(kind, it):
             if not PHOTO_NAME.match(str(v)):
                 raise Bad('bad_data')
             out[k] = v
+        elif k == 'copy':                   # 説明は改行できる（2026-11-04。コード.gs と同じ）
+            c = re.sub(r'[\x00-\x09\x0b-\x1f\x7f]', '', str(v)).strip()
+            if len(c) > LIMITS[k]:
+                raise Bad('bad_data')
+            out[k] = c
         else:
             out[k] = s_(v, LIMITS[k])
     keys = TYPE_KEYS[kind]

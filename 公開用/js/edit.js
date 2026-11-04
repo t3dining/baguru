@@ -1,5 +1,6 @@
 /* 管理画面の「ページで直す」で使う道具（管理画面の中に、このページを ?edit で開いたときだけ main.js が読む）
    ・作る.py が文のまわりに付けた印（<!--t:キー--> 〜 <!--/t-->）を探して、<bg-t> で包んで点線で囲み、押せるようにする
+     メニューの字（名前・説明・値段など。データ/menu.json）にも印がある（<!--m:群.番号.欄--> 〜 <!--/m-->。キーは「m:群.番号.欄」）
      （span でなく bg-t にするのは、ページの CSS（「.st-no span」など）が付かないように。付くと、直す画面でだけ形が変わってしまう）
    ・押したら、その文が入っている枠（いちばん近い、行の箱。p・li・dd・h3 など）をまるごと管理画面に知らせる（2026-11-04。バグるマネージと同じ）
      枠の中の並び（直せる文・直せない字・改行）と、枠の幅・字の形・字の大きさ。管理画面は、それと同じ形の直す欄を作る（だから改行の場所がページと同じ）
@@ -34,11 +35,11 @@
   /** 印のあいだを <bg-t data-t="キー"> で包む */
   function wrap() {
     var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT), starts = [], c;
-    while ((c = walker.nextNode())) if (/^t:[a-z0-9-]+$/.test(c.data)) starts.push(c);
+    while ((c = walker.nextNode())) if (/^t:[a-z0-9-]+$/.test(c.data) || /^m:[a-z0-9-]+(\.[a-z0-9]+)+$/.test(c.data)) starts.push(c);
     starts.forEach(function (mark) {
-      var key = mark.data.slice(2), span = document.createElement('bg-t'), n = mark.nextSibling, next;
+      var key = mark.data.charAt(0) === 'm' ? mark.data : mark.data.slice(2), span = document.createElement('bg-t'), n = mark.nextSibling, next;
       span.setAttribute('data-t', key);
-      while (n && !(n.nodeType === 8 && n.data === '/t')) { next = n.nextSibling; span.appendChild(n); n = next; }
+      while (n && !(n.nodeType === 8 && (n.data === '/t' || n.data === '/m'))) { next = n.nextSibling; span.appendChild(n); n = next; }
       mark.parentNode.insertBefore(span, mark.nextSibling);
       (spans[key] = spans[key] || []).push(span);
     });
@@ -75,10 +76,14 @@
     });
   }
 
-  /** 文を入れかえる：** で囲んだところは <b>、改行は <br>（作る.py の rich と同じ） */
-  function render(span, text) {
+  /** 文を入れかえる：** で囲んだところは <b>、改行は <br>（作る.py の rich と同じ）。メニューの字（m:）は ** を太字にしない（作る.py の mt と同じ） */
+  function render(span, text, plain) {
     text = String(text).replace(/\{\{TEL\}\}/g, tel);
     while (span.firstChild) span.removeChild(span.firstChild);
+    if (plain) {
+      text.split('\n').forEach(function (line, j) { if (j) span.appendChild(document.createElement('br')); putText(span, line); });
+      return;
+    }
     text.split(/\*\*([\s\S]+?)\*\*/).forEach(function (piece, i) {
       var box = span;
       if (i % 2) { box = document.createElement('b'); span.appendChild(box); }
@@ -208,7 +213,7 @@
     var d = e.data || {};
     if (d.bg !== 'kanri') return;
     if (d.type === 'set') {
-      Object.keys(d.texts || {}).forEach(function (k) { (spans[k] || []).forEach(function (sp) { render(sp, d.texts[k]); }); });
+      Object.keys(d.texts || {}).forEach(function (k) { (spans[k] || []).forEach(function (sp) { render(sp, d.texts[k], k.slice(0, 2) === 'm:'); }); });
     } else if (d.type === 'pick') {
       // 管理画面が直している枠（開き直したとき・全ページ共通を選んだとき）。frame があれば、枠の形も知らせ直す
       var sp = (spans[String(d.key || '')] || [])[0];

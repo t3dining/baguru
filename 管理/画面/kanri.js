@@ -309,6 +309,56 @@
     openSheet(tagName(x.tag), el, [button('保存する', 'btn-main', save)]);
   }
 
+  /* ---------- ページで直す：メニューの字（データ/menu.json。キーは「m:群.番号.欄」） ----------
+     ・ページで直すで押した字がメニューの字なら、メニューのタブと同じもの（st.menu）を直して、メニューとして保存する（2026-11-04 ko-dai さんの指示）
+     ・欄ごとの決まり（呼び名・字数の上限・空にできないか・改行できるか）は MENU_FIELD。字数の上限は コード.gs・にせの受け口.py の LIMITS と同じ */
+  var MENU_FIELD = {
+    name: ['名前', 80, true], sub: ['小さい字の説明', 120], copy: ['説明', 600, false, true], price: ['値段', 40, true],
+    note: ['ひとこと', 200], limit: ['赤い札', 30], 'tip.label': ['ひとことの見出し', 20], 'tip.text': ['ひとこと', 300],
+    'prices.label': ['量など', 40], 'prices.price': ['値段', 40, true], 'badges.text': ['札', 30, true]
+  };
+  function isMenuKey(k) { return /^m:/.test(k); }
+  function menuRef(k) {
+    var m = /^m:([a-z0-9-]+)\.(\d+)\.(.+)$/.exec(k);
+    if (!m) return null;
+    var g = group(st.menu, m[1]), path = m[3].split('.');
+    if (!g || !g.items[Number(m[2])]) return null;
+    var field = path.filter(function (p) { return !/^\d+$/.test(p); }).join('.');
+    return MENU_FIELD[field] ? { gid: m[1], i: Number(m[2]), path: path, field: field, rule: MENU_FIELD[field], g: g } : null;
+  }
+  function menuGet(menu, ref) {
+    var o = group(menu, ref.gid).items[ref.i];
+    for (var j = 0; j < ref.path.length && o != null; j++) o = o[/^\d+$/.test(ref.path[j]) ? Number(ref.path[j]) : ref.path[j]];
+    return o == null ? '' : String(o);
+  }
+  function menuSet(menu, ref, v) {
+    var o = group(menu, ref.gid).items[ref.i];
+    for (var j = 0; j < ref.path.length - 1; j++) {
+      var p = /^\d+$/.test(ref.path[j]) ? Number(ref.path[j]) : ref.path[j];
+      if (o[p] == null) o[p] = {};
+      o = o[p];
+    }
+    o[ref.path[ref.path.length - 1]] = v;
+  }
+  /** ページの文でもメニューの字でも、{ page: {name}, part: {name}, item: { key, tag, text }, menu: ref } の形で返す。無ければ null */
+  function lookup(k) {
+    if (!isMenuKey(k)) return findText(st.texts, k);
+    var r = menuRef(k);
+    if (!r) return null;
+    var pg = st.texts.pages.filter(function (p) { return p.id === r.g.page; })[0];
+    return { page: { name: pg ? pg.name : r.g.page }, part: { name: r.g.title }, item: { key: k, tag: 'menu', text: menuGet(st.menu, r) }, menu: r };
+  }
+  function keyName(k) { var at = lookup(k); return at && at.menu ? at.menu.rule[0] : tagName(at ? at.item.tag : ''); }
+  /** メニューの字を確かめる。{val} か {err} */
+  function checkMenu(raw, rule, field) {
+    var val = String(raw).replace(/\r\n?/g, '\n').trim();
+    if (!rule[3]) val = val.replace(/\s*\n\s*/g, '');
+    if (/price$/.test(field)) val = price(val);
+    if (!val && rule[2]) return { err: rule[0] + 'は空にできません。消したいときは、メニューのタブで品を直してください。' };
+    if (val.length > rule[1]) return { err: rule[1] + '字までにしてください。' };
+    return { val: val };
+  }
+
   /* ---------- ページで直す（本物のページを中に出し、点線の文を押して直す） ----------
      ・ページは ホームページの ○○.html?edit。中の js/edit.js が文を点線で囲み、押した文の枠（p・li・dd・h3 など）をまるごと知らせてくる
      ・枠ごとまるごと直す（2026-11-04 ko-dai さんの指示：バグるマネージと同じに）：枠の中の文を1つの欄で直す。リンクの字なども、文ならいっしょに直せる。
@@ -412,7 +462,7 @@
         if (typeof d.tel === 'string' && d.tel.length < 40) pe.tel = d.tel;
         // ページは公開したときの文なので、管理画面の今の文（保存したばかりのもの・直している途中のもの）を入れて見せる
         var t = {};
-        (Array.isArray(d.keys) ? d.keys : []).forEach(function (k) { var at = findText(st.texts, k); if (at) t[k] = at.item.text; });
+        (Array.isArray(d.keys) ? d.keys : []).forEach(function (k) { var at = lookup(k); if (at) t[k] = at.item.text; });
         Object.keys(pe.cur).forEach(function (k) { t[k] = pe.cur[k]; });
         toFrame({ type: 'set', texts: t });
         if (pe.keys.length) toFrame({ type: 'pick', key: pe.keys[0] });
@@ -445,7 +495,7 @@
     list.forEach(function (p) {
       if (!p || typeof p !== 'object') return;
       var cs = p.cs && typeof p.cs === 'object' ? p.cs : null;
-      if (typeof p.k === 'string' && findText(st.texts, p.k) && !seen[p.k]) { seen[p.k] = 1; out.push({ k: p.k, cs: cs }); }
+      if (typeof p.k === 'string' && p.k.length < 80 && lookup(p.k) && !seen[p.k]) { seen[p.k] = 1; out.push({ k: p.k, cs: cs }); }
       else if (p.br === true) out.push({ br: true, cs: cs });
       else if (typeof p.t === 'string' && p.t.length <= 500) out.push({ t: p.t, cs: cs });
     });
@@ -462,26 +512,30 @@
     if (sameFrame && pe.dirty) { pe.piece = { pieces: pieces, st: frame && frame.st }; return mirrorDraw(); }   // 幅だけ変わった
     if (!sameFrame && !leaveText()) { if (pe.keys.length) toFrame({ type: 'pick', key: pe.keys[0] }); return; }
     pe.keys = keys; pe.orig = {}; pe.cur = {}; pe.dirty = false;
-    keys.forEach(function (k) { pe.orig[k] = pe.cur[k] = findText(st.texts, k).item.text; });
+    keys.forEach(function (k) { pe.orig[k] = pe.cur[k] = lookup(k).item.text; });
     pe.piece = { pieces: pieces, st: frame && frame.st && typeof frame.st === 'object' ? frame.st : null };
-    var first = findText(st.texts, keys[0]);
+    var first = lookup(keys[0]), allMenu = keys.every(isMenuKey);
     var mirror = h('div', { class: 'mirror', role: 'textbox', 'aria-multiline': 'true', 'aria-label': '直す文', spellcheck: 'false' });
     mirror.contentEditable = 'true';
     pe.box = mirror;
     var bold = button('太字', 'btn-sm', function () { mirror.focus(); document.execCommand('bold'); });
     bold.addEventListener('mousedown', function (e) { e.preventDefault(); });     // 選んだ字を外さない
     async function save() {
-      var texts = clone(st.texts), changed = [], bad = '';
+      // ページの文は文章として、メニューの字はメニューとして保存する（両方あれば、文章 → メニューの順に）
+      var texts = clone(st.texts), menu = clone(st.menu), tc = [], mc = [], bad = '';
       keys.forEach(function (k) {
-        var at = findText(texts, k), got = checkText(pe.cur[k], at.item.tag);
-        if (got.err) { bad = bad || ('「' + oneLine(pe.orig[k], 12) + '」のところ：' + got.err); return; }
-        if (got.val !== pe.orig[k]) { at.item.text = got.val; changed.push(got.val); }
+        var at = lookup(k), got = at.menu ? checkMenu(pe.cur[k], at.menu.rule, at.menu.field) : checkText(pe.cur[k], at.item.tag);
+        if (got.err) { bad = bad || ('「' + oneLine(pe.orig[k] || keyName(k), 12) + '」のところ：' + got.err); return; }
+        if (got.val === pe.orig[k]) return;
+        if (at.menu) { menuSet(menu, at.menu, got.val); mc.push(got.val); } else { findText(texts, k).item.text = got.val; tc.push(got.val); }
       });
       if (bad) return toast(bad, true);
-      if (!changed.length) { pe.dirty = false; return toast('変わっていません。'); }
-      var note = '文章：「' + oneLine(keys.map(function (k) { return findText(texts, k).item.text; }).join(''), 20) + '」に直しました';
-      if (await saveData('texts', texts, [], note, { stay: true, box: pe.ed })) {
-        keys.forEach(function (k) { pe.orig[k] = pe.cur[k] = findText(st.texts, k).item.text; });
+      if (!tc.length && !mc.length) { pe.dirty = false; return toast('変わっていません。'); }
+      var ok = true;
+      if (tc.length) ok = await saveData('texts', texts, [], '文章：「' + oneLine(tc.join(''), 20) + '」に直しました', { stay: true, box: pe.ed });
+      if (ok && mc.length) ok = await saveData('menu', menu, [], 'メニュー：「' + oneLine(mc.join(''), 20) + '」に直しました', { stay: true, box: pe.ed });
+      if (ok) {
+        keys.forEach(function (k) { pe.orig[k] = pe.cur[k] = lookup(k).item.text; });
         pe.dirty = false;
         mirrorDraw();
         toFrame({ type: 'set', texts: pe.cur });
@@ -495,12 +549,12 @@
     }
     var chips = pieces.some(function (p) { return p.t && p.t.trim(); });
     pe.ed.textContent = '';
-    pe.ed.appendChild(h('p', { class: 'hint where', text: first.page.name + ' ＞ ' + first.part.name + '（' + tagName(first.item.tag) + (keys.length > 1 ? '・枠ごと' : '') + '）' }));
+    pe.ed.appendChild(h('p', { class: 'hint where', text: first.page.name + ' ＞ ' + first.part.name + '（' + keyName(keys[0]) + (keys.length > 1 ? '・枠ごと' : '') + (allMenu ? '・メニューのタブと同じもの' : '') + '）' }));
     pe.ed.appendChild(h('div', { class: 'm-ed-wrap' }, [mirror]));
     pe.ed.appendChild(h('p', { class: 'hint', text: (pe.piece.st ? 'この欄は、ページの枠と同じ幅・同じ字の形と大きさです。改行の場所も、ページと同じになります。' : '') +
-      '打ったそばから、上のページの字が変わります。Enter で改行。太字にしたい字は、選んで「太字」を押します（もう一度押すと外れます）。' +
+      '打ったそばから、上のページの字が変わります。' + (allMenu ? (keys.some(function (k) { return lookup(k).menu.rule[3]; }) ? 'Enter で改行（説明だけ）。' : '') + 'メニューの字は、メニューのタブで直したのと同じに保存されます。' : 'Enter で改行。太字にしたい字は、選んで「太字」を押します（もう一度押すと外れます）。') +
       (chips || keys.some(function (k) { return pe.cur[k].indexOf('{{TEL}}') >= 0; }) ? '色の付いた字（電話番号など）は、ここでは打ち直せません。' : '') }));
-    pe.ed.appendChild(h('div', { class: 'ed-ft' }, [bold, button('元に戻す', '', undo), button('保存する', 'btn-main', save)]));
+    pe.ed.appendChild(h('div', { class: 'ed-ft' }, [allMenu ? null : bold, button('元に戻す', '', undo), button('保存する', 'btn-main', save)]));
     mirrorWire(mirror);
     mirrorDraw();
     toFrame({ type: 'pick', key: keys[0] });
@@ -531,7 +585,7 @@
         r.dataset.k = p.k;
         setStyle(r, p.cs);
         var text = pe.cur[p.k] || '';
-        text.split(/\*\*([\s\S]+?)\*\*/).forEach(function (piece, i) {
+        (isMenuKey(p.k) ? [text] : text.split(/\*\*([\s\S]+?)\*\*/)).forEach(function (piece, i) {   // メニューの字は ** を太字にしない
           var to = r;
           if (i % 2) { to = document.createElement('b'); r.appendChild(to); }
           piece.split('\n').forEach(function (line, j) {
@@ -583,7 +637,7 @@
         if (it.chip || it.k !== k) return;
         var t = it.t.split(ZW).join('').replace(/ /g, ' ');
         if (!t) return;
-        if (it.b !== bold) { s += '**'; bold = it.b; }
+        if (it.b !== bold && !isMenuKey(k)) { s += '**'; bold = it.b; }   // メニューの字には太字の印を付けない
         s += t;
       });
       if (bold) s += '**';
@@ -644,6 +698,7 @@
     box.addEventListener('keydown', function (e) {
       if (e.key !== 'Enter' || e.isComposing || composing) return;
       e.preventDefault();                       // 改行は、こちらで入れる（ブラウザが入れる <div> などにしない）
+      if (!lineOk()) return;                     // 改行できない欄（メニューの名前・値段など）
       insertPlain('\n');
     });
     box.addEventListener('paste', function (e) {   // 貼りつけは字だけ
@@ -651,6 +706,13 @@
       insertPlain(((e.clipboardData && e.clipboardData.getData('text/plain')) || '').replace(/\r\n?/g, '\n'));
     });
     box.addEventListener('drop', function (e) { e.preventDefault(); });
+  }
+  /** 打っている所の文で、改行できるか（メニューの字は説明だけ） */
+  function lineOk() {
+    var sel = window.getSelection(), n = sel.rangeCount ? sel.anchorNode : null;
+    var el = n && (n.nodeType === 1 ? n : n.parentElement), mk = el && el.closest('.mk');
+    var k = mk ? mk.dataset.k : pe.keys[0], at = k && lookup(k);
+    return !(at && at.menu && !at.menu.rule[3]);
   }
   /** 打つ所に字（改行は \n のまま）を入れて、作り直す */
   function insertPlain(text) {
@@ -781,7 +843,7 @@
       else if (k === 'sub') { var s = text(it.sub, '例：炊きたてご飯・コーンスープ'); el.appendChild(fld('小さい字の説明', 'なくてもよい', s)); get.sub = function () { return s.value.trim(); }; }
       else if (k === 'price') { var pr = text(it.price, '例：1,150', 'text'); el.appendChild(fld('値段', '「円」は入れなくてよい', pr)); get.price = function () { return price(pr.value); }; }
       else if (k === 'note') { var no = text(it.note, '例：ドレッシング：シーザー・ゴマ・和風'); el.appendChild(fld('一言', 'なくてもよい', no)); get.note = function () { return no.value.trim(); }; }
-      else if (k === 'copy') { var c = area(it.copy, 'お料理の説明'); el.appendChild(fld('説明', null, c)); get.copy = function () { return c.value.trim().replace(/\s*\n\s*/g, ''); }; }
+      else if (k === 'copy') { var c = area(it.copy, 'お料理の説明'); el.appendChild(fld('説明', null, c)); get.copy = function () { return c.value.replace(/\r\n?/g, '\n').trim(); }; }   // 説明は改行できる（2026-11-04） 
       else if (k === 'limit') { var l = text(it.limit, '例：1日20食限定'); el.appendChild(fld('赤い札', 'なくてもよい', l)); get.limit = function () { return l.value.trim(); }; }
       else if (k === 'badges') {
         var bs = rows(it.badges, function (b) {

@@ -286,8 +286,17 @@ def at(s):
     return html.escape(s or '', quote=True)
 
 
-def yen(p):
-    return '%s<small>円</small>' % tx(p)
+def mt(ref, s, br=False):
+    """メニューの字に、管理画面の「ページで直す」の印を付ける（<!--m:群.番号.欄--> 〜 <!--/m-->。見た目は変わらない）。
+    ref は「群の id.品の番号（menu.json の並び。お休みの品も数える）.欄」。br：改行を <br> にする（説明だけ）"""
+    body = tx(s)
+    if br:
+        body = body.replace('\n', '<br>')
+    return '<!--m:%s-->%s<!--/m-->' % (ref, body)
+
+
+def yen(p, ref=None):
+    return '%s<small>円</small>' % (mt(ref, p) if ref else tx(p))
 
 
 def soldout(it):
@@ -311,13 +320,15 @@ def sized(it):
     return pic(it, ' width="%d" height="%d" loading="lazy"' % (w, h))
 
 
-def li(it):
-    sub = '<small>%s</small>' % tx(it['sub']) if it.get('sub') else ''
-    return '<li><span class="nm">%s%s%s</span><span class="pr">%s</span></li>' % (tx(it['name']), sold(it), sub, yen(it['price']))
+# 品を作る関数の r は、印の頭（「群の id.品の番号.」）
+def li(it, r):
+    sub = '<small>%s</small>' % mt(r + 'sub', it['sub']) if it.get('sub') else ''
+    return '<li><span class="nm">%s%s%s</span><span class="pr">%s</span></li>' % (mt(r + 'name', it['name']), sold(it), sub, yen(it['price'], r + 'price'))
 
 
-def trs(it):
-    return ['  <tr><th>%s</th><td>%s</td></tr>' % (tx(r['label']), yen(r['price'])) for r in it['prices']]
+def trs(it, r):
+    return ['  <tr><th>%s</th><td>%s</td></tr>' % (mt(r + 'prices.%d.label' % j, x['label']), yen(x['price'], r + 'prices.%d.price' % j))
+            for j, x in enumerate(it['prices'])]
 
 
 def duo_yen(it):
@@ -332,68 +343,69 @@ def duo_yen(it):
     return ''.join(out)
 
 
-def mh(it, no):
+def mh(it, no, r):
     out = ['<article class="%s" id="%s">' % (cls('mh menu-sec', it), at(it['id'])),
            '  <figure>%s<span class="hb-no">%02d</span></figure>' % (pic(it), no),
            '  <div>']
     if it.get('badges'):
         out.append('    <div class="badges">%s</div>' % ''.join(
-            '<span class="badge%s">%s</span>' % (' is-' + b['color'] if b.get('color') else '', tx(b['text'])) for b in it['badges']))
-    out.append('    <h3>%s%s</h3>' % (tx(it['name']), sold(it)))
+            '<span class="badge%s">%s</span>' % (' is-' + b['color'] if b.get('color') else '', mt(r + 'badges.%d.text' % j, b['text'])) for j, b in enumerate(it['badges'])))
+    out.append('    <h3>%s%s</h3>' % (mt(r + 'name', it['name']), sold(it)))
     if it.get('copy'):
-        out.append('    <p class="mh-copy">%s</p>' % tx(it['copy']))
-    out += ['    <table class="price-tbl">'] + ['    ' + r for r in trs(it)] + ['    </table>']
+        out.append('    <p class="mh-copy">%s</p>' % mt(r + 'copy', it['copy'], True))
+    out += ['    <table class="price-tbl">'] + ['    ' + x for x in trs(it, r)] + ['    </table>']
     if it.get('tip'):
-        out.append('    <p class="tip"><b>%s</b>　%s</p>' % (tx(it['tip']['label']), tx(it['tip']['text'])))
+        out.append('    <p class="tip"><b>%s</b>　%s</p>' % (mt(r + 'tip.label', it['tip']['label']), mt(r + 'tip.text', it['tip']['text'])))
     return out + ['  </div>', '</article>']
 
 
-def card(it):
+def card(it, r):
     return ['<article class="%s">' % cls('card', it),
             '  <figure>%s</figure>' % pic(it),
-            '  <div class="card-body"><h3>%s%s</h3><p>%s</p>' % (tx(it['name']), sold(it), tx(it.get('copy'))),
-            '    <table class="price-tbl lunch">'] + ['    ' + r for r in trs(it)] + ['    </table></div>', '</article>']
+            '  <div class="card-body"><h3>%s%s</h3><p>%s</p>' % (mt(r + 'name', it['name']), sold(it), mt(r + 'copy', it.get('copy'), True)),
+            '    <table class="price-tbl lunch">'] + ['    ' + x for x in trs(it, r)] + ['    </table></div>', '</article>']
 
 
-def pic_card(it):
+def pic_card(it, r):
     out = ['<article class="%s">' % cls('pic-card', it),
            '  <figure class="pic-fig">%s</figure>' % sized(it),
            '  <div class="pic-body">',
-           '    <div class="pic-hd"><h4>%s%s</h4><span class="pr">%s</span></div>' % (tx(it['name']), sold(it), yen(it['price']))]
+           '    <div class="pic-hd"><h4>%s%s</h4><span class="pr">%s</span></div>' % (mt(r + 'name', it['name']), sold(it), yen(it['price'], r + 'price'))]
     if it.get('note'):
-        out.append('    <p class="note">%s</p>' % tx(it['note']))
+        out.append('    <p class="note">%s</p>' % mt(r + 'note', it['note']))
     return out + ['  </div>', '</article>']
 
 
-def duo(it):
+def duo(it, r):
+    # 値段は、量の名前と「〜」をはさんで作るので、ページで直す印は付けない（メニューのタブで直す）
     out = ['<article class="%s">' % cls('duo-item', it), '  ' + pic(it), '  <div class="duo-body">']
     if it.get('limit'):
-        out.append('    <span class="limit">%s</span>' % tx(it['limit']))
-    out.append('    <h3>%s%s</h3>' % (tx(it['name']), sold(it)))
+        out.append('    <span class="limit">%s</span>' % mt(r + 'limit', it['limit']))
+    out.append('    <h3>%s%s</h3>' % (mt(r + 'name', it['name']), sold(it)))
     if it.get('copy'):
-        out.append('    <p>%s</p>' % tx(it['copy']))
+        out.append('    <p>%s</p>' % mt(r + 'copy', it['copy'], True))
     return out + ['    <span class="yen">%s</span>' % duo_yen(it), '  </div>', '</article>']
 
 
-def mini(it):
-    ps = '／'.join('<span class="yen">%s</span>円' % tx(r['price']) for r in it['prices'])
-    return ['<article class="%s">%s<div><h4>%s%s</h4><p>%s</p></div></article>' % (cls('mini', it), pic(it), tx(it['name']), sold(it), ps)]
+def mini(it, r):
+    ps = '／'.join('<span class="yen">%s</span>円' % mt(r + 'prices.%d.price' % j, x['price']) for j, x in enumerate(it['prices']))
+    return ['<article class="%s">%s<div><h4>%s%s</h4><p>%s</p></div></article>' % (cls('mini', it), pic(it), mt(r + 'name', it['name']), sold(it), ps)]
 
 
 def group_lines(g):
-    items = [it for it in g['items'] if it.get('status') != 'paused']
+    items = [('%s.%d.' % (g['id'], i), it) for i, it in enumerate(g['items']) if it.get('status') != 'paused']
     k = g['type']
     if k == 'plist':
-        return [li(it) for it in items]
+        return [li(it, r) for r, it in items]
     if k == 'pic-set':
         return (['<div class="pic-set">', '  <figure class="pic-fig">%s</figure>' % sized(g), '  <ul class="plist">']
-                + ['    ' + li(it) for it in items] + ['  </ul>', '</div>'])
+                + ['    ' + li(it, r) for r, it in items] + ['  </ul>', '</div>'])
     if k == 'mini':
-        return [x for it in items for x in mini(it)]
+        return [x for r, it in items for x in mini(it, r)]
     if k == 'mh':
-        blocks = [mh(it, i + 1) for i, it in enumerate(items)]
+        blocks = [mh(it, n + 1, r) for n, (r, it) in enumerate(items)]
     else:
-        blocks = [{'card': card, 'pic-card': pic_card, 'duo': duo}[k](it) for it in items]
+        blocks = [{'card': card, 'pic-card': pic_card, 'duo': duo}[k](it, r) for r, it in items]
     out = []
     for b in blocks:
         out += ([''] if out and k == 'mh' else []) + b

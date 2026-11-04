@@ -8,7 +8,7 @@
    ・品の形の決まり（TYPE_KEYS・cleanItem_ など）と文章の決まり（mergeTexts_）は 管理/にせの受け口.py と同じにしておく。片方を変えたら、もう片方も直す
    ・置きかたは 受け口の作りかた.md */
 
-var VERSION = '2026-11-04a';
+var VERSION = '2026-11-04b';
 var SITE_URL = 'https://t3dining.github.io/baguru';   // ホームページの場所（作る.py の SITE_URL と同じ。タブの小さな絵に使う）
 var BRANCH = 'main';
 var WORKFLOW = 'publish.yml';
@@ -205,6 +205,10 @@ function cleanItem_(kind, it) {
     } else if (k === 'photo') {
       if (!PHOTO_NAME.test(String(v))) throw bad_('bad_data');
       o[k] = String(v);
+    } else if (k === 'copy') {   // 説明は改行できる（2026-11-04。にせの受け口.py と同じ）
+      var c = String(v).replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, '').trim();
+      if (c.length > LIMITS.copy) throw bad_('bad_data');
+      o[k] = c;
     } else {
       o[k] = clean_(v, LIMITS[k]);
     }
