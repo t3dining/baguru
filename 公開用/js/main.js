@@ -15,10 +15,36 @@
     if (/[?&]from=owner\b/.test(location.search)) sessionStorage.setItem('bg.fromOwner', '1');
     fromOwner = sessionStorage.getItem('bg.fromOwner') === '1';
   } catch (e) { fromOwner = /[?&]from=owner\b/.test(location.search); }
+  /* 新しい場所の Owner（t3dining-store.github.io。2026-11-05 にお店用のアプリだけ引っ越した）は、このページを枠（iframe）にはめ込んで開く。
+     はめ込まれていて Owner から来たときだけ（管理画面の「ページで直す」＝ ?edit は別）：
+     ・🏠 は、枠の外の窓ごと Owner に戻す（target="_top"）
+     ・ホームページの外へのリンクは、枠の中で開かない。公式アプリは窓ごと移す（アプリの 🏠 で Owner に戻れる）。地図・Instagram などは新しい窓。電話は窓ごと
+     ★お客さまがふつうに開いたとき（枠の外）は、何も変えない */
+  var framed = false;
+  try { framed = window.top !== window; } catch (e) { framed = true; }
+  var inOwner = framed && fromOwner && !/[?&]edit\b/.test(location.search);
+  var OWNER_URL = 'https://t3dining-store.github.io/baguru-owner/';
+  if (inOwner) {
+    body.classList.add('in-owner');
+    if (ownerHome) { ownerHome.href = OWNER_URL; ownerHome.target = '_top'; }
+    var siteRoot = location.href.split(/[?#]/)[0].replace(/[^/]*$/, '');   // このページのフォルダ（公開先では …/baguru/）
+    document.addEventListener('click', function (e) {
+      var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+      if (!a || a === ownerHome) return;
+      var u;
+      try { u = new URL(a.getAttribute('href'), location.href); } catch (x) { return; }
+      if (/^(tel|mailto|sms):$/.test(u.protocol)) { a.target = '_top'; return; }
+      if (!/^https?:$/.test(u.protocol) || u.href.indexOf(siteRoot) === 0) return;   // ホームページの中は、枠の中のまま
+      if (u.hostname === 't3dining.github.io' && u.pathname.indexOf('/baguru-app/') === 0) { a.target = '_top'; return; }
+      a.target = '_blank';
+      a.rel = 'noopener';
+    }, true);
+  }
   if (ownerHome && fromOwner) {
     ownerHome.hidden = false;
     body.classList.add('from-owner');
     ownerHome.addEventListener('click', function (e) {
+      if (inOwner) return;   // はめ込まれているときは、上の target="_top" のまま Owner へ
       var to = '';
       try { to = sessionStorage.getItem('bg.owner') || ''; } catch (x) { to = ''; }
       if (to) { e.preventDefault(); location.href = to; }
