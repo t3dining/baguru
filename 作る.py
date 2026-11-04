@@ -45,7 +45,7 @@ SITE_URL = 'https://t3dining.github.io/baguru'  # 会社の GitHub（無料）�
 #   中身は SITE_URL/PREVIEW/ に置く。そのアドレスはどこにも載せず、管理画面とバグる Owner からだけ開く
 #   ★会社の GitHub の置き場所は誰でも見られる（無料のため）ので、探せば中身も見える。本当の秘密は置かない
 #   本当に公開する日に COMING_SOON を False にする（中身が SITE_URL に出る）。バグる Owner のホームページのカードのアドレスも、そのとき直す
-COMING_SOON = True
+COMING_SOON = False   # 2026-11-04 夕方に外した（ko-dai さんの指示：「検索で出なければいいので、coming soon も外して」）。検索に出さないのは SAMPLE の noindex
 PREVIEW = 'naka-f90249acdb'
 BASE_URL = SITE_URL + '/' + PREVIEW if COMING_SOON else SITE_URL   # 中身のページの場所（canonical・OGP・管理画面が開くページ）
 ORDER_URL = 'https://t3dining.github.io/baguru-app/takeout.html#menu'  # ★モバイルオーダーの受け口（会社の GitHub の店舗アプリの、注文だけの画面。order.html はお店のタブレットの画面なので、つながない）

@@ -7,8 +7,8 @@
 <meta name="robots" content="noindex, nofollow">
 <title>ホームページの管理｜バグる</title>
 <meta name="theme-color" content="#15110f">
-<link rel="icon" href="https://t3dining.github.io/baguru/naka-f90249acdb/img/icon-192.png" sizes="192x192">
-<link rel="apple-touch-icon" href="https://t3dining.github.io/baguru/naka-f90249acdb/img/apple-touch-icon.png">
+<link rel="icon" href="https://t3dining.github.io/baguru/img/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="https://t3dining.github.io/baguru/img/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="HPの管理">
 <!-- ホームページと同じ字（「ページで直す」の直す欄の字の形を、ページとそろえるため） -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -171,9 +171,9 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-
      ★ホームページには置かない。Google の受け口が出す（作る.py が 管理/受け口/画面.html にまとめる）。この Mac では 管理画面を試す.command で開く -->
 <header class="top">
   <a class="top-home" id="owner-home" href="https://t3dining.github.io/baguru-owner/" target="_top" hidden aria-label="バグる Owner に戻る">🏠</a>
-  <img src="https://t3dining.github.io/baguru/naka-f90249acdb/img/logo.png" alt="" width="40" height="40">
+  <img src="https://t3dining.github.io/baguru/img/logo.png" alt="" width="40" height="40">
   <div class="top-ttl"><b>ホームページの管理</b><small>炭焼ハンバーグ バグる</small></div>
-  <a class="top-site" id="site-link" href="https://t3dining.github.io/baguru/naka-f90249acdb/" target="_blank" rel="noopener">ホームページを見る</a>
+  <a class="top-site" id="site-link" href="https://t3dining.github.io/baguru/" target="_blank" rel="noopener">ホームページを見る</a>
 </header>
 
 <main class="main">
@@ -225,7 +225,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-
 </div>
 
 <div class="toast" id="toast" role="status" hidden></div>
-<script>window.KANRI = {"site": "https://t3dining.github.io/baguru/naka-f90249acdb"};</script>
+<script>window.KANRI = {"site": "https://t3dining.github.io/baguru"};</script>
 <script>
 /* ホームページの管理画面（お知らせ・メニューの写真・名前・値段・ページの文章）
    ・この画面は Google の受け口（管理/受け口/コード.gs）が出す。ホームページには置かない（URL を知っている人だけが開ける）
@@ -241,7 +241,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-
   var LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
   var CONF = window.KANRI || {};                     // 画面.html では { site: ホームページのアドレス }（作る.py が入れる）
   var GAS = !LOCAL && !!(window.google && google.script && google.script.run);
-  var IMG = LOCAL ? 'https://t3dining.github.io/baguru/naka-f90249acdb/img/' : (CONF.site || '') + '/img/';   // 写真はホームページから読む
+  var IMG = LOCAL ? 'https://t3dining.github.io/baguru/img/' : (CONF.site || '') + '/img/';   // 写真はホームページから読む
   var PIN_KEY = 'baguru-kanri-pin';
   var NEWS_CATS = ['お知らせ', 'イベント', 'テイクアウト', 'メニュー', '営業日'];
   var LINKS = [['', 'リンクなし'], ['menu.html', 'メニュー'], ['takeout.html', 'テイクアウト'], ['reserve.html', 'ご予約'],
