@@ -24,6 +24,18 @@
       if (to) { e.preventDefault(); location.href = to; }
     });
   }
+  /* 公式アプリ（baguru-app/。モバイルオーダーの takeout.html・アプリを開く）へのリンクにも from=owner を足す（2026-11-04）。
+     アプリの側が「🏠 ホーム」とテスト用アカウントにする。同じタブなので sessionStorage の印も届くが、消えていたときのため */
+  if (fromOwner) {
+    Array.prototype.forEach.call(document.querySelectorAll('a[href*="t3dining.github.io/baguru-app/"]'), function (a) {
+      try {
+        var u = new URL(a.href);
+        if (u.hostname !== 't3dining.github.io' || u.pathname.indexOf('/baguru-app/') !== 0) return;
+        u.searchParams.set('from', 'owner');
+        a.href = u.href;
+      } catch (x) {}
+    });
+  }
   var toggle = document.querySelector('.nav-toggle');
   function closeNav() {
     body.classList.remove('nav-open');
