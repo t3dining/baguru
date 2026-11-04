@@ -13,7 +13,8 @@
 
   var up = window.parent;
   if (up === window) return;
-  var FROM = /^https:\/\/[a-z0-9-]+\.script\.googleusercontent\.com$/;   // Google の受け口が出す管理画面
+  // Google の受け口が出す管理画面の場所（n-…-0lu-script.googleusercontent.com の形。2026-11-04 に本物で確かめた。前は「.script.」の形だけを受けていて、打った文がページに出なかった）
+  var FROM = /^https:\/\/[a-z0-9-]+[.-]script\.googleusercontent\.com$/;
   var JA = /[぀-ヿ㐀-鿿！-｠]/;
   // 管理画面の直す欄に写す字の形（枠と、枠の中の字のかたまりごと）
   var CS_FRAME = ['fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'letterSpacing', 'lineHeight', 'wordBreak', 'overflowWrap', 'lineBreak',
