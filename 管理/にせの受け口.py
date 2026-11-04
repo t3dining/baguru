@@ -63,12 +63,22 @@ LINKS = ['menu.html', 'takeout.html', 'reserve.html', 'access.html', 'concept.ht
 PHOTO_NAME = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._-]{0,80}\.jpg$')
 NEW_PHOTO = re.compile(r'^u-\d{8}-\d{6}-[a-z0-9]{4}\.jpg$')
 DATAS = ('menu', 'news', 'texts')
-ONE_LINE = {'title': 80, 'desc': 200, 'hero': 40, 'herosub': 80}   # 改行できない文の種類と字数の上限（kanri.js・コード.gs と同じ）
+ONE_LINE = {'title': 80, 'desc': 200}   # 改行できない文の種類と字数の上限（kanri.js・コード.gs と同じ）
+SHORT = {'hero': 40, 'herosub': 80}      # 改行できるが短くしておく文（2026-11-04c から改行できる）
 TEXT_MAX = 1000
+LINES = ('name', 'sub', 'copy', 'note')  # 品の欄で改行できるもの（と一言の文 tip.text。kanri.js の MENU_FIELD の4つめ・コード.gs と同じ）
 
 
 class Bad(Exception):
     pass
+
+
+def lines_(v, n):
+    """改行（\\n）だけは残す s_（品の LINES の欄と一言の文。コード.gs の cleanLines_ と同じ）"""
+    v = re.sub(r'[\x00-\x09\x0b-\x1f\x7f]', '', re.sub(r'\r\n?', '\n', str(v if v is not None else ''))).strip()
+    if len(v) > n:
+        raise Bad('bad_data')
+    return v
 
 
 def s_(v, n):
@@ -95,8 +105,8 @@ def clean_item(kind, it):
             if ps:
                 out[k] = ps
         elif k == 'tip':
-            if isinstance(v, dict) and s_(v.get('text'), 300):
-                out[k] = {'label': s_(v.get('label'), 20), 'text': s_(v.get('text'), 300)}
+            if isinstance(v, dict) and lines_(v.get('text'), 300):   # 一言の文は改行できる（2026-11-04c。コード.gs と同じ）
+                out[k] = {'label': s_(v.get('label'), 20), 'text': lines_(v.get('text'), 300)}
         elif k == 'status':
             if v in ('soldout', 'paused'):
                 out[k] = v
@@ -108,11 +118,8 @@ def clean_item(kind, it):
             if not PHOTO_NAME.match(str(v)):
                 raise Bad('bad_data')
             out[k] = v
-        elif k == 'copy':                   # 説明は改行できる（2026-11-04。コード.gs と同じ）
-            c = re.sub(r'[\x00-\x09\x0b-\x1f\x7f]', '', str(v)).strip()
-            if len(c) > LIMITS[k]:
-                raise Bad('bad_data')
-            out[k] = c
+        elif k in LINES:                    # 名前・小さい字の説明・説明・ひとことは改行できる（2026-11-04c。コード.gs と同じ）
+            out[k] = lines_(v, LIMITS[k])
         else:
             out[k] = s_(v, LIMITS[k])
     keys = TYPE_KEYS[kind]
@@ -191,7 +198,7 @@ def merge_texts(cur, inc):
                 n = ONE_LINE.get(x['tag'])
                 if n:
                     v = re.sub(r'\s*\n\s*', '', v)
-                if not v or len(v) > (n or TEXT_MAX):
+                if not v or len(v) > (n or SHORT.get(x['tag']) or TEXT_MAX):
                     raise Bad('bad_data')
                 x['text'] = v
     return out

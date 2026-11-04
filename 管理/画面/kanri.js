@@ -45,7 +45,9 @@
   var TAGS = { title: 'ページの題（検索結果に出る）', desc: '検索結果に出る説明', hero: 'ページの上の大きな見出し', herosub: '大きな見出しの下の字',
     h1: '大きな見出し', h2: '見出し', h3: '小見出し', h4: '小見出し', summary: '質問', figcaption: '写真の説明', dt: '項目の名前', dd: '項目の中身',
     th: '表の項目', td: '表の中身', li: '箇条書き', legend: '入力欄の見出し', label: '入力欄の名前', a: 'リンクの字', small: '小さい字', address: '住所' };
-  var ONE_LINE = { title: 80, desc: 200, hero: 40, herosub: 80 };
+  var ONE_LINE = { title: 80, desc: 200 };
+  // 改行できるが、短くしておく文（ページの上の大きな見出しと、その下の字。2026-11-04c から改行できる）
+  var SHORT = { hero: 40, herosub: 80 };
   var TEXT_MAX = 1000;
 
   var st = { pin: '', menu: null, news: null, texts: null, sha: {}, tab: 'news', tpage: 'index', tq: '', tmode: 'page', tdev: 'sp', fresh: {}, watch: 0, dirty: false };
@@ -232,10 +234,10 @@
   function textRows(x) { return Math.min(14, Math.max(ONE_LINE[x.tag] ? 2 : 3, Math.ceil(x.text.length / 24) + (x.text.match(/\n/g) || []).length)); }
   /** 入れた文を確かめる。{val} か {err} */
   function checkText(raw, tag) {
-    var one = ONE_LINE[tag], val = raw.replace(/\r\n?/g, '\n').trim();
+    var one = ONE_LINE[tag], max = one || SHORT[tag] || TEXT_MAX, val = raw.replace(/\r\n?/g, '\n').trim();
     if (one) val = val.replace(/\s*\n\s*/g, '');
     if (!val) return { err: '文を入れてください。文ごと消したいときは、Claude に頼んでください。' };
-    if (val.length > (one || TEXT_MAX)) return { err: (one || TEXT_MAX) + '字までにしてください。' };
+    if (val.length > max) return { err: max + '字までにしてください。' };
     return { val: val };
   }
   function saveText(key, val, opts) {
@@ -314,8 +316,8 @@
      ・ページで直すで押した字がメニューの字なら、メニューのタブと同じもの（st.menu）を直して、メニューとして保存する（2026-11-04 ko-dai さんの指示）
      ・欄ごとの決まり（呼び名・字数の上限・空にできないか・改行できるか）は MENU_FIELD。字数の上限は コード.gs・にせの受け口.py の LIMITS と同じ */
   var MENU_FIELD = {
-    name: ['名前', 80, true], sub: ['小さい字の説明', 120], copy: ['説明', 600, false, true], price: ['値段', 40, true],
-    note: ['ひとこと', 200], limit: ['赤い札', 30], 'tip.label': ['ひとことの見出し', 20], 'tip.text': ['ひとこと', 300],
+    name: ['名前', 80, true, true], sub: ['小さい字の説明', 120, false, true], copy: ['説明', 600, false, true], price: ['値段', 40, true],
+    note: ['ひとこと', 200, false, true], limit: ['赤い札', 30], 'tip.label': ['ひとことの見出し', 20], 'tip.text': ['ひとこと', 300, false, true],
     'prices.label': ['量など', 40], 'prices.price': ['値段', 40, true], 'badges.text': ['札', 30, true]
   };
   function isMenuKey(k) { return /^m:/.test(k); }
@@ -574,7 +576,7 @@
     pe.ed.appendChild(h('p', { class: 'hint where', text: first.page.name + ' ＞ ' + first.part.name + '（' + keyName(keys[0]) + (keys.length > 1 ? '・枠ごと' : '') + (allMenu ? '・メニューのタブと同じもの' : '') + '）' }));
     pe.ed.appendChild(h('div', { class: 'm-ed-wrap' }, [mirror]));
     pe.ed.appendChild(h('p', { class: 'hint', text: (pe.piece.st ? 'この欄は、ページの枠と同じ幅・同じ字の形と大きさです。改行の場所も、ページと同じになります。' : '') +
-      '打ったそばから、上のページの字が変わります。' + (allMenu ? (keys.some(function (k) { return lookup(k).menu.rule[3]; }) ? 'Enter で改行（説明だけ。上で選んでいる「スマホ」か「パソコン」の形だけに入ります）。' : '') + 'メニューの字は、メニューのタブで直したのと同じに保存されます。' : 'Enter で改行（上で選んでいる「スマホ」か「パソコン」の形だけに入ります。両方に入れたいときは、両方の形で入れます）。太字にしたい字は、選んで「太字」を押します（もう一度押すと外れます）。') +
+      '打ったそばから、上のページの字が変わります。' + (allMenu ? (keys.some(function (k) { return lookup(k).menu.rule[3]; }) ? 'Enter で改行（値段・札・量などは1行のまま。上で選んでいる「スマホ」か「パソコン」の形だけに入ります）。' : '') + 'メニューの字は、メニューのタブで直したのと同じに保存されます。' : 'Enter で改行（上で選んでいる「スマホ」か「パソコン」の形だけに入ります。両方に入れたいときは、両方の形で入れます）。太字にしたい字は、選んで「太字」を押します（もう一度押すと外れます）。') +
       (chips || keys.some(function (k) { return pe.cur[k].indexOf('{{TEL}}') >= 0; }) ? '色の付いた字（電話番号など）は、ここでは打ち直せません。' : '') }));
     pe.ed.appendChild(h('div', { class: 'ed-ft' }, [allMenu ? null : bold, button('元に戻す', '', undo), button('保存する', 'btn-main', save)]));
     mirrorWire(mirror);
@@ -743,7 +745,7 @@
     });
     box.addEventListener('drop', function (e) { e.preventDefault(); });
   }
-  /** 打っている所の文で、改行できるか（メニューの字は説明だけ） */
+  /** 打っている所の文で、改行できるか（メニューの字は、名前・小さい字の説明・説明・ひとこと・一言の文だけ。MENU_FIELD の4つめ） */
   function lineOk() {
     var sel = window.getSelection(), n = sel.rangeCount ? sel.anchorNode : null;
     var el = n && (n.nodeType === 1 ? n : n.parentElement), mk = el && el.closest('.mk');
@@ -798,6 +800,15 @@
   }
   function text(v, ph, mode) { return h('input', { type: 'text', value: v || '', placeholder: ph || '', inputmode: mode || null, autocomplete: 'off' }); }
   function area(v, ph) { var t = h('textarea', { placeholder: ph || '' }); t.value = v || ''; return t; }
+  /** 1行の欄に見えるが、改行も入る欄（品の名前・小さい字の説明・ひとこと。ふつうの input だと、ページで直すで入れた改行が消えるため） */
+  function lines(v, ph) {
+    var t = h('textarea', { class: 'lines', rows: '1', placeholder: ph || '' });
+    t.value = v || '';
+    var fit = function () { t.rows = Math.min(6, (t.value.match(/\n/g) || []).length + 1); };
+    t.addEventListener('input', fit); fit();
+    return t;
+  }
+  function linesVal(t) { return t.value.replace(/\r\n?/g, '\n').replace(/[ \t]*\n[ \t]*/g, '\n').replace(/\n{2,}/g, '\n').trim(); }
   function select(opts, v) {
     var s = h('select');
     opts.forEach(function (o) { s.appendChild(h('option', { value: o[0], text: o[1] })); });
@@ -875,10 +886,10 @@
     var el = h('div'), get = {};
     FIELDS[type].forEach(function (k) {
       if (k === 'photo') { var p = photoField(it.photo, it.alt, size || [900, 675]); el.appendChild(fld('写真', null, p)); get.photo = p.read; }
-      else if (k === 'name') { var n = text(it.name, '例：超粗びきハンバーグ'); el.appendChild(fld('名前', null, n)); get.name = function () { return n.value.trim(); }; }
-      else if (k === 'sub') { var s = text(it.sub, '例：炊きたてご飯・コーンスープ'); el.appendChild(fld('小さい字の説明', 'なくてもよい', s)); get.sub = function () { return s.value.trim(); }; }
+      else if (k === 'name') { var n = lines(it.name, '例：超粗びきハンバーグ'); el.appendChild(fld('名前', null, n)); get.name = function () { return linesVal(n); }; }
+      else if (k === 'sub') { var s = lines(it.sub, '例：炊きたてご飯・コーンスープ'); el.appendChild(fld('小さい字の説明', 'なくてもよい', s)); get.sub = function () { return linesVal(s); }; }
       else if (k === 'price') { var pr = text(it.price, '例：1,150', 'text'); el.appendChild(fld('値段', '「円」は入れなくてよい', pr)); get.price = function () { return price(pr.value); }; }
-      else if (k === 'note') { var no = text(it.note, '例：ドレッシング：シーザー・ゴマ・和風'); el.appendChild(fld('一言', 'なくてもよい', no)); get.note = function () { return no.value.trim(); }; }
+      else if (k === 'note') { var no = lines(it.note, '例：ドレッシング：シーザー・ゴマ・和風'); el.appendChild(fld('一言', 'なくてもよい', no)); get.note = function () { return linesVal(no); }; }
       else if (k === 'copy') { var c = area(it.copy, 'お料理の説明'); el.appendChild(fld('説明', null, c)); get.copy = function () { return c.value.replace(/\r\n?/g, '\n').trim(); }; }   // 説明は改行できる（2026-11-04） 
       else if (k === 'limit') { var l = text(it.limit, '例：1日20食限定'); el.appendChild(fld('赤い札', 'なくてもよい', l)); get.limit = function () { return l.value.trim(); }; }
       else if (k === 'badges') {
@@ -898,9 +909,9 @@
         }, '＋ 行を足す', 8);
         el.appendChild(fld('値段', '左に量など、右に値段', ps)); get.prices = ps.read;
       } else if (k === 'tip') {
-        var tl = text(it.tip && it.tip.label, '例：食べ方'), tt = text(it.tip && it.tip.text, '例：アツアツの焼石に載せて…');
+        var tl = text(it.tip && it.tip.label, '例：食べ方'), tt = area(it.tip && it.tip.text, '例：アツアツの焼石に載せて…');   // 一言は改行できる（2026-11-04）
         el.appendChild(fld('一言', 'なくてもよい', h('div', { class: 'pair is-tip' }, [tl, tt])));
-        get.tip = function () { return tt.value.trim() ? { label: tl.value.trim(), text: tt.value.trim() } : null; };
+        get.tip = function () { var v = linesVal(tt); return v ? { label: tl.value.trim(), text: v } : null; };
       }
     });
     var stat = radios(STATUS, it.status);

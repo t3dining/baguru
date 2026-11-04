@@ -30,6 +30,7 @@ img{max-width:100%; display:block}
 
 input[type=text],input[type=password],input[type=date],select,textarea{width:100%; padding:10px 12px; border:1px solid var(--line2); border-radius:6px; background:#fff; font-size:16px}
 textarea{min-height:120px; resize:vertical; line-height:1.7}
+textarea.lines{min-height:0; resize:none; line-height:1.5; overflow:hidden}   /* 1行に見えて、改行も入る欄（kanri.js の lines） */
 input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-offset:1px; border-color:var(--ember)}
 
 .btn{display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:44px; padding:8px 18px; border:1px solid var(--line2); border-radius:6px; background:#fff; font-weight:700; cursor:pointer; white-space:nowrap}
@@ -119,7 +120,8 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-
 .fld .opt{font-weight:500; color:var(--muted); font-size:12px; margin-left:6px}
 .pair{display:grid; grid-template-columns:1fr 130px auto; gap:6px; margin-bottom:6px; align-items:center}
 .pair.is-badge{grid-template-columns:1fr 110px auto}
-.pair.is-tip{grid-template-columns:110px 1fr}
+.pair.is-tip{grid-template-columns:110px 1fr; align-items:start}
+.pair.is-tip textarea{min-height:64px}
 .x{width:36px; height:36px; border:1px solid var(--line2); border-radius:6px; background:#fff; color:var(--muted); cursor:pointer; font-size:18px; line-height:1}
 .seg{display:flex; flex-wrap:wrap; gap:6px}
 .seg label{display:flex; align-items:center; gap:6px; padding:8px 12px; border:1px solid var(--line2); border-radius:6px; background:#fff; cursor:pointer; font-size:14px}

@@ -339,8 +339,8 @@ def sized(it):
 
 # 品を作る関数の r は、印の頭（「群の id.品の番号.」）
 def li(it, r):
-    sub = '<small>%s</small>' % mt(r + 'sub', it['sub']) if it.get('sub') else ''
-    return '<li><span class="nm">%s%s%s</span><span class="pr">%s</span></li>' % (mt(r + 'name', it['name']), sold(it), sub, yen(it['price'], r + 'price'))
+    sub = '<small>%s</small>' % mt(r + 'sub', it['sub'], True) if it.get('sub') else ''
+    return '<li><span class="nm">%s%s%s</span><span class="pr">%s</span></li>' % (mt(r + 'name', it['name'], True), sold(it), sub, yen(it['price'], r + 'price'))
 
 
 def trs(it, r):
@@ -367,19 +367,19 @@ def mh(it, no, r):
     if it.get('badges'):
         out.append('    <div class="badges">%s</div>' % ''.join(
             '<span class="badge%s">%s</span>' % (' is-' + b['color'] if b.get('color') else '', mt(r + 'badges.%d.text' % j, b['text'])) for j, b in enumerate(it['badges'])))
-    out.append('    <h3>%s%s</h3>' % (mt(r + 'name', it['name']), sold(it)))
+    out.append('    <h3>%s%s</h3>' % (mt(r + 'name', it['name'], True), sold(it)))
     if it.get('copy'):
         out.append('    <p class="mh-copy">%s</p>' % mt(r + 'copy', it['copy'], True))
     out += ['    <table class="price-tbl">'] + ['    ' + x for x in trs(it, r)] + ['    </table>']
     if it.get('tip'):
-        out.append('    <p class="tip"><b>%s</b>　%s</p>' % (mt(r + 'tip.label', it['tip']['label']), mt(r + 'tip.text', it['tip']['text'])))
+        out.append('    <p class="tip"><b>%s</b>　%s</p>' % (mt(r + 'tip.label', it['tip']['label']), mt(r + 'tip.text', it['tip']['text'], br=True)))
     return out + ['  </div>', '</article>']
 
 
 def card(it, r):
     return ['<article class="%s">' % cls('card', it),
             '  <figure>%s</figure>' % pic(it),
-            '  <div class="card-body"><h3>%s%s</h3><p>%s</p>' % (mt(r + 'name', it['name']), sold(it), mt(r + 'copy', it.get('copy'), True)),
+            '  <div class="card-body"><h3>%s%s</h3><p>%s</p>' % (mt(r + 'name', it['name'], True), sold(it), mt(r + 'copy', it.get('copy'), True)),
             '    <table class="price-tbl lunch">'] + ['    ' + x for x in trs(it, r)] + ['    </table></div>', '</article>']
 
 
@@ -387,9 +387,9 @@ def pic_card(it, r):
     out = ['<article class="%s">' % cls('pic-card', it),
            '  <figure class="pic-fig">%s</figure>' % sized(it),
            '  <div class="pic-body">',
-           '    <div class="pic-hd"><h4>%s%s</h4><span class="pr">%s</span></div>' % (mt(r + 'name', it['name']), sold(it), yen(it['price'], r + 'price'))]
+           '    <div class="pic-hd"><h4>%s%s</h4><span class="pr">%s</span></div>' % (mt(r + 'name', it['name'], True), sold(it), yen(it['price'], r + 'price'))]
     if it.get('note'):
-        out.append('    <p class="note">%s</p>' % mt(r + 'note', it['note']))
+        out.append('    <p class="note">%s</p>' % mt(r + 'note', it['note'], True))
     return out + ['  </div>', '</article>']
 
 
@@ -398,7 +398,7 @@ def duo(it, r):
     out = ['<article class="%s">' % cls('duo-item', it), '  ' + pic(it), '  <div class="duo-body">']
     if it.get('limit'):
         out.append('    <span class="limit">%s</span>' % mt(r + 'limit', it['limit']))
-    out.append('    <h3>%s%s</h3>' % (mt(r + 'name', it['name']), sold(it)))
+    out.append('    <h3>%s%s</h3>' % (mt(r + 'name', it['name'], True), sold(it)))
     if it.get('copy'):
         out.append('    <p>%s</p>' % mt(r + 'copy', it['copy'], True))
     return out + ['    <span class="yen">%s</span>' % duo_yen(it), '  </div>', '</article>']
@@ -406,7 +406,7 @@ def duo(it, r):
 
 def mini(it, r):
     ps = '／'.join('<span class="yen">%s</span>円' % mt(r + 'prices.%d.price' % j, x['price']) for j, x in enumerate(it['prices']))
-    return ['<article class="%s">%s<div><h4>%s%s</h4><p>%s</p></div></article>' % (cls('mini', it), pic(it), mt(r + 'name', it['name']), sold(it), ps)]
+    return ['<article class="%s">%s<div><h4>%s%s</h4><p>%s</p></div></article>' % (cls('mini', it), pic(it), mt(r + 'name', it['name'], True), sold(it), ps)]
 
 
 def group_lines(g):
@@ -518,10 +518,11 @@ def put_texts(s):
 
 
 def meta(page):
-    """ページの題・検索結果の説明・大きな見出しとその下の字（改行は消す）と、飾りの英字・写真"""
+    """ページの題・検索結果の説明・大きな見出しとその下の字（改行と改行の印は消す）と、飾りの英字・写真。
+    大きな見出しとその下の字は改行できる（2026-11-04c）。改行を入れて出すのは page_hero の中だけ（パンくずリスト・検索の情報は1行）"""
     p = dict(PAGES[page])
     for k in ('title', 'desc') if page == 'index' else ('title', 'desc', 'h1', 'sub'):
-        p[k] = text_of('%s-%s' % (page, k)).replace('\n', '')
+        p[k] = re.sub(r'\s*(\n|%s|%s)\s*' % (SP_BR, PC_BR), '', text_of('%s-%s' % (page, k)))
     return p
 
 
@@ -645,7 +646,8 @@ def header(page):
 
 def page_hero(page):
     p = meta(page)
-    p['h1'], p['sub'] = tx(p['h1']), tx(p['sub'])
+    # 大きな見出しとその下の字は、管理画面の「ページで直す」で押して直せるように <!--t:キー--> の印を付ける（改行もそのまま出す）
+    h1, sub = ('<!--t:%s-%s-->%s<!--/t-->' % (page, k, rich(text_of('%s-%s' % (page, k)))) for k in ('h1', 'sub'))
     return '''<section class="phero" data-en="%s">
   <img src="img/%s" alt="" data-eager>
   <div class="phero-in wrap">
@@ -655,7 +657,7 @@ def page_hero(page):
   </div>
 </section>
 <nav class="crumb wrap" aria-label="パンくずリスト"><ol><li><a href="index.html">ホーム</a></li><li aria-current="page">%s</li></ol></nav>''' % (
-        p['en'], p['img'], p['en'], p['h1'], p['sub'], p['h1'])
+        p['en'], p['img'], p['en'], h1, sub, tx(p['h1']))
 
 
 def footer():

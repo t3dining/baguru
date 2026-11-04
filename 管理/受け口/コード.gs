@@ -8,14 +8,16 @@
    ・品の形の決まり（TYPE_KEYS・cleanItem_ など）と文章の決まり（mergeTexts_）は 管理/にせの受け口.py と同じにしておく。片方を変えたら、もう片方も直す
    ・置きかたは 受け口の作りかた.md */
 
-var VERSION = '2026-11-04b';
+var VERSION = '2026-11-04c';
 var SITE_URL = 'https://t3dining.github.io/baguru';   // ホームページの場所（作る.py の SITE_URL と同じ。タブの小さな絵に使う）
 var BRANCH = 'main';
 var WORKFLOW = 'publish.yml';
 var MAX_FAIL = 8, FAIL_WINDOW_MS = 30 * 60 * 1000;     // 8回まちがえたら30分入れない
 var FILES = { menu: 'データ/menu.json', news: 'データ/news.json', texts: 'データ/texts.json' };
-var ONE_LINE = { title: 80, desc: 200, hero: 40, herosub: 80 };   // 改行できない文の種類と字数の上限（kanri.js・にせの受け口.py と同じ）
+var ONE_LINE = { title: 80, desc: 200 };   // 改行できない文の種類と字数の上限（kanri.js・にせの受け口.py と同じ）
+var SHORT = { hero: 40, herosub: 80 };      // 改行できるが短くしておく文（2026-11-04c から改行できる）
 var TEXT_MAX = 1000;
+var LINES = ['name', 'sub', 'copy', 'note'];   // 品の欄で改行できるもの（と一言の文 tip.text。kanri.js の MENU_FIELD の4つめ・にせの受け口.py と同じ）
 var ORDER = ['id', 'name', 'sub', 'photo', 'alt', 'limit', 'badges', 'copy', 'price', 'prices', 'note', 'tip', 'status'];
 var TYPE_KEYS = {
   'plist': ['name', 'sub', 'price'],
@@ -175,6 +177,13 @@ function status_(req) {
 
 /* ============ 品の形の決まり（にせの受け口.py の clean_item などと同じ） ============ */
 
+/** 改行（\n）だけは残す clean_（品の LINES の欄と一言の文。にせの受け口.py の lines_ と同じ） */
+function cleanLines_(v, n) {
+  var s = String(v == null ? '' : v).replace(/\r\n?/g, '\n').replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, '').trim();
+  if (s.length > n) throw bad_('bad_data');
+  return s;
+}
+
 function clean_(v, n) {
   var s = String(v == null ? '' : v).replace(/[\u0000-\u001f\u007f]/g, '').trim();
   if (s.length > n) throw bad_('bad_data');
@@ -196,7 +205,7 @@ function cleanItem_(kind, it) {
         .map(function (r) { return { label: clean_(r.label, 40), price: clean_(r.price, 40) }; });
       if (ps.length) o[k] = ps;
     } else if (k === 'tip') {
-      if (v && typeof v === 'object' && clean_(v.text, 300)) o[k] = { label: clean_(v.label, 20), text: clean_(v.text, 300) };
+      if (v && typeof v === 'object' && cleanLines_(v.text, 300)) o[k] = { label: clean_(v.label, 20), text: cleanLines_(v.text, 300) };   // 一言の文は改行できる（2026-11-04c）
     } else if (k === 'status') {
       if (v === 'soldout' || v === 'paused') o[k] = v;
     } else if (k === 'id') {
@@ -205,10 +214,8 @@ function cleanItem_(kind, it) {
     } else if (k === 'photo') {
       if (!PHOTO_NAME.test(String(v))) throw bad_('bad_data');
       o[k] = String(v);
-    } else if (k === 'copy') {   // 説明は改行できる（2026-11-04。にせの受け口.py と同じ）
-      var c = String(v).replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, '').trim();
-      if (c.length > LIMITS.copy) throw bad_('bad_data');
-      o[k] = c;
+    } else if (LINES.indexOf(k) >= 0) {   // 名前・小さい字の説明・説明・ひとことは改行できる（2026-11-04c。にせの受け口.py と同じ）
+      o[k] = cleanLines_(v, LIMITS[k]);
     } else {
       o[k] = clean_(v, LIMITS[k]);
     }
@@ -256,7 +263,7 @@ function mergeTexts_(cur, inc) {
         var v = String(got[x.key] == null ? '' : got[x.key]).replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, '').trim();
         var n = ONE_LINE[x.tag];
         if (n) v = v.replace(/\s*\n\s*/g, '');
-        if (!v || v.length > (n || TEXT_MAX)) throw bad_('bad_data');
+        if (!v || v.length > (n || SHORT[x.tag] || TEXT_MAX)) throw bad_('bad_data');
         x.text = v;
       });
     });
