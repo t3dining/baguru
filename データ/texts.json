@@ -2062,17 +2062,17 @@
       {
        "key": "recruit-42",
        "tag": "td",
-       "text": "このページの応募フォーム、お電話（"
+       "text": "このページの応募フォーム【スマホ改行】お電話（"
       },
       {
        "key": "recruit-43",
        "tag": "td",
-       "text": "）、Instagram の DM（"
+       "text": "）【スマホ改行】Instagram の DM（"
       },
       {
        "key": "recruit-44",
        "tag": "td",
-       "text": "）、またはお店のスタッフまで！"
+       "text": "）【スマホ改行】お店のスタッフまで！"
       }
      ]
     },
