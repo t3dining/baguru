@@ -1,0 +1,38 @@
+# ホームページを作って公開する（会社の GitHub の置き場所に入れたときに使う）
+# ・main に変更が入るたびに 作る.py でページを作り直し、_site/ を GitHub Pages に出す（作る.py の COMING_SOON のあいだは、表は Coming soon・中身は PREVIEW の場所）
+# ・管理画面で保存したときも、受け口（管理/受け口/コード.gs）が main に書き込むので、ここが動く
+# ・★ファイルの名前（publish.yml）を変えたら、コード.gs の WORKFLOW も直す
+name: ホームページを作って公開する
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pillow
+      - run: python 作る.py --pages
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,243 @@
+<section class="hero">
+  <div class="hero-txt">
+    <p class="hero-eyebrow"><span>{{t:index-1}}</span><span>{{t:index-2}}</span></p>
+    <h1 class="hero-ttl"><span class="hero-ttl-s">{{t:index-3}}</span>{{t:index-4}}<br><span class="hero-ttl-b">{{t:index-5}}</span></h1>
+    <p class="hero-lead">{{t:index-6}}</p>
+    <div class="btns hero-btns">
+      <a class="btn btn-ember" href="menu.html">メニューを見る</a>
+      <a class="btn btn-line" href="takeout.html">テイクアウトを注文</a>
+      <a class="btn btn-line btn-tel" href="{{TEL_LINK}}"><svg class="i" aria-hidden="true"><use href="#i-phone"/></svg>電話する<span class="nw">{{TEL}}</span></a>
+    </div>
+  </div>
+  <div class="hero-img"><img src="img/hero.jpg" alt="鉄板にのった超粗びきハンバーグ2個と、仕上げに使う焼石" fetchpriority="high" data-eager></div>
+  <svg class="emblem" viewBox="0 0 200 200" aria-hidden="true">
+    <defs><path id="ring" d="M100 100 m-80 0 a80 80 0 1 1 160 0 a80 80 0 1 1 -160 0"/></defs>
+    <circle cx="100" cy="100" r="97" fill="none" stroke="currentColor" stroke-width="2"/>
+    <circle cx="100" cy="100" r="64" fill="none" stroke="currentColor" stroke-width="1.5"/>
+    <g class="emblem-ring"><text font-family="Oswald, sans-serif" font-size="14" font-weight="600" fill="currentColor"><textPath href="#ring" textLength="496" lengthAdjust="spacing">CHARCOAL GRILLED HAMBURG STEAK ・ TOYOTA ・ SINCE 2021 ・</textPath></text></g>
+    <g transform="translate(100 90)" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="0" cy="-27" r="7"/><path d="M0 -20V30M-15 -8H15M-28 10c2 16 14 22 28 22s26-6 28-22"/>
+    </g>
+    <text x="100" y="152" text-anchor="middle" font-family="Oswald, sans-serif" font-size="15" font-weight="600" letter-spacing="5" fill="currentColor">BAGURU</text>
+  </svg>
+</section>
+
+<section class="today" aria-label="今日の営業とご来店の案内">
+  <ul class="today-list wrap">
+    <li><svg class="i" aria-hidden="true"><use href="#i-clock"/></svg><div><span class="k">{{t:index-7}}</span><span class="v" data-today>平日 11:00–15:00 / 17:00–22:30</span></div></li>
+    <li><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><div><span class="k">{{t:index-8}}</span><span class="v"><span data-days="dows">火曜日</span><small data-days="note">（祝日は営業）</small></span></div></li>
+    <li><svg class="i" aria-hidden="true"><use href="#i-car"/></svg><div><span class="k">{{t:index-9}}</span><span class="v">{{t:index-10}}</span></div></li>
+    <li><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><div><span class="k">{{t:index-11}}</span><a class="v" href="reserve.html#booking">{{t:index-12}}</a></div></li>
+  </ul>
+</section>
+
+<section class="sec sec-dark" id="hamburg" data-deco="HAMBURG">
+  <div class="wrap">
+    <div class="sh">
+      <p class="sh-en">4 HAMBURG STEAKS</p>
+      <h2 class="sh-jp">{{t:index-13}}</h2>
+      <p class="sh-lead">{{t:index-14}}</p>
+    </div>
+    <ol class="hb-grid">
+      <li class="hb"><a href="menu.html#arabiki">
+        <figure><img src="img/hb-arabiki.jpg" alt="鉄板にのった超粗びきハンバーグ2個"><span class="hb-no">01</span><span class="tag">{{t:index-15}}</span></figure>
+        <div class="hb-body">
+          <h3>{{t:index-16}}</h3>
+          <p>{{t:index-17}}</p>
+          <p class="hb-price"><span class="g">{{t:index-18}}</span><span class="yen">{{t:index-19}}<small>{{t:index-20}}</small></span></p>
+        </div>
+      </a></li>
+      <li class="hb"><a href="menu.html#teppan">
+        <figure><img src="img/hb-teppan.jpg" alt="鉄板にのった鉄板炭焼ハンバーグ"><span class="hb-no">02</span></figure>
+        <div class="hb-body">
+          <h3>{{t:index-21}}</h3>
+          <p>{{t:index-22}}</p>
+          <p class="hb-price"><span class="g">{{t:index-23}}</span><span class="yen">{{t:index-24}}<small>{{t:index-25}}</small></span></p>
+        </div>
+      </a></li>
+      <li class="hb"><a href="menu.html#demi">
+        <figure><img src="img/hb-demi.jpg" alt="自家製デミソースがかかったハンバーグ"><span class="hb-no">03</span></figure>
+        <div class="hb-body">
+          <h3>{{t:index-26}}</h3>
+          <p>{{t:index-27}}</p>
+          <p class="hb-price"><span class="g">{{t:index-28}}</span><span class="yen">{{t:index-29}}<small>{{t:index-30}}</small></span></p>
+        </div>
+      </a></li>
+      <li class="hb"><a href="menu.html#cheese">
+        <figure><img src="img/hb-cheese.jpg" alt="チーズソースがたっぷりかかったハンバーグ"><span class="hb-no">04</span></figure>
+        <div class="hb-body">
+          <h3>{{t:index-31}}</h3>
+          <p>{{t:index-32}}</p>
+          <p class="hb-price"><span class="g">{{t:index-33}}</span><span class="yen">{{t:index-34}}<small>{{t:index-35}}</small></span></p>
+        </div>
+      </a></li>
+    </ol>
+    <div class="sauce">
+      <p class="sauce-ttl">{{t:index-36}}</p>
+      <ul><li>{{t:index-37}}</li><li>{{t:index-38}}</li><li>{{t:index-39}}</li><li>{{t:index-40}}</li></ul>
+    </div>
+    <p class="tax">{{t:index-41}}</p>
+    <p class="more"><a class="btn btn-line" href="menu.html">メニューを全て見る</a></p>
+  </div>
+</section>
+
+<section class="sec sec-brick deco-l" data-deco="CHARCOAL">
+  <div class="wrap">
+    <div class="sh">
+      <p class="sh-en">OUR STYLE</p>
+      <h2 class="sh-jp">{{t:index-42}}</h2>
+    </div>
+    <div class="style-grid">
+      <article class="st">
+        <p class="st-no"><span>{{t:index-43}}</span>01 CHARCOAL</p>
+        <h3>{{t:index-44}}</h3>
+        <p>{{t:index-45}}</p>
+      </article>
+      <article class="st">
+        <p class="st-no"><span>{{t:index-46}}</span>02 MEAT</p>
+        <h3>{{t:index-47}}</h3>
+        <p>{{t:index-48}}</p>
+      </article>
+      <article class="st">
+        <p class="st-no"><span>{{t:index-49}}</span>03 RICE</p>
+        <h3>{{t:index-50}}</h3>
+        <p>{{t:index-51}}</p>
+      </article>
+    </div>
+    <p class="more"><a class="btn btn-dark" href="concept.html">バグるのこだわりを読む</a></p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap howto">
+    <figure class="howto-img"><img src="img/howto.jpg" alt="焼石の上で、超粗びきハンバーグをトングで持ち上げたところ"></figure>
+    <div>
+      <div class="sh sh-left">
+        <p class="sh-en">HOW TO ENJOY</p>
+        <h2 class="sh-jp">{{t:index-52}}</h2>
+      </div>
+      <ol class="steps">
+        <li><b>1</b><div><h3>{{t:index-53}}</h3><p>{{t:index-54}}</p></div></li>
+        <li><b>2</b><div><h3>{{t:index-55}}</h3><p>{{t:index-56}}</p></div></li>
+        <li><b>3</b><div><h3>{{t:index-57}}</h3><p>{{t:index-58}}</p></div></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-brick" id="lunch" data-deco="LUNCH">
+  <div class="wrap">
+    <div class="sh">
+      <p class="sh-en">WEEKDAY LUNCH</p>
+      <h2 class="sh-jp">{{t:index-59}}</h2>
+      <p class="sh-lead">{{t:index-60}}</p>
+    </div>
+    <div class="cards">
+      <article class="card">
+        <figure><img src="img/lunch-hamburg.jpg" alt="炭焼ハンバーグとご飯、サラダのランチプレート"></figure>
+        <div class="card-body"><h3>{{t:index-61}}</h3><p>{{t:index-62}}</p><p class="card-price">{{t:index-63}}<small>{{t:index-64}}</small></p></div>
+      </article>
+      <article class="card">
+        <figure><img src="img/lunch-karaage.jpg" alt="唐揚げとご飯、サラダのランチプレート"></figure>
+        <div class="card-body"><h3>{{t:index-65}}</h3><p>{{t:index-66}}</p><p class="card-price">{{t:index-67}}<small>{{t:index-68}}</small></p></div>
+      </article>
+      <article class="card">
+        <figure><img src="img/lunch-taco.jpg" alt="野菜たっぷりのタコライス"></figure>
+        <div class="card-body"><h3>{{t:index-69}}</h3><p>{{t:index-70}}</p><p class="card-price">{{t:index-71}}<small>{{t:index-72}}</small></p></div>
+      </article>
+    </div>
+    <p class="note">{{t:index-73}}<a href="menu.html#lunch">{{t:index-74}}</a>{{t:index-75}}</p>
+  </div>
+</section>
+
+<section class="sec deco-l" id="sweets" data-deco="SWEETS">
+  <div class="wrap">
+    <div class="sh">
+      <p class="sh-en">SWEETS</p>
+      <h2 class="sh-jp">{{t:index-76}}</h2>
+    </div>
+    <div class="duo">
+      <article class="duo-item">
+        <img src="img/pudding.jpg" alt="さくらんぼと生クリームを載せたレトロぷりん">
+        <div class="duo-body">
+          <span class="limit">{{t:index-77}}</span>
+          <h3>{{t:index-78}}</h3>
+          <p>{{t:index-79}}</p>
+          <span class="yen">{{t:index-80}}<small>{{t:index-81}}</small></span>
+        </div>
+      </article>
+      <article class="duo-item">
+        <img src="img/acai.jpg" alt="フルーツを載せた5種類のアサイーボウル">
+        <div class="duo-body">
+          <span class="limit">{{t:index-82}}</span>
+          <h3>{{t:index-83}}</h3>
+          <p>{{t:index-84}}</p>
+          <span class="yen">{{t:index-85}}<small>{{t:index-86}}</small></span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <img src="img/takeout.jpg" alt="">
+  <div class="band-in">
+    <p class="sh-en">TAKEOUT</p>
+    <h2>{{t:index-87}}</h2>
+    <p>{{t:index-88}}</p>
+    <div class="btns">
+      <a class="btn btn-ember" href="{{ORDER_URL}}"><svg class="i" aria-hidden="true"><use href="#i-phone2"/></svg>モバイルオーダーで注文</a>
+      <a class="btn btn-line" href="takeout.html">テイクアウトメニュー</a>
+    </div>
+    <small>{{t:index-89}}</small>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap narrow">
+    <div class="sh">
+      <p class="sh-en">NEWS</p>
+      <h2 class="sh-jp">{{t:index-90}}</h2>
+    </div>
+    <ul class="news-list">
+      {{news:home}}
+    </ul>
+    <p class="more"><a class="btn btn-outline" href="news.html">お知らせを全て見る</a></p>
+  </div>
+</section>
+
+<section class="sec sec-brick" id="access" data-deco="ACCESS">
+  <div class="wrap">
+    <div class="sh">
+      <p class="sh-en">ACCESS</p>
+      <h2 class="sh-jp">{{t:index-91}}</h2>
+    </div>
+    <div class="access">
+      <div class="map"><iframe src="{{MAP_EMBED}}" title="炭焼ハンバーグ バグるの地図" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+      <div>
+        <dl class="info">
+          <div><dt>{{t:index-92}}</dt><dd>{{t:index-93}}</dd></div>
+          <div><dt>{{t:index-94}}</dt><dd><a href="{{TEL_LINK}}">{{TEL}}</a></dd></div>
+          <div><dt>{{t:index-95}}</dt><dd>{{t:index-96}}<br><small>{{t:index-97}}</small></dd></div>
+          <div><dt>{{t:index-98}}</dt><dd><span data-days="dows">火曜日</span><span data-days="note">（祝日・GW・お盆・年末年始は営業）</span><div class="days-special" data-days="special" hidden><p class="days-ttl">臨時の営業・お休み</p><ul></ul></div></dd></div>
+          <div><dt>{{t:index-99}}</dt><dd>{{t:index-100}}</dd></div>
+        </dl>
+        <div class="btn-row">
+          <a class="btn btn-dark" href="{{MAP_LINK}}" target="_blank" rel="noopener"><svg class="i" aria-hidden="true"><use href="#i-pin"/></svg>Googleマップで開く</a>
+          <a class="btn btn-outline" href="access.html">アクセスの詳細</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="crew">
+  <div class="crew-in wrap">
+    <div>
+      <p class="sh-en">CREW WANTED</p>
+      <h2>{{t:index-101}}</h2>
+      <p>{{t:index-102}}</p>
+    </div>
+    <a class="btn" href="recruit.html">採用情報を見る<svg class="i" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+  </div>
+</section>

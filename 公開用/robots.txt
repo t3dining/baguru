@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://t3dining.github.io/baguru/sitemap.xml

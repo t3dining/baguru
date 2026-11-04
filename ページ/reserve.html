@@ -1,0 +1,134 @@
+<section class="sec">
+  <div class="wrap narrow">
+    <div class="notice">
+      <svg class="i" aria-hidden="true"><use href="#i-cal"/></svg>
+      <div>
+        <h2>{{t:reserve-1}}</h2>
+        <p>{{t:reserve-2}}</p>
+      </div>
+    </div>
+    <div class="btns center" style="margin-top:22px">
+      <a class="btn btn-ember" href="#booking"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg>ネットで予約する</a>
+      <a class="btn btn-outline" href="{{TEL_LINK}}"><svg class="i" aria-hidden="true"><use href="#i-phone"/></svg>電話で予約する</a>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-brick" id="booking">
+  <div class="wrap narrow">
+    <div class="sh">
+      <p class="sh-en">ONLINE RESERVATION</p>
+      <h2 class="sh-jp">{{t:reserve-3}}</h2>
+      <p class="sh-lead"><span class="nw">{{t:reserve-4}}</span>　<span class="nw">{{t:reserve-5}}</span>　<span class="nw">{{t:reserve-6}}</span>　<span class="nw">{{t:reserve-7}}</span>　<span class="nw">{{t:reserve-8}}</span></p>
+    </div>
+    <ol class="rsv-flow">
+      <li>{{t:reserve-9}}</li>
+      <li>{{t:reserve-10}}</li>
+      <li>{{t:reserve-11}}</li>
+    </ol>
+
+    <form class="rsv" id="rsv" novalidate onsubmit="return false">
+      <noscript><p class="rsv-off">ネット予約には JavaScript が要ります。お電話でご予約ください。</p></noscript>
+      <div class="rsv-off" data-off hidden></div>
+
+      <fieldset class="rsv-step">
+        <legend>{{t:reserve-12}}</legend>
+        <div class="chips" id="r-people"><p class="hint">読み込んでいます…</p></div>
+        <p class="hint" id="r-people-note"></p>
+      </fieldset>
+
+      <fieldset class="rsv-step">
+        <legend>{{t:reserve-13}}</legend>
+        <div id="r-days"><p class="hint">空き状況を読み込んでいます…</p></div>
+      </fieldset>
+
+      <fieldset class="rsv-step">
+        <legend>{{t:reserve-14}}</legend>
+        <div id="r-times"><p class="hint">先に日にちを選んでください。</p></div>
+      </fieldset>
+
+      <fieldset class="rsv-step">
+        <legend>{{t:reserve-15}}</legend>
+        <div class="fgrid">
+          <div><label for="r-name">{{t:reserve-16}}<span class="need">必須</span></label><input type="text" id="r-name" autocomplete="name" maxlength="40" placeholder="例：豊田 太郎"></div>
+          <div><label for="r-tel">{{t:reserve-17}}<span class="need">必須</span></label><input type="tel" id="r-tel" autocomplete="tel" inputmode="tel" maxlength="20" placeholder="例：090-1234-5678"></div>
+          <div class="full"><label for="r-email">{{t:reserve-18}}<span class="need">必須</span></label><input type="email" id="r-email" autocomplete="email" inputmode="email" maxlength="120" placeholder="確定のお知らせをお送りします"></div>
+        </div>
+        <div class="fgrid">
+          <fieldset class="full dessert"><legend class="lbl">{{t:reserve-19}}<span class="opt">{{t:reserve-20}}</span></legend>
+            <p class="hint">{{t:reserve-21}}</p>
+            <div class="chk">
+              <label><input type="checkbox" name="dessert" id="r-dessert" value="yes">{{t:reserve-22}}</label>
+            </div>
+            <div class="plate-msg" id="r-plate-box" hidden><label for="r-plate">{{t:reserve-23}}<span class="opt">{{t:reserve-24}}</span></label><input type="text" id="r-plate" maxlength="30" placeholder="例：Happy Birthday たろう"></div>
+          </fieldset>
+          <div class="full"><label for="r-note">{{t:reserve-25}}<span class="opt">任意</span></label><textarea id="r-note" maxlength="300" placeholder="お祝い・アレルギー・ベビーカーなど"></textarea></div>
+        </div>
+        <div class="hp" aria-hidden="true"><label for="r-website">ここには何も入れないでください</label><input type="text" id="r-website" tabindex="-1" autocomplete="off"></div>
+      </fieldset>
+
+      <p class="consent">{{t:reserve-26}}<a href="privacy.html">{{t:reserve-27}}</a>{{t:reserve-28}}</p>
+      <p class="form-msg" id="r-msg" role="alert" hidden></p>
+      <button class="btn btn-ember btn-wide" type="submit" id="r-next">内容を確認する</button>
+    </form>
+
+    <div class="rsv-confirm" id="r-confirm" hidden>
+      <h3>{{t:reserve-29}}</h3>
+      <dl class="info" id="r-summary"></dl>
+      <p class="hint">{{t:reserve-30}}</p>
+      <p class="form-msg" id="r-cmsg" role="alert" hidden></p>
+      <div class="btns">
+        <button class="btn btn-ember" type="button" id="r-send">この内容で送る</button>
+        <button class="btn btn-outline" type="button" id="r-back">戻って直す</button>
+      </div>
+    </div>
+
+    <div class="rsv-done" id="r-done" hidden>
+      <svg class="i" aria-hidden="true"><use href="#i-check"/></svg>
+      <h3>{{t:reserve-31}}</h3>
+      <p class="rsv-wait">{{t:reserve-32}}</p>
+      <p class="rsv-no">{{t:reserve-33}} <b id="r-no"></b></p>
+      <p id="r-done-what"></p>
+      <p>{{t:reserve-34}}</p>
+      <p id="r-mailed" hidden>{{t:reserve-35}}</p>
+      <p id="r-unmailed" hidden>{{t:reserve-36}}</p>
+      <p>{{t:reserve-37}}<br><a href="{{TEL_LINK}}">{{TEL}}</a></p>
+      <div class="btns center"><a class="btn btn-dark" href="index.html">ホームへ</a><button class="btn btn-outline" type="button" id="r-again">続けて送る</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="sh">
+      <p class="sh-en">HOW TO VISIT</p>
+      <h2 class="sh-jp">{{t:reserve-38}}</h2>
+    </div>
+    <ol class="flow">
+      <li><svg class="i" aria-hidden="true"><use href="#i-car"/></svg><h3>{{t:reserve-39}}</h3><p>{{t:reserve-40}}</p></li>
+      <li><svg class="i" aria-hidden="true"><use href="#i-door"/></svg><h3>{{t:reserve-41}}</h3><p>{{t:reserve-42}}</p></li>
+      <li><svg class="i" aria-hidden="true"><use href="#i-seat"/></svg><h3>{{t:reserve-43}}</h3><p>{{t:reserve-44}}</p></li>
+      <li><svg class="i" aria-hidden="true"><use href="#i-card"/></svg><h3>{{t:reserve-45}}</h3><p>{{t:reserve-46}}</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="sec sec-brick">
+  <div class="wrap narrow">
+    <div class="sh">
+      <p class="sh-en">FAQ</p>
+      <h2 class="sh-jp">{{t:reserve-47}}</h2>
+    </div>
+    <div class="faq">
+      <details open><summary>{{t:reserve-48}}</summary><p>{{t:reserve-49}}</p></details>
+      <details><summary>{{t:reserve-50}}</summary><p>{{t:reserve-51}}</p></details>
+      <details><summary>{{t:reserve-52}}</summary><p>{{t:reserve-53}}</p></details>
+      <details><summary>{{t:reserve-54}}</summary><p>{{t:reserve-55}}</p></details>
+      <details><summary>{{t:reserve-56}}</summary><p>{{t:reserve-57}}</p></details>
+      <details><summary>{{t:reserve-58}}</summary><p>{{t:reserve-59}}</p></details>
+      <details><summary>{{t:reserve-60}}</summary><p>{{t:reserve-61}}</p></details>
+      <details><summary>{{t:reserve-62}}</summary><p>{{t:reserve-63}}</p></details>
+      <details><summary>{{t:reserve-64}}</summary><p>{{t:reserve-65}}</p></details>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,49 @@
+<section class="sec">
+  <div class="wrap narrow">
+    <div class="notice">
+      <svg class="i" aria-hidden="true"><use href="#i-phone"/></svg>
+      <div>
+        <h2>{{t:contact-1}}</h2>
+        <p>{{t:contact-2}}</p>
+      </div>
+    </div>
+    <div class="btns center" style="margin-top:22px">
+      <a class="btn btn-ember" href="{{TEL_LINK}}"><svg class="i" aria-hidden="true"><use href="#i-phone"/></svg>電話する<span class="nw">{{TEL}}</span></a>
+      <a class="btn btn-outline" href="reserve.html#booking"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg>ネット予約</a>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-brick" id="form">
+  <div class="wrap narrow">
+    <div class="sh">
+      <p class="sh-en">CONTACT</p>
+      <h2 class="sh-jp">{{t:contact-3}}</h2>
+      <p class="sh-lead">{{t:contact-4}}</p>
+    </div>
+    <form class="form" data-contact="問い合わせ" novalidate onsubmit="return false">
+      <div><label for="c-name">{{t:contact-5}}<span class="need">必須</span></label><input type="text" id="c-name" name="name" autocomplete="name" maxlength="40" required></div>
+      <div><label for="c-email">{{t:contact-6}}<span class="need">必須</span></label><input type="email" id="c-email" name="email" autocomplete="email" inputmode="email" maxlength="120" required placeholder="お返事をお送りします"></div>
+      <div><label for="c-tel">{{t:contact-7}}<span class="opt">任意</span></label><input type="tel" id="c-tel" name="tel" autocomplete="tel" inputmode="tel" maxlength="20" placeholder="例：090-1234-5678"></div>
+      <div><label for="c-topic">{{t:contact-8}}</label>
+        <select id="c-topic" name="topic">
+          <option>ご予約について</option>
+          <option>テイクアウト・配達について</option>
+          <option>団体・貸切のご相談</option>
+          <option>取材・お取引について</option>
+          <option selected>その他</option>
+        </select></div>
+      <div><label for="c-msg">{{t:contact-9}}<span class="need">必須</span></label><textarea id="c-msg" name="message" maxlength="2000" required></textarea></div>
+      <div class="hp" aria-hidden="true"><label for="c-website">ここには何も入れないでください</label><input type="text" id="c-website" name="website" tabindex="-1" autocomplete="off"></div>
+      <p class="consent">{{t:contact-10}}<a href="privacy.html">{{t:contact-11}}</a>{{t:contact-12}}</p>
+      <button class="btn btn-ember btn-wide" type="submit">この内容で送る</button>
+      <p class="form-msg" role="alert" hidden></p>
+    </form>
+    <div class="form-done" hidden>
+      <svg class="i" aria-hidden="true"><use href="#i-check"/></svg>
+      <h3>{{t:contact-13}}</h3>
+      <p>{{t:contact-14}}<a href="{{TEL_LINK}}">{{TEL}}</a>{{t:contact-15}}</p>
+      <button class="btn btn-outline" type="button" data-again>続けて送る</button>
+    </div>
+  </div>
+</section>

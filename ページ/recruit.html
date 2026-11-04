@@ -1,0 +1,91 @@
+<section class="sec">
+  <div class="wrap port">
+    <figure class="howto-img" style="margin:0"><img src="img/recruit.jpg" alt="焼石の上で、超粗びきハンバーグをトングで持ち上げたところ"></figure>
+    <div>
+      <p class="sh-en">CREW WANTED</p>
+      <h2 class="big-copy" style="margin-top:0">{{t:recruit-1}}</h2>
+      <p class="lead">{{t:recruit-2}}<span class="nw">{{t:recruit-3}}</span>{{t:recruit-4}}</p>
+      <dl class="rc-pay">
+        <div><dt>{{t:recruit-5}}</dt><dd>{{t:recruit-6}}<span>{{t:recruit-7}}</span></dd></div>
+        <div><dt>{{t:recruit-8}}</dt><dd>{{t:recruit-9}}<span>{{t:recruit-10}}</span></dd></div>
+      </dl>
+      <div class="btns">
+        <a class="btn btn-ember" href="#entry">応募する</a>
+        <a class="btn btn-outline" href="{{TEL_LINK}}"><svg class="i" aria-hidden="true"><use href="#i-phone"/></svg>電話で応募</a>
+        <a class="btn btn-outline" href="{{INSTAGRAM}}" target="_blank" rel="noopener"><svg class="i" aria-hidden="true"><use href="#i-ig"/></svg>DMで応募</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-brick" data-deco="CREW">
+  <div class="wrap">
+    <div class="sh">
+      <p class="sh-en">POINT</p>
+      <h2 class="sh-jp">{{t:recruit-11}}</h2>
+    </div>
+    <div class="notice rc-now">
+      <svg class="i" aria-hidden="true"><use href="#i-clock"/></svg>
+      <div>
+        <h2>{{t:recruit-12}}</h2>
+        <p>{{t:recruit-13}}</p>
+      </div>
+    </div>
+    <div class="points">
+      <article class="point"><svg class="i" aria-hidden="true"><use href="#i-flame"/></svg><h3>{{t:recruit-14}}</h3><p>{{t:recruit-15}}</p></article>
+      <article class="point"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg><h3>{{t:recruit-16}}</h3><p>{{t:recruit-17}}</p></article>
+      <article class="point"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><h3>{{t:recruit-18}}</h3><p>{{t:recruit-19}}</p></article>
+      <article class="point"><svg class="i" aria-hidden="true"><use href="#i-car"/></svg><h3>{{t:recruit-20}}</h3><p>{{t:recruit-21}}</p></article>
+      <article class="point"><svg class="i" aria-hidden="true"><use href="#i-kids"/></svg><h3>{{t:recruit-22}}</h3><p>{{t:recruit-23}}</p></article>
+      <article class="point"><svg class="i" aria-hidden="true"><use href="#i-menu"/></svg><h3>{{t:recruit-24}}</h3><p>{{t:recruit-25}}</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap narrow">
+    <div class="sh">
+      <p class="sh-en">JOB DETAILS</p>
+      <h2 class="sh-jp">{{t:recruit-26}}</h2>
+    </div>
+    <table class="req">
+      <tr><th>{{t:recruit-27}}</th><td>{{t:recruit-28}}</td></tr>
+      <tr><th>{{t:recruit-29}}</th><td>{{t:recruit-30}}</td></tr>
+      <tr><th>{{t:recruit-31}}</th><td>{{t:recruit-32}}</td></tr>
+      <tr><th>{{t:recruit-33}}</th><td>{{t:recruit-34}}</td></tr>
+      <tr><th>{{t:recruit-35}}</th><td>{{t:recruit-36}}</td></tr>
+      <tr><th>{{t:recruit-37}}</th><td>{{t:recruit-38}}</td></tr>
+      <tr><th>{{t:recruit-39}}</th><td>{{t:recruit-40}}</td></tr>
+      <tr><th>{{t:recruit-41}}</th><td>{{t:recruit-42}}<a href="{{TEL_LINK}}">{{TEL}}</a>{{t:recruit-43}}<a href="{{INSTAGRAM}}" target="_blank" rel="noopener">@baguru.hamburg</a>{{t:recruit-44}}</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="sec sec-brick" id="entry">
+  <div class="wrap narrow">
+    <div class="sh">
+      <p class="sh-en">ENTRY</p>
+      <h2 class="sh-jp">{{t:recruit-45}}</h2>
+      <p class="sh-lead">{{t:recruit-46}}</p>
+    </div>
+    <form class="form" data-contact="採用" novalidate onsubmit="return false">
+      <div><label for="f-name">{{t:recruit-47}}<span class="need">必須</span></label><input type="text" id="f-name" name="name" autocomplete="name" maxlength="40" required></div>
+      <div><label for="f-tel">{{t:recruit-48}}<span class="need">必須</span></label><input type="tel" id="f-tel" name="tel" autocomplete="tel" inputmode="tel" maxlength="20" required placeholder="例：090-1234-5678"></div>
+      <div><label for="f-email">{{t:recruit-49}}<span class="need">必須</span></label><input type="email" id="f-email" name="email" autocomplete="email" inputmode="email" maxlength="120" required placeholder="ご連絡に使います"></div>
+      <fieldset><legend>{{t:recruit-50}}</legend>
+        <div class="chk"><label><input type="checkbox" name="jobs" value="ホール">{{t:recruit-51}}</label><label><input type="checkbox" name="jobs" value="キッチン">{{t:recruit-52}}</label><label><input type="checkbox" name="jobs" value="どちらでも">{{t:recruit-53}}</label></div>
+      </fieldset>
+      <div><label for="f-time">{{t:recruit-54}}</label><input type="text" id="f-time" name="time" maxlength="200" placeholder="例：土日の昼、平日の夜 など"></div>
+      <div><label for="f-msg">{{t:recruit-55}}</label><textarea id="f-msg" name="message" maxlength="2000" placeholder="聞きたいことなど、何でもどうぞ"></textarea></div>
+      <div class="hp" aria-hidden="true"><label for="f-website">ここには何も入れないでください</label><input type="text" id="f-website" name="website" tabindex="-1" autocomplete="off"></div>
+      <p class="consent">{{t:recruit-56}}<a href="privacy.html">{{t:recruit-57}}</a>{{t:recruit-58}}</p>
+      <button class="btn btn-ember btn-wide" type="submit">この内容で応募する</button>
+      <p class="form-msg" role="alert" hidden></p>
+    </form>
+    <div class="form-done" hidden>
+      <svg class="i" aria-hidden="true"><use href="#i-check"/></svg>
+      <h3>{{t:recruit-59}}</h3>
+      <p>{{t:recruit-60}}<a href="{{TEL_LINK}}">{{TEL}}</a>{{t:recruit-61}}</p>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,1339 @@
+<!-- 作る.py が 管理/画面/ から作ります。直接直さない。Google の受け口のプロジェクトに、HTML のファイル「画面」として貼る -->
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">   <!-- maximum-scale：iPhone で小さい字の直す欄を押しても、画面が大きくならないように（バグるマネージと同じ） -->
+<meta name="robots" content="noindex, nofollow">
+<title>ホームページの管理｜バグる</title>
+<meta name="theme-color" content="#15110f">
+<link rel="icon" href="https://t3dining.github.io/baguru/naka-f90249acdb/img/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="https://t3dining.github.io/baguru/naka-f90249acdb/img/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="HPの管理">
+<!-- ホームページと同じ字（「ページで直す」の直す欄の字の形を、ページとそろえるため） -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<style>
+/* ホームページの管理画面。色はホームページ（css/style.css）と同じ */
+:root{
+  --coal:#15110f; --coal2:#221b17; --paper:#faf6f0; --bg:#efe8de; --line:#e0d5c6; --line2:#cdbfae;
+  --ember:#c7361d; --ember2:#a62a14; --brass:#b8914b; --ok:#2f6d3a; --red:#b3261e;
+  --text:#221c18; --muted:#675d55; --r:8px;
+  --jp:"Zen Kaku Gothic New","Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",Meiryo,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0; background:var(--bg); color:var(--text); font-family:var(--jp); font-size:16px; line-height:1.6}
+button,input,select,textarea{font:inherit; color:inherit}
+img{max-width:100%; display:block}
+
+.top{position:sticky; top:0; z-index:5; display:flex; align-items:center; gap:10px; padding:10px 16px; padding-top:max(10px, env(safe-area-inset-top)); background:var(--coal); color:#fff}
+.top img{width:40px; height:40px; border-radius:50%; background:#fff}
+.top-home{flex:none; display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border:1px solid rgba(255,255,255,.35); border-radius:999px; background:rgba(255,255,255,.08); color:#fff; text-decoration:none; font-size:16px}
+.top-ttl{display:flex; flex-direction:column; line-height:1.3; min-width:0}
+.top-ttl b{font-size:16px}
+.top-ttl small{font-size:12px; color:#cfc4b6}
+.top-site{margin-left:auto; color:#fff; font-size:13px; white-space:nowrap; text-underline-offset:3px}
+
+.main{max-width:760px; margin:0 auto; padding:16px 16px 60px}
+.loading{text-align:center; color:var(--muted); padding:40px 0}
+
+.login{background:var(--paper); border:1px solid var(--line); border-radius:var(--r); padding:24px 20px; margin-top:20px}
+.login h1{font-size:18px; margin:0 0 14px}
+.login form{display:flex; gap:8px}
+.login input{flex:1; min-width:0}
+
+input[type=text],input[type=password],input[type=date],select,textarea{width:100%; padding:10px 12px; border:1px solid var(--line2); border-radius:6px; background:#fff; font-size:16px}
+textarea{min-height:120px; resize:vertical; line-height:1.7}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-offset:1px; border-color:var(--ember)}
+
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:44px; padding:8px 18px; border:1px solid var(--line2); border-radius:6px; background:#fff; font-weight:700; cursor:pointer; white-space:nowrap}
+.btn-main{background:var(--ember); border-color:var(--ember); color:#fff}
+.btn-main:active{background:var(--ember2)}
+.btn-del{color:var(--red); border-color:#e3b4ae}
+.btn-sm{min-height:36px; padding:4px 12px; font-size:14px}
+.btn:disabled{opacity:.5; cursor:default}
+.link{border:0; background:none; padding:4px 0; color:var(--ember2); text-decoration:underline; text-underline-offset:3px; cursor:pointer}
+
+.err{color:var(--red); font-weight:700; margin:10px 0 0; min-height:1em}
+.hint{color:var(--muted); font-size:13px; margin:8px 0 0}
+.warn{color:var(--red); font-size:13px; margin:6px 0 0}
+
+.tabs{display:flex; gap:4px; background:var(--paper); border:1px solid var(--line); border-radius:var(--r); padding:4px}
+.tabs button{flex:1 1 auto; border:0; border-radius:6px; background:none; padding:9px 4px; font-size:14px; font-weight:700; color:var(--muted); cursor:pointer; line-height:1.3; white-space:nowrap}
+.tabs button[aria-selected=true]{background:var(--coal); color:#fff}
+@media (max-width:380px){.tabs button{font-size:12px; padding:9px 2px}}
+
+/* ページの文章 */
+.tmode{margin-top:16px; flex-wrap:nowrap}
+.tmode label,.tbar .seg label{flex:1; justify-content:center; white-space:nowrap}
+.tmode input,.tbar .seg input{position:absolute; opacity:0; width:1px; height:1px}   /* 丸は出さず、選んだほうを色で見せる */
+.tmode label:has(input:focus-visible),.tbar .seg label:has(input:focus-visible){outline:2px solid var(--ember); outline-offset:1px}
+.tbar{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); gap:8px; margin-top:10px; align-items:center}
+.tbar input{width:100%; padding:10px 12px; border:1px solid var(--line2); border-radius:6px; background:#fff; font-size:16px}
+.tbar select:disabled{opacity:.45}
+.tbar .seg{flex-wrap:nowrap}
+.tbar .seg label{flex:1; justify-content:center; padding:9px 6px}
+.hint.where{margin:0 0 12px}
+/* ページで直す：本物のページを縮めて出す（幅はスマホ 390px・パソコン 1280px） */
+.pv{position:relative; height:56vh; min-height:300px; scroll-margin-top:8px; margin-top:10px; border:1px solid var(--line2); border-radius:var(--r); overflow:hidden; background:#fff}
+.pv iframe{position:absolute; top:0; left:0; border:0; transform-origin:0 0; background:#fff}
+.ed{margin-top:10px; padding:14px; background:var(--paper); border:1px solid var(--line); border-radius:var(--r)}
+.ed textarea{min-height:0}
+.ed-none{margin:0; font-weight:700}
+.ed-ft{display:flex; gap:8px; margin-top:12px}
+.ed-ft .btn-main{flex:1}
+/* 枠ごとまるごと直す欄：幅・字の形・字の大きさ・色は、ページの枠と同じものを kanri.js が入れる（だから改行の場所がページと同じ） */
+.m-ed-wrap{overflow-x:auto; margin:4px -4px 0; padding:4px}
+.mirror{box-sizing:content-box; min-height:1.4em; padding:10px 12px; border:1.5px dashed var(--ember); border-radius:8px; background:#fff; outline:none; line-height:1.7; font-size:16px; word-break:keep-all; overflow-wrap:anywhere}
+.mirror:focus{border-style:solid; box-shadow:0 0 0 3px rgba(199,54,29,.18)}
+.mirror .m-chip{background:rgba(199,54,29,.16); border-radius:3px; box-shadow:inset 0 -2px 0 rgba(199,54,29,.55)}
+@media (max-width:600px){.pv{height:44vh}}   /* スマホ：ページと直す欄が、いっしょに画面に入るように */
+
+.pub{margin:12px 2px 0; font-size:14px; color:var(--muted); min-height:1.6em}
+.pub.is-work{color:var(--brass); font-weight:700}
+.pub.is-done{color:var(--ok); font-weight:700}
+.pub.is-fail{color:var(--red); font-weight:700}
+
+.grp{margin-top:22px}
+.grp-hd{display:flex; align-items:center; gap:8px; margin:0 2px 8px}
+.grp-hd h2{font-size:17px; margin:0; padding-left:10px; border-left:4px solid var(--ember); line-height:1.3}
+.grp-hd .btn{margin-left:auto}
+.list{list-style:none; margin:0; padding:0; background:var(--paper); border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
+.list li+li{border-top:1px solid var(--line)}
+.row-btn{display:flex; align-items:center; gap:12px; width:100%; padding:10px 12px; border:0; background:none; text-align:left; cursor:pointer; min-height:56px}
+.row-btn:active{background:#f1e9dd}
+.row-btn img{width:56px; height:42px; object-fit:cover; border-radius:4px; flex:none; background:var(--line)}
+.row-btn .noimg{width:56px; height:42px; border-radius:4px; flex:none; background:repeating-linear-gradient(45deg,#eee5d8 0 6px,#e6dccd 6px 12px)}
+.row-main{flex:1; min-width:0}
+.row-main b{display:block; font-size:15px; line-height:1.4; overflow-wrap:anywhere}
+.row-main small{display:block; color:var(--muted); font-size:13px; line-height:1.4}
+.row-go{color:var(--line2); font-size:20px; flex:none}
+.chip{display:inline-block; font-size:11px; font-weight:900; padding:0 7px; border-radius:3px; margin-left:6px; vertical-align:2px; color:#fff; background:var(--coal)}
+.chip.is-paused{background:#8a7f75}
+.empty{padding:16px; color:var(--muted); font-size:14px}
+.grp-photo{display:flex; align-items:center; gap:12px; padding:10px 12px; background:var(--paper); border:1px solid var(--line); border-radius:var(--r); margin-bottom:8px; width:100%; cursor:pointer; text-align:left}
+.grp-photo img{width:72px; height:54px; object-fit:cover; border-radius:4px}
+
+.hist li{display:flex; align-items:center; gap:10px; padding:10px 12px}
+.hist .row-main b{font-weight:500; font-size:14px}
+.foot{text-align:center; margin-top:40px}
+
+/* 直す画面 */
+.sheet{position:fixed; inset:0; z-index:20; background:rgba(21,17,15,.55); display:flex; align-items:flex-end; justify-content:center}
+.sheet-in{width:100%; max-width:760px; max-height:94vh; max-height:94dvh; display:flex; flex-direction:column; background:var(--bg); border-radius:14px 14px 0 0; overflow:hidden}
+.sheet-hd{display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--paper); border-bottom:1px solid var(--line)}
+.sheet-hd h2{font-size:16px; margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.sheet-body{overflow:auto; padding:16px; -webkit-overflow-scrolling:touch}
+.sheet-ft{display:flex; gap:8px; padding:12px 16px; padding-bottom:max(12px, env(safe-area-inset-bottom)); background:var(--paper); border-top:1px solid var(--line)}
+.sheet-ft .btn-main{flex:1}
+@media (min-width:761px){.sheet{align-items:center}.sheet-in{border-radius:14px; max-height:88vh}}
+
+.fld{margin-bottom:16px}
+.fld > label,.fld > .lbl{display:block; font-weight:700; font-size:14px; margin-bottom:6px}
+.fld .opt{font-weight:500; color:var(--muted); font-size:12px; margin-left:6px}
+.pair{display:grid; grid-template-columns:1fr 130px auto; gap:6px; margin-bottom:6px; align-items:center}
+.pair.is-badge{grid-template-columns:1fr 110px auto}
+.pair.is-tip{grid-template-columns:110px 1fr}
+.x{width:36px; height:36px; border:1px solid var(--line2); border-radius:6px; background:#fff; color:var(--muted); cursor:pointer; font-size:18px; line-height:1}
+.seg{display:flex; flex-wrap:wrap; gap:6px}
+.seg label{display:flex; align-items:center; gap:6px; padding:8px 12px; border:1px solid var(--line2); border-radius:6px; background:#fff; cursor:pointer; font-size:14px}
+.seg input{accent-color:var(--ember); margin:0}
+.seg label:has(input:checked){border-color:var(--ember); background:#fbe9e5; font-weight:700}
+.photo{display:flex; gap:12px; align-items:flex-start}
+.photo-pv{width:150px; flex:none; border-radius:6px; overflow:hidden; background:var(--line); aspect-ratio:var(--ar,4/3)}
+.photo-pv img{width:100%; height:100%; object-fit:cover}
+.photo + .fld{margin:14px 0 0}
+.photo-side{flex:1; min-width:0; display:flex; flex-direction:column; gap:8px; align-items:flex-start}
+.file-btn{position:relative; overflow:hidden}
+.file-btn input{position:absolute; inset:0; opacity:0; cursor:pointer}
+.moves{display:flex; gap:6px; flex-wrap:wrap}
+.row{display:flex; gap:8px; justify-content:flex-end; margin-top:12px}
+
+/* 写真の切り取り */
+.crop{position:fixed; inset:0; z-index:30; background:rgba(21,17,15,.85); display:flex; align-items:center; justify-content:center; padding:16px}
+.crop-in{width:100%; max-width:640px; background:var(--paper); border-radius:12px; padding:16px}
+.crop-in h2{font-size:16px; margin:0}
+.crop-box{position:relative; width:100%; margin-top:12px; background:#000; border-radius:6px; overflow:hidden; touch-action:none; cursor:grab}
+.crop-box canvas{display:block; width:100%; height:100%}
+.crop-zoom{display:flex; align-items:center; gap:10px; margin-top:12px; font-size:13px; color:var(--muted)}
+.crop-zoom input{flex:1; accent-color:var(--ember)}
+
+.toast{position:fixed; left:50%; bottom:max(24px, env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:40; max-width:calc(100% - 32px); padding:12px 18px; border-radius:8px; background:var(--coal); color:#fff; font-size:14px; box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.toast.is-bad{background:var(--red)}
+</style>
+</head>
+<body>
+<!-- バグるのホームページの管理画面。お知らせ・メニュー（写真・名前・値段）・ページの文章を変える。
+     合言葉で入り、受け口（管理/受け口/コード.gs）が会社の GitHub に書き込むと、2〜3分でホームページに出る。
+     ★ホームページには置かない。Google の受け口が出す（作る.py が 管理/受け口/画面.html にまとめる）。この Mac では 管理画面を試す.command で開く -->
+<header class="top">
+  <a class="top-home" id="owner-home" href="https://t3dining.github.io/baguru-owner/" target="_top" hidden aria-label="バグる Owner に戻る">🏠</a>
+  <img src="https://t3dining.github.io/baguru/naka-f90249acdb/img/logo.png" alt="" width="40" height="40">
+  <div class="top-ttl"><b>ホームページの管理</b><small>炭焼ハンバーグ バグる</small></div>
+  <a class="top-site" id="site-link" href="https://t3dining.github.io/baguru/naka-f90249acdb/" target="_blank" rel="noopener">ホームページを見る</a>
+</header>
+
+<main class="main">
+  <section id="login" class="login" hidden>
+    <h1>合言葉を入れてください</h1>
+    <form id="login-form">
+      <input id="pin" type="password" autocomplete="current-password" inputmode="text" aria-label="合言葉">
+      <button class="btn btn-main" type="submit">入る</button>
+    </form>
+    <p class="err" id="login-err" role="alert"></p>
+    <p class="hint">この端末で合言葉を覚えます。お店のスマホ・パソコンだけで使ってください。</p>
+  </section>
+
+  <section id="app" hidden>
+    <nav class="tabs" role="tablist">
+      <button type="button" role="tab" data-tab="news">お知らせ</button>
+      <button type="button" role="tab" data-tab="menu">メニュー</button>
+      <button type="button" role="tab" data-tab="takeout">テイクアウト</button>
+      <button type="button" role="tab" data-tab="texts">文章</button>
+      <button type="button" role="tab" data-tab="history">前に戻す</button>
+    </nav>
+    <p class="pub" id="pub" role="status" aria-live="polite"></p>
+    <div id="view"></div>
+    <p class="foot"><button type="button" class="link" id="logout">この端末から出る</button></p>
+  </section>
+
+  <p class="loading" id="loading">読み込んでいます…</p>
+</main>
+
+<!-- 直す画面（下から出る） -->
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-in" role="dialog" aria-modal="true" aria-labelledby="sheet-ttl">
+    <header class="sheet-hd"><button type="button" class="link" id="sheet-close">戻る</button><h2 id="sheet-ttl"></h2></header>
+    <div class="sheet-body" id="sheet-body"></div>
+    <footer class="sheet-ft" id="sheet-ft"></footer>
+  </div>
+</div>
+
+<!-- 写真の切り取り -->
+<div class="crop" id="crop" hidden>
+  <div class="crop-in" role="dialog" aria-modal="true" aria-labelledby="crop-ttl">
+    <h2 id="crop-ttl">写真の切り取り</h2>
+    <p class="hint">指で動かして、写したいところを枠に合わせます。2本の指か、下のつまみで大きさを変えます。</p>
+    <div class="crop-box" id="crop-box"><canvas id="crop-cv"></canvas></div>
+    <label class="crop-zoom">小さく<input type="range" id="crop-zoom" min="1" max="4" step="0.01" value="1" aria-label="写真の大きさ">大きく</label>
+    <p class="warn" id="crop-warn"></p>
+    <div class="row"><button type="button" class="btn" id="crop-cancel">やめる</button><button type="button" class="btn btn-main" id="crop-ok">この形で使う</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
+<script>window.KANRI = {"site": "https://t3dining.github.io/baguru/naka-f90249acdb"};</script>
+<script>
+/* ホームページの管理画面（お知らせ・メニューの写真・名前・値段・ページの文章）
+   ・この画面は Google の受け口（管理/受け口/コード.gs）が出す。ホームページには置かない（URL を知っている人だけが開ける）
+     受け口の api() を google.script.run で呼ぶ。この Mac の確認用（localhost）では 管理/にせの受け口.py の /api/kanri を呼ぶ
+   ・Google に貼る1枚（管理/受け口/画面.html）は、作る.py がこのフォルダの3つをまとめて作る。★ここを直したら作る.py を動かして、貼り直す
+   ・データの形は 作る.py の「メニューとお知らせ」「ページの文章」と同じ（データ/menu.json・news.json・texts.json）。形ごとに直せるところは FIELDS
+   ・文章は、ページの文を1つずつ直すだけ。文を足す・消す・並べ替えるのは Claude（道具/文章を分ける.py）
+   ・保存は1品・1件・1文ずつ。受け口が会社の GitHub に書き込むと、2〜3分でホームページに出る
+   ・★データの文字は textContent で入れる（innerHTML は使わない） */
+(function () {
+  'use strict';
+
+  var LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  var CONF = window.KANRI || {};                     // 画面.html では { site: ホームページのアドレス }（作る.py が入れる）
+  var GAS = !LOCAL && !!(window.google && google.script && google.script.run);
+  var IMG = LOCAL ? 'https://t3dining.github.io/baguru/naka-f90249acdb/img/' : (CONF.site || '') + '/img/';   // 写真はホームページから読む
+  var PIN_KEY = 'baguru-kanri-pin';
+  var NEWS_CATS = ['お知らせ', 'イベント', 'テイクアウト', 'メニュー', '営業日'];
+  var LINKS = [['', 'リンクなし'], ['menu.html', 'メニュー'], ['takeout.html', 'テイクアウト'], ['reserve.html', 'ご予約'],
+    ['access.html', 'アクセス'], ['concept.html', 'コンセプト'], ['recruit.html', '採用'], ['contact.html', 'お問い合わせ']];
+  var BADGE_COLORS = [['', '黒'], ['ember', '赤'], ['brass', '金']];
+  var STATUS = [['', '普通'], ['soldout', '売り切れ'], ['paused', 'しばらくお休み（出さない）']];
+  // 形ごとに直せるところ（作る.py の group_lines と合わせる。pic-set の品は plist と同じ）
+  var FIELDS = {
+    plist: ['name', 'sub', 'price'],
+    'pic-card': ['photo', 'name', 'price', 'note'],
+    mh: ['photo', 'name', 'badges', 'copy', 'prices', 'tip'],
+    card: ['photo', 'name', 'copy', 'prices'],
+    duo: ['photo', 'limit', 'name', 'copy', 'prices'],
+    mini: ['photo', 'name', 'prices']
+  };
+  var ERR = {
+    bad_pin: '合言葉が違います。',
+    locked: '何度も間違えたので、しばらく入れません。30分ほど後で、もう一度試してください。',
+    conflict: '他の端末で先に変えられていました。新しい内容を読み込み直したので、もう一度直してください。',
+    not_ready: 'この画面は、Google の受け口のアドレスから開いてください。',
+    not_setup: '受け口の用意がまだです（GitHub の鍵が入っていません）。',
+    offline: 'つながりませんでした。電波の良いところで、もう一度試してください。',
+    no_answer: '受け口から返事がありませんでした。もう一度試してください。',
+    bad_data: '入れた内容に、使えないところがありました。',
+    bad_photo: '写真をうまく送れませんでした。もう一度選び直してください。',
+    github: 'GitHub に書き込めませんでした。少し後で、もう一度試してください。'
+  };
+  var NEED = { ping: 'now', load: 'menu', save: 'sha', history: 'list', restore: 'commit', status: 'state' };
+  // 文の種類の呼び名（texts.json の tag）。改行できない文は字数の上限も（コード.gs・にせの受け口.py の ONE_LINE と同じ）
+  var TAGS = { title: 'ページの題（検索結果に出る）', desc: '検索結果に出る説明', hero: 'ページの上の大きな見出し', herosub: '大きな見出しの下の字',
+    h1: '大きな見出し', h2: '見出し', h3: '小見出し', h4: '小見出し', summary: '質問', figcaption: '写真の説明', dt: '項目の名前', dd: '項目の中身',
+    th: '表の項目', td: '表の中身', li: '箇条書き', legend: '入力欄の見出し', label: '入力欄の名前', a: 'リンクの字', small: '小さい字', address: '住所' };
+  var ONE_LINE = { title: 80, desc: 200, hero: 40, herosub: 80 };
+  var TEXT_MAX = 1000;
+
+  var st = { pin: '', menu: null, news: null, texts: null, sha: {}, tab: 'news', tpage: 'index', tq: '', tmode: 'page', tdev: 'sp', fresh: {}, watch: 0, dirty: false };
+
+  /* ---------- 小さな道具 ---------- */
+
+  function $(id) { return document.getElementById(id); }
+  function h(tag, attrs, kids) {
+    var el = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      var v = attrs[k];
+      if (v == null || v === false) return;
+      if (k === 'text') el.textContent = v;
+      else if (k === 'on') Object.keys(v).forEach(function (ev) { el.addEventListener(ev, v[ev]); });
+      else if (k === 'class') el.className = v;
+      else if (k in el && typeof v !== 'string') el[k] = v;
+      else el.setAttribute(k, v);
+    });
+    (kids || []).forEach(function (c) { if (c) el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return el;
+  }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function keep(k, v) { try { if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch (e) { /* 覚えられなくても使える */ } }
+  function kept(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+  function wait(ms) { return new Promise(function (ok) { setTimeout(ok, ms); }); }
+  function pad(n) { return ('0' + n).slice(-2); }
+  function hm(d) { return d.getHours() + ':' + pad(d.getMinutes()); }
+  function today() { var d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function rand(n) { var s = ''; while (s.length < n) s += Math.random().toString(36).slice(2); return s.slice(0, n); }
+  function errText(e) { return ERR[e.code] || ('うまくいきませんでした（' + (e.code || e.message) + '）'); }
+  function imgSrc(name) { return st.fresh[name] || (IMG + encodeURIComponent(name)); }
+
+  function toast(msg, bad) {
+    var t = $('toast');
+    t.textContent = msg; t.className = 'toast' + (bad ? ' is-bad' : ''); t.hidden = false;
+    clearTimeout(toast.t);
+    toast.t = setTimeout(function () { t.hidden = true; }, bad ? 6000 : 3500);
+  }
+
+  /* ---------- 受け口とのやりとり（予約ボードの api.js と同じく、返事がないときは2回まで送り直す） ---------- */
+
+  function fail(code) { var e = new Error(code); e.code = code; return e; }
+  function send(payload) {
+    if (GAS) {
+      return new Promise(function (ok, ng) {
+        google.script.run.withSuccessHandler(ok).withFailureHandler(function () { ng(fail('offline')); }).api(payload);
+      });
+    }
+    return fetch('/api/kanri', { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
+      .then(function (res) { return res.text(); })
+      .then(function (t) { try { return JSON.parse(t); } catch (e) { return null; } });
+  }
+  async function post(payload) {
+    if (!LOCAL && !GAS) throw fail('not_ready');
+    payload.pin = st.pin;
+    var last = fail('no_answer');
+    var tries = payload.action === 'save' || payload.action === 'restore' ? 1 : 3;   // 書き込みは二重にならないよう送り直さない
+    for (var i = 0; i < tries; i++) {
+      if (i) await wait(800 * i);
+      try {
+        var obj = await send(payload);
+        if (!obj) { last = fail('no_answer'); continue; }
+        if (!obj.ok) throw fail(obj.error || 'refused');
+        if (NEED[payload.action] && !(NEED[payload.action] in obj)) { last = fail('no_answer'); continue; }
+        return obj;
+      } catch (e) {
+        if (e.code && e.code !== 'no_answer') throw e;
+        last = e.code ? e : fail('offline');
+      }
+    }
+    throw last;
+  }
+
+  /* ---------- 入る・読み込む ---------- */
+
+  function showLogin(msg) {
+    $('loading').hidden = true; $('app').hidden = true; $('login').hidden = false;
+    $('login-err').textContent = msg || '';
+    $('pin').focus();
+  }
+
+  async function enter() {
+    $('loading').hidden = false; $('login').hidden = true;
+    try {
+      await reload();
+      $('app').hidden = false;
+      show(st.tab);
+    } catch (e) {
+      if (e.code === 'bad_pin' || e.code === 'locked') { st.pin = ''; keep(PIN_KEY, ''); }
+      showLogin(errText(e));
+    } finally {
+      $('loading').hidden = true;
+    }
+  }
+
+  async function reload() {
+    var r = await post({ action: 'load' });
+    st.menu = r.menu; st.news = r.news; st.texts = r.texts; st.sha = r.sha || {};
+  }
+
+  /* ---------- 画面の切り替え ---------- */
+
+  function show(tab) {
+    stopPage();
+    st.tab = tab;
+    document.querySelectorAll('.tabs button').forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.tab === tab)); });
+    var v = $('view');
+    v.textContent = '';
+    if (tab === 'news') viewNews(v);
+    else if (tab === 'texts') viewTexts(v);
+    else if (tab === 'history') viewHistory(v);
+    else viewMenu(v, tab);
+  }
+
+  function rowBtn(photo, title, sub, onclick, chip) {
+    var kids = [];
+    if (photo !== undefined) kids.push(photo ? h('img', { src: imgSrc(photo), alt: '', loading: 'lazy' }) : h('span', { class: 'noimg' }));
+    var t = h('b', { text: title });
+    if (chip) t.appendChild(h('span', { class: 'chip' + (chip.cls ? ' ' + chip.cls : ''), text: chip.text }));
+    kids.push(h('span', { class: 'row-main' }, [t, sub ? h('small', { text: sub }) : null]));
+    kids.push(h('span', { class: 'row-go', text: '›', 'aria-hidden': 'true' }));
+    return h('button', { type: 'button', class: 'row-btn', on: { click: onclick } }, kids);
+  }
+
+  function viewNews(v) {
+    var list = h('ul', { class: 'list' });
+    sortedNews().forEach(function (n) {
+      list.appendChild(h('li', null, [rowBtn(undefined, n.title, n.date.replace(/-/g, '.') + '　' + n.cat, function () { editNews(n.id); })]));
+    });
+    if (!st.news.items.length) list.appendChild(h('li', { class: 'empty', text: 'お知らせはまだありません。' }));
+    v.appendChild(h('div', { class: 'grp' }, [
+      h('div', { class: 'grp-hd' }, [h('h2', { text: 'お知らせ' }), h('button', { type: 'button', class: 'btn btn-main btn-sm', text: '＋ 足す', on: { click: function () { editNews(null); } } })]),
+      list,
+      h('p', { class: 'hint', text: '日付の新しい順に出ます。トップのページには、新しいものから3つが出ます。' })
+    ]));
+  }
+
+  function priceText(it) {
+    if (it.price) return it.price + '円';
+    var ps = (it.prices || []).map(function (r) { return (r.label ? r.label + ' ' : '') + r.price + '円'; });
+    return ps.length > 2 ? ps[0] + ' 他' : ps.join('／');
+  }
+
+  function viewMenu(v, page) {
+    st.menu.groups.filter(function (g) { return g.page === page; }).forEach(function (g) {
+      var type = g.type === 'pic-set' ? 'plist' : g.type;
+      var hasPhoto = FIELDS[type].indexOf('photo') >= 0;
+      var box = h('div', { class: 'grp' }, [
+        h('div', { class: 'grp-hd' }, [h('h2', { text: g.title }), h('button', { type: 'button', class: 'btn btn-sm', text: '＋ 足す', on: { click: function () { editItem(g.id, null); } } })])
+      ]);
+      if (g.type === 'pic-set') {
+        box.appendChild(h('button', { type: 'button', class: 'grp-photo', on: { click: function () { editGroupPhoto(g.id); } } }, [
+          h('img', { src: imgSrc(g.photo), alt: '' }), h('span', { class: 'row-main' }, [h('b', { text: 'この段の写真' }), h('small', { text: '押すと写真を変えられます' })])
+        ]));
+      }
+      var list = h('ul', { class: 'list' });
+      g.items.forEach(function (it, i) {
+        var chip = it.status === 'soldout' ? { text: '売り切れ' } : it.status === 'paused' ? { text: 'お休み', cls: 'is-paused' } : null;
+        list.appendChild(h('li', null, [rowBtn(hasPhoto ? (it.photo || '') : undefined, it.name, priceText(it), function () { editItem(g.id, i); }, chip)]));
+      });
+      if (!g.items.length) list.appendChild(h('li', { class: 'empty', text: 'まだありません。' }));
+      box.appendChild(list);
+      v.appendChild(box);
+    });
+  }
+
+  /* ---------- ページの文章 ---------- */
+
+  function tagName(t) { return TAGS[t] || '文'; }
+  function oneLine(s, n) { s = s.replace(/\*\*/g, '').replace(/\s*\n\s*/g, ' '); return s.length > n ? s.slice(0, n) + '…' : s; }
+  function findText(texts, key) {
+    var hit = null;
+    texts.pages.forEach(function (p) { p.parts.forEach(function (pt) { pt.texts.forEach(function (x) { if (x.key === key) hit = { page: p, part: pt, item: x }; }); }); });
+    return hit;
+  }
+
+  function textHint(x) {
+    var one = ONE_LINE[x.tag];
+    var s = one ? '改行はできません（' + one + '字まで）。' : '改行したところは、ページでも改行します。**で囲んだところ** は太字になります。';
+    if (x.text.indexOf('{{TEL}}') >= 0) s += '{{TEL}} のところには、お店の電話番号が入ります。';
+    return s;
+  }
+  function textRows(x) { return Math.min(14, Math.max(ONE_LINE[x.tag] ? 2 : 3, Math.ceil(x.text.length / 24) + (x.text.match(/\n/g) || []).length)); }
+  /** 入れた文を確かめる。{val} か {err} */
+  function checkText(raw, tag) {
+    var one = ONE_LINE[tag], val = raw.replace(/\r\n?/g, '\n').trim();
+    if (one) val = val.replace(/\s*\n\s*/g, '');
+    if (!val) return { err: '文を入れてください。文ごと消したいときは、Claude に頼んでください。' };
+    if (val.length > (one || TEXT_MAX)) return { err: (one || TEXT_MAX) + '字までにしてください。' };
+    return { val: val };
+  }
+  function saveText(key, val, opts) {
+    var texts = clone(st.texts);
+    findText(texts, key).item.text = val;
+    return saveData('texts', texts, [], '文章：「' + oneLine(val, 20) + '」に直しました', opts);
+  }
+
+  /* 「ページで直す」と「一覧で直す」。上でページを選ぶ（全ページ共通の文は、ホームの下の欄で直す） */
+  function viewTexts(v) {
+    var mode = radios([['page', 'ページで直す'], ['list', '一覧で直す']], st.tmode);
+    var pg = select(st.texts.pages.map(function (p) { return [p.id, p.name]; }), st.tpage);
+    var box = h('div');
+    mode.classList.add('tmode');
+    v.appendChild(mode);
+    v.appendChild(box);
+    function draw() {
+      stopPage();
+      box.textContent = '';
+      if (st.tmode === 'list') textList(box, pg); else textPage(box, pg);
+    }
+    mode.addEventListener('change', function () {
+      if (!leaveText()) { mode.querySelector('input[value="' + st.tmode + '"]').checked = true; return; }
+      st.tmode = mode.read(); draw();
+    });
+    pg.addEventListener('change', function () {
+      if (!leaveText()) { pg.value = st.tpage; return; }
+      st.tpage = pg.value; draw();
+    });
+    draw();
+  }
+
+  function textList(box, pg) {
+    var q = h('input', { type: 'search', value: st.tq, placeholder: '文を探す', 'aria-label': '文を探す', autocomplete: 'off' });
+    var list = h('div');
+    function draw() {
+      var word = st.tq.trim();
+      list.textContent = '';
+      pg.disabled = !!word;
+      st.texts.pages.forEach(function (p) {
+        if (!word && p.id !== st.tpage) return;
+        p.parts.forEach(function (part) {
+          var hits = part.texts.filter(function (x) { return !word || x.text.replace(/\*\*/g, '').indexOf(word) >= 0; });
+          if (!hits.length) return;
+          var ul = h('ul', { class: 'list' });
+          hits.forEach(function (x) { ul.appendChild(h('li', null, [rowBtn(undefined, oneLine(x.text, 80), tagName(x.tag), function () { editText(x.key); })])); });
+          list.appendChild(h('div', { class: 'grp' }, [h('div', { class: 'grp-hd' }, [h('h2', { text: (word ? p.name + '　' : '') + part.name })]), ul]));
+        });
+      });
+      if (!list.children.length) list.appendChild(h('p', { class: 'empty', text: '「' + word + '」が入った文はありません。' }));
+    }
+    q.addEventListener('input', function () { st.tq = q.value; draw(); });
+    box.appendChild(h('div', { class: 'tbar' }, [pg, q]));
+    box.appendChild(h('p', { class: 'hint', text: 'ページの文を1つずつ直せます。文を足す・消す、並びや色を変えるのは Claude に頼んでください。' }));
+    box.appendChild(list);
+    draw();
+  }
+
+  function editText(key) {
+    var at = findText(st.texts, key), x = at.item;
+    var t = area(x.text);
+    t.rows = textRows(x);
+    if (ONE_LINE[x.tag]) t.style.minHeight = '0';
+    var el = h('div', null, [h('p', { class: 'hint where', text: at.page.name + ' ＞ ' + at.part.name }), fld(tagName(x.tag), null, t, textHint(x))]);
+    el.addEventListener('input', function () { st.dirty = true; });
+    async function save() {
+      var got = checkText(t.value, x.tag);
+      if (got.err) return toast(got.err, true);
+      if (got.val === x.text) return closeSheet(true);
+      await saveText(key, got.val);
+    }
+    openSheet(tagName(x.tag), el, [button('保存する', 'btn-main', save)]);
+  }
+
+  /* ---------- ページで直す（本物のページを中に出し、点線の文を押して直す） ----------
+     ・ページは ホームページの ○○.html?edit。中の js/edit.js が文を点線で囲み、押した文の枠（p・li・dd・h3 など）をまるごと知らせてくる
+     ・枠ごとまるごと直す（2026-11-04 ko-dai さんの指示：バグるマネージと同じに）：枠の中の文を1つの欄で直す。リンクの字なども、文ならいっしょに直せる。
+       文でない字（電話番号・定休日など自動で変わる字）は、色を付けた打てない字（m-chip）にする。消しても元に戻る
+     ・★直す欄は、ページの枠と同じ幅・同じ字の形・同じ字の大きさ（edit.js が知らせる）。文節の切れ目（<wbr>）も同じ計算で入れるので、改行の場所がページと同じ
+       太字は太字のまま出す（「太字」のボタンで付ける・外す）。保存するときは **…** の形にする
+     ・打った文は、その場でページに入れて見せる。保存は「保存する」を押したときだけ
+     ・知らせを受けるのは、そのページの場所（ホームページ）からだけ */
+  var DEVICE = { sp: 390, pc: 1280 };
+  var pe = null;          // ページで直している途中のこと { frame, pv, ed, keys, orig, cur, piece, box, dirty }
+  var MARK = '';    // 打っている所の印（直す欄を作り直すあいだだけ使う）
+  var ZW = '​';      // 空の文や、改行の後ろに置く、見えない字（打つ所を作るため。保存しない）
+  var CS_OK = /^(fontFamily|fontSize|fontWeight|fontStyle|letterSpacing|lineHeight|wordBreak|overflowWrap|lineBreak|textAlign|textTransform|fontFeatureSettings|color|whiteSpace|textDecorationLine|verticalAlign|display|paddingLeft|paddingRight|marginLeft|marginRight|backgroundColor|borderRadius)$/;
+
+  function siteOrigin() { if (LOCAL) return location.origin; try { return new URL(CONF.site).origin; } catch (e) { return ''; } }
+  function siteFile(p) { return (LOCAL ? '../' : (CONF.site || '') + '/') + p; }
+  function pageUrl(id) { return siteFile((id === 'common' ? 'index' : id) + '.html?edit=1'); }
+  function toFrame(msg) { if (pe && pe.frame.contentWindow) { msg.bg = 'kanri'; pe.frame.contentWindow.postMessage(msg, siteOrigin()); } }
+
+  /* 文節に分ける BudouX（ホームページの js/budoux-ja.json）。作る.py の phrases・edit.js と同じ計算 */
+  var BX = null, BX_BASE = 0;
+  function loadBudoux() {
+    if (BX !== null) return;
+    BX = false;
+    fetch(siteFile('js/budoux-ja.json')).then(function (r) { return r.json(); }).then(function (m) {
+      var b = 0;
+      Object.keys(m).forEach(function (k) { Object.keys(m[k]).forEach(function (x) { b -= m[k][x]; }); });
+      BX_BASE = b * 0.5; BX = m;
+    }).catch(function () { /* 読めなくても直せる（直す欄の改行の場所が、少しずれるだけ） */ });
+  }
+  function phrases(text) {
+    var s = Array.from(text), out = [];
+    if (!s.length) return out;
+    function g(k, key) { return (BX[k] && BX[k][key]) || 0; }
+    function sl(a, b) { return s.slice(a, b).join(''); }
+    out.push(s[0]);
+    for (var i = 1; i < s.length; i++) {
+      var sc = BX_BASE;
+      if (i > 2) sc += g('UW1', s[i - 3]) + g('TW1', sl(i - 3, i));
+      if (i > 1) sc += g('UW2', s[i - 2]) + g('BW1', sl(i - 2, i)) + g('TW2', sl(i - 2, i + 1));
+      sc += g('UW3', s[i - 1]) + g('UW4', s[i]) + g('BW2', sl(i - 1, i + 1));
+      if (i + 1 < s.length) sc += g('UW5', s[i + 1]) + g('BW3', sl(i, i + 2)) + g('TW3', sl(i - 1, i + 2));
+      if (i + 2 < s.length) sc += g('UW6', s[i + 2]) + g('TW4', sl(i, i + 3));
+      if (sc > 0) out.push(s[i]); else out[out.length - 1] += s[i];
+    }
+    return out;
+  }
+  function putText(box, chunk) {
+    if (!chunk) return;
+    var parts = BX && /[぀-ヿ㐀-鿿！-｠]/.test(chunk) ? phrases(chunk) : [chunk];
+    parts.forEach(function (p, i) {
+      if (i) box.appendChild(document.createElement('wbr'));
+      box.appendChild(document.createTextNode(p));
+    });
+  }
+  /** 字の形を写す（値は CSSOM で入れるので、変な値は入らない） */
+  function setStyle(el, cs) {
+    if (!cs || typeof cs !== 'object') return;
+    Object.keys(cs).forEach(function (k) { var v = cs[k]; if (CS_OK.test(k) && typeof v === 'string' && v.length < 300) el.style[k] = v; });
+  }
+
+  function stopPage() {
+    if (!pe) return;
+    window.removeEventListener('message', pe.onMsg);
+    window.removeEventListener('resize', pe.fit);
+    pe = null;
+  }
+  /** 直している途中の文があれば、捨ててよいか聞く。よければ、ページの字も元に戻す */
+  function leaveText() {
+    if (!pe || !pe.dirty) return true;
+    if (!confirm('直したところを保存せずに、移りますか？')) return false;
+    toFrame({ type: 'set', texts: pe.orig });
+    pe.dirty = false;
+    return true;
+  }
+
+  function textPage(box, pg) {
+    var dev = radios([['sp', 'スマホ'], ['pc', 'パソコン']], st.tdev);
+    var pv = h('div', { class: 'pv' }), frame = h('iframe', { title: 'ページ', src: pageUrl(st.tpage) });
+    var ed = h('div', { class: 'ed' });
+    loadBudoux();
+    pv.appendChild(frame);
+    box.appendChild(h('div', { class: 'tbar' }, [pg, dev]));
+    box.appendChild(pv);
+    box.appendChild(ed);
+    pg.disabled = false;
+    pe = { frame: frame, pv: pv, ed: ed, keys: [], orig: {}, cur: {}, piece: null, box: null, dirty: false };
+    pe.fit = function () {
+      var d = DEVICE[st.tdev], w = pv.clientWidth, s = Math.min(1, w / d);
+      frame.style.width = d + 'px';
+      frame.style.height = Math.ceil(pv.clientHeight / s) + 'px';
+      frame.style.transform = 'scale(' + s + ')';
+      frame.style.left = Math.max(0, Math.round((w - d * s) / 2)) + 'px';
+    };
+    pe.onMsg = function (e) {
+      if (!pe || e.source !== frame.contentWindow || e.origin !== siteOrigin()) return;
+      var d = e.data || {};
+      if (d.bg !== 'edit') return;
+      if (d.type === 'ready') {
+        if (typeof d.tel === 'string' && d.tel.length < 40) pe.tel = d.tel;
+        // ページは公開したときの文なので、管理画面の今の文（保存したばかりのもの・直している途中のもの）を入れて見せる
+        var t = {};
+        (Array.isArray(d.keys) ? d.keys : []).forEach(function (k) { var at = findText(st.texts, k); if (at) t[k] = at.item.text; });
+        Object.keys(pe.cur).forEach(function (k) { t[k] = pe.cur[k]; });
+        toFrame({ type: 'set', texts: t });
+        if (pe.keys.length) toFrame({ type: 'pick', key: pe.keys[0] });
+        else if (st.tpage === 'common') toFrame({ type: 'pick', key: 'common-1', want: true });   // 全ページ共通の文は、ホームの下の欄から直す
+      } else if (d.type === 'pick') {
+        pickFrame(String(d.key || ''), d.frame);
+      }
+    };
+    dev.addEventListener('change', function () {
+      st.tdev = dev.read(); pe.fit();
+      if (pe.keys.length && !pe.dirty) toFrame({ type: 'pick', key: pe.keys[0], want: true });   // 幅が変わったので、枠の形を聞き直す
+    });
+    window.addEventListener('message', pe.onMsg);
+    window.addEventListener('resize', pe.fit);
+    edEmpty();
+    pe.fit();
+    requestAnimationFrame(pe.fit);
+  }
+
+  function edEmpty() {
+    pe.ed.textContent = '';
+    pe.ed.appendChild(h('p', { class: 'ed-none', text: '上のページで、直したい文（点線で囲んだ文）を押してください。' }));
+    pe.ed.appendChild(h('p', { class: 'hint', text: '押した文の枠（段落や項目）を、まるごと直せます。ページの題・検索結果の説明や、送ったあとに出る文など、ページに見えない文は「一覧で直す」で直せます。' }));
+  }
+
+  /** 枠の並びを確かめる。[{k} | {t} | {br}]（cs は字の形）。直せる文が無ければ null */
+  function cleanPieces(list, key) {
+    if (!Array.isArray(list) || !list.length || list.length > 60) list = [{ k: key }];
+    var out = [], seen = {};
+    list.forEach(function (p) {
+      if (!p || typeof p !== 'object') return;
+      var cs = p.cs && typeof p.cs === 'object' ? p.cs : null;
+      if (typeof p.k === 'string' && findText(st.texts, p.k) && !seen[p.k]) { seen[p.k] = 1; out.push({ k: p.k, cs: cs }); }
+      else if (p.br === true) out.push({ br: true, cs: cs });
+      else if (typeof p.t === 'string' && p.t.length <= 500) out.push({ t: p.t, cs: cs });
+    });
+    return out.some(function (p) { return p.k; }) ? out : null;
+  }
+
+  /** ページで文を押したとき：その枠をまるごと直す欄を出す */
+  function pickFrame(key, frame) {
+    if (!pe) return;
+    var pieces = cleanPieces(frame && frame.pieces, key);
+    if (!pieces) return;
+    var keys = pieces.filter(function (p) { return p.k; }).map(function (p) { return p.k; });
+    var sameFrame = keys.join() === pe.keys.join();
+    if (sameFrame && pe.dirty) { pe.piece = { pieces: pieces, st: frame && frame.st }; return mirrorDraw(); }   // 幅だけ変わった
+    if (!sameFrame && !leaveText()) { if (pe.keys.length) toFrame({ type: 'pick', key: pe.keys[0] }); return; }
+    pe.keys = keys; pe.orig = {}; pe.cur = {}; pe.dirty = false;
+    keys.forEach(function (k) { pe.orig[k] = pe.cur[k] = findText(st.texts, k).item.text; });
+    pe.piece = { pieces: pieces, st: frame && frame.st && typeof frame.st === 'object' ? frame.st : null };
+    var first = findText(st.texts, keys[0]);
+    var mirror = h('div', { class: 'mirror', role: 'textbox', 'aria-multiline': 'true', 'aria-label': '直す文', spellcheck: 'false' });
+    mirror.contentEditable = 'true';
+    pe.box = mirror;
+    var bold = button('太字', 'btn-sm', function () { mirror.focus(); document.execCommand('bold'); });
+    bold.addEventListener('mousedown', function (e) { e.preventDefault(); });     // 選んだ字を外さない
+    async function save() {
+      var texts = clone(st.texts), changed = [], bad = '';
+      keys.forEach(function (k) {
+        var at = findText(texts, k), got = checkText(pe.cur[k], at.item.tag);
+        if (got.err) { bad = bad || ('「' + oneLine(pe.orig[k], 12) + '」のところ：' + got.err); return; }
+        if (got.val !== pe.orig[k]) { at.item.text = got.val; changed.push(got.val); }
+      });
+      if (bad) return toast(bad, true);
+      if (!changed.length) { pe.dirty = false; return toast('変わっていません。'); }
+      var note = '文章：「' + oneLine(keys.map(function (k) { return findText(texts, k).item.text; }).join(''), 20) + '」に直しました';
+      if (await saveData('texts', texts, [], note, { stay: true, box: pe.ed })) {
+        keys.forEach(function (k) { pe.orig[k] = pe.cur[k] = findText(st.texts, k).item.text; });
+        pe.dirty = false;
+        mirrorDraw();
+        toFrame({ type: 'set', texts: pe.cur });
+      }
+    }
+    function undo() {
+      keys.forEach(function (k) { pe.cur[k] = pe.orig[k]; });
+      pe.dirty = false;
+      mirrorDraw();
+      toFrame({ type: 'set', texts: pe.orig });
+    }
+    var chips = pieces.some(function (p) { return p.t && p.t.trim(); });
+    pe.ed.textContent = '';
+    pe.ed.appendChild(h('p', { class: 'hint where', text: first.page.name + ' ＞ ' + first.part.name + '（' + tagName(first.item.tag) + (keys.length > 1 ? '・枠ごと' : '') + '）' }));
+    pe.ed.appendChild(h('div', { class: 'm-ed-wrap' }, [mirror]));
+    pe.ed.appendChild(h('p', { class: 'hint', text: (pe.piece.st ? 'この欄は、ページの枠と同じ幅・同じ字の形と大きさです。改行の場所も、ページと同じになります。' : '') +
+      '打ったそばから、上のページの字が変わります。Enter で改行。太字にしたい字は、選んで「太字」を押します（もう一度押すと外れます）。' +
+      (chips || keys.some(function (k) { return pe.cur[k].indexOf('{{TEL}}') >= 0; }) ? '色の付いた字（電話番号など）は、ここでは打ち直せません。' : '') }));
+    pe.ed.appendChild(h('div', { class: 'ed-ft' }, [bold, button('元に戻す', '', undo), button('保存する', 'btn-main', save)]));
+    mirrorWire(mirror);
+    mirrorDraw();
+    toFrame({ type: 'pick', key: keys[0] });
+    window.scrollTo({ top: window.scrollY + pe.pv.getBoundingClientRect().top - 8, behavior: 'smooth' });   // ページと直す欄を、いっしょに見えるところへ
+  }
+
+  /** 直す欄を、今の文（pe.cur）から作り直す。caret があれば、その文のその字の所に、打つ所を戻す */
+  function mirrorDraw(caret) {
+    var box = pe.box, s = pe.piece.st;
+    box.textContent = '';
+    box.removeAttribute('style');
+    if (s) {
+      setStyle(box, s);
+      if (!/nowrap|pre/.test(s.whiteSpace || '')) box.style.whiteSpace = 'normal';
+      var w = Number(s.w), ind = Number(s.indent), max = Number(s.max);
+      if (s.fit) {     // 1行で、字の長さに合わせて縮む枠：打った字に合わせて、ページの枠が広がれる所まで広げる
+        if (w >= 1 && w <= 2000) box.style.minWidth = w + 'px';
+        box.style.width = 'max-content';
+        if (max >= w && max <= 2000) box.style.maxWidth = max + 'px';
+      } else if (w >= 10 && w <= 2000) box.style.width = (w + 0.02) + 'px';     // 0.02：小数の誤差で1字だけ折り返さないように
+      if (ind > 0 && ind < w) box.style.textIndent = ind + 'px';
+      if (typeof s.bg === 'string' && s.bg.length < 60) box.style.backgroundColor = s.bg;
+    }
+    var spot = null;
+    pe.piece.pieces.forEach(function (p) {
+      if (p.k) {
+        var r = h('span', { class: 'mk' });
+        r.dataset.k = p.k;
+        setStyle(r, p.cs);
+        var text = pe.cur[p.k] || '';
+        text.split(/\*\*([\s\S]+?)\*\*/).forEach(function (piece, i) {
+          var to = r;
+          if (i % 2) { to = document.createElement('b'); r.appendChild(to); }
+          piece.split('\n').forEach(function (line, j) {
+            if (j) to.appendChild(document.createElement('br'));
+            // {{TEL}} は、お店の電話番号を、色を付けた打てない字にして出す（消すことはできる）
+            line.split(/\{\{(TEL)\}\}/).forEach(function (bit, n) {
+              if (!(n % 2)) return putText(to, bit);
+              var v = h('span', { class: 'm-chip m-var', text: pe.tel || '電話番号' });
+              v.contentEditable = 'false';
+              v.dataset.v = bit;
+              to.appendChild(v);
+            });
+          });
+        });
+        if (!text || /\n$/.test(text)) r.appendChild(document.createTextNode(ZW));   // 空の文・終わりの改行のあとにも、打つ所を
+        if (caret && caret.k === p.k) spot = r;
+        box.appendChild(r);
+      } else {
+        var c = h('span', { class: 'm-chip' });
+        c.contentEditable = 'false';
+        setStyle(c, p.cs);
+        if (p.br) c.appendChild(document.createElement('br')); else c.textContent = p.t;
+        box.appendChild(c);
+      }
+    });
+    if (spot) caretAt(spot, caret.pos);
+  }
+
+  /** 直す欄から、文ごとの今の字を読む（**太字**・改行は \n。見えない字は外す） */
+  function mirrorRead(box) {
+    var items = [];
+    (function walk(node, k, b) {
+      for (var x = node.firstChild; x; x = x.nextSibling) {
+        if (x.nodeType === 3) items.push({ k: k, t: x.nodeValue, b: b });
+        else if (x.nodeType !== 1 || x.nodeName === 'WBR') continue;
+        else if (x.classList.contains('m-chip')) items.push(x.dataset.v ? { k: k, t: '{{' + x.dataset.v + '}}', b: b } : { chip: true });
+        else if (x.nodeName === 'BR') items.push({ k: k, t: '\n', b: b });
+        else walk(x, x.classList.contains('mk') ? x.dataset.k : k, b || /^(B|STRONG)$/.test(x.nodeName) || /^(bold|[6-9]00)$/.test(x.style.fontWeight));
+      }
+    })(box, null, false);
+    // 文の外に打った字は、すぐ前の文（無ければ、すぐ後ろの文）に入れる
+    var last = null;
+    items.forEach(function (it) { if (it.chip) return; if (it.k) last = it.k; else it.k = last; });
+    for (var i = items.length - 1, next = null; i >= 0; i--) { if (items[i].chip) continue; if (items[i].k) next = items[i].k; else items[i].k = next; }
+    var out = {};
+    pe.keys.forEach(function (k) {
+      var s = '', bold = false;
+      items.forEach(function (it) {
+        if (it.chip || it.k !== k) return;
+        var t = it.t.split(ZW).join('').replace(/ /g, ' ');
+        if (!t) return;
+        if (it.b !== bold) { s += '**'; bold = it.b; }
+        s += t;
+      });
+      if (bold) s += '**';
+      out[k] = s.replace(/\*\*\*\*/g, '');
+    });
+    return out;
+  }
+
+  /** 打つ所を、文の pos 字目に置く（改行は1字。**太字の印** は数えない） */
+  function caretAt(el, pos) {
+    var sel = window.getSelection(), r = document.createRange(), left = pos, done = false;
+    var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT), n;
+    while (!done && (n = w.nextNode())) {
+      if (n.nodeType === 3) {
+        var raw = n.nodeValue, vis = raw.split(ZW).join('').length;
+        if (left <= vis) {
+          var off = 0, cnt = 0;
+          while (off < raw.length && (cnt < left || raw[off] === ZW)) { if (raw[off] !== ZW) cnt++; off++; }
+          r.setStart(n, off); done = true;
+        } else left -= vis;
+      } else if (n.nodeName === 'BR') {
+        left -= 1;
+        if (left === 0 && !(n.nextSibling && n.nextSibling.nodeType === 3)) { r.setStartAfter(n); done = true; }
+      }
+    }
+    if (!done) { r.selectNodeContents(el); r.collapse(false); }
+    r.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(r);
+  }
+
+  /** 打ったとき：文を読み、ページに見せる。字を打ち終わったら、直す欄を作り直す（文節の切れ目を入れ直す。打っている所はそのまま） */
+  function mirrorTyped(rebuild) {
+    var box = pe.box, sel = window.getSelection(), mark = null;
+    if (rebuild && sel.rangeCount && box.contains(sel.anchorNode)) {
+      var r = sel.getRangeAt(0).cloneRange();
+      r.collapse(true);
+      mark = document.createTextNode(MARK);
+      r.insertNode(mark);
+    }
+    var got = mirrorRead(box), caret = null;
+    Object.keys(got).forEach(function (k) {
+      var i = got[k].indexOf(MARK);
+      if (i >= 0) { caret = { k: k, pos: got[k].slice(0, i).replace(/\*\*/g, '').length }; got[k] = got[k].split(MARK).join(''); }
+    });
+    if (mark && mark.parentNode) mark.parentNode.removeChild(mark);
+    pe.cur = got;
+    pe.dirty = pe.keys.some(function (k) { return got[k] !== pe.orig[k]; });
+    toFrame({ type: 'set', texts: got });
+    if (rebuild) mirrorDraw(caret);
+  }
+
+  function mirrorWire(box) {
+    var composing = false;
+    box.addEventListener('compositionstart', function () { composing = true; });
+    box.addEventListener('compositionend', function () { composing = false; setTimeout(function () { if (pe && pe.box === box) mirrorTyped(true); }, 0); });
+    box.addEventListener('input', function (e) { mirrorTyped(!composing && !e.isComposing); });
+    box.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' || e.isComposing || composing) return;
+      e.preventDefault();                       // 改行は、こちらで入れる（ブラウザが入れる <div> などにしない）
+      insertPlain('\n');
+    });
+    box.addEventListener('paste', function (e) {   // 貼りつけは字だけ
+      e.preventDefault();
+      insertPlain(((e.clipboardData && e.clipboardData.getData('text/plain')) || '').replace(/\r\n?/g, '\n'));
+    });
+    box.addEventListener('drop', function (e) { e.preventDefault(); });
+  }
+  /** 打つ所に字（改行は \n のまま）を入れて、作り直す */
+  function insertPlain(text) {
+    var sel = window.getSelection();
+    if (!sel.rangeCount || !pe.box.contains(sel.anchorNode)) return;
+    var r = sel.getRangeAt(0);
+    r.deleteContents();
+    var t = document.createTextNode(text);
+    r.insertNode(t);
+    r.setStartAfter(t); r.collapse(true);
+    sel.removeAllRanges(); sel.addRange(r);
+    mirrorTyped(true);
+  }
+
+  /* ---------- 直す画面 ---------- */
+
+  function openSheet(title, body, buttons) {
+    $('sheet-ttl').textContent = title;
+    var b = $('sheet-body'), f = $('sheet-ft');
+    b.textContent = ''; f.textContent = '';
+    b.appendChild(body);
+    buttons.forEach(function (x) { if (x) f.appendChild(x); });
+    st.dirty = false;
+    $('sheet').hidden = false;
+    b.scrollTop = 0;
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSheet(force) {
+    if (!force && st.dirty && !confirm('直したところを保存せずに、戻りますか？')) return;
+    $('sheet').hidden = true;
+    document.body.style.overflow = '';
+  }
+  function setBusy(on, box) {
+    box = box || $('sheet-ft');
+    box.querySelectorAll('button').forEach(function (b) { b.disabled = on; });
+    var main = box.querySelector('.btn-main');
+    if (main) { if (on) { main.dataset.label = main.textContent; main.textContent = '保存しています…'; } else if (main.dataset.label) main.textContent = main.dataset.label; }
+  }
+  function button(text, cls, fn) { return h('button', { type: 'button', class: 'btn ' + (cls || ''), text: text, on: { click: fn } }); }
+
+  function fld(label, opt, input, hint) {
+    var id = 'f' + rand(6);
+    if (input.tagName === 'INPUT' || input.tagName === 'TEXTAREA' || input.tagName === 'SELECT') input.id = id;
+    var lab = input.id === id ? h('label', { for: id }, [label, opt ? h('span', { class: 'opt', text: opt }) : null])
+      : h('span', { class: 'lbl' }, [label, opt ? h('span', { class: 'opt', text: opt }) : null]);
+    return h('div', { class: 'fld' }, [lab, input, hint ? h('p', { class: 'hint', text: hint }) : null]);
+  }
+  function text(v, ph, mode) { return h('input', { type: 'text', value: v || '', placeholder: ph || '', inputmode: mode || null, autocomplete: 'off' }); }
+  function area(v, ph) { var t = h('textarea', { placeholder: ph || '' }); t.value = v || ''; return t; }
+  function select(opts, v) {
+    var s = h('select');
+    opts.forEach(function (o) { s.appendChild(h('option', { value: o[0], text: o[1] })); });
+    s.value = v || '';
+    return s;
+  }
+  function radios(opts, v) {
+    var name = 'r' + rand(6), box = h('div', { class: 'seg', role: 'radiogroup' });
+    opts.forEach(function (o) {
+      var r = h('input', { type: 'radio', name: name, value: o[0] });
+      if ((v || '') === o[0]) r.checked = true;
+      box.appendChild(h('label', null, [r, o[1]]));
+    });
+    box.read = function () { var c = box.querySelector('input:checked'); return c ? c.value : ''; };
+    return box;
+  }
+
+  /** 値段：「1150」「１，１５０円」→「1,150」。数字だけでないもの（340／290／240、＋550 など）はそのまま */
+  function price(s) {
+    s = String(s || '').trim().replace(/円$/, '').replace(/[０-９]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); }).replace(/，/g, ',');
+    if (/^[\d,]+$/.test(s)) s = Number(s.replace(/,/g, '')).toLocaleString('en-US');
+    return s;
+  }
+
+  /** 行を足したり消したりできる表（値段の表・札） */
+  function rows(list, make, addText, max) {
+    var box = h('div'), wrap = h('div');
+    function add(v) {
+      var r = make(v || {});
+      r.appendChild(h('button', { type: 'button', class: 'x', 'aria-label': 'この行を消す', text: '×', on: { click: function () { r.remove(); st.dirty = true; } } }));
+      wrap.appendChild(r);
+    }
+    (list || []).forEach(add);
+    box.appendChild(wrap);
+    box.appendChild(button(addText, 'btn-sm', function () { if (!max || wrap.children.length < max) { add(); st.dirty = true; } }));
+    box.read = function () { return Array.prototype.map.call(wrap.children, function (r) { return r.read(); }).filter(Boolean); };
+    return box;
+  }
+
+  function photoField(name, alt, size) {
+    var w = size[0], hh = size[1];
+    var cur = { name: name || '', data: null };
+    var pv = h('div', { class: 'photo-pv', style: '--ar:' + w + '/' + hh }, [name ? h('img', { src: imgSrc(name), alt: '' }) : null]);
+    var file = h('input', { type: 'file', accept: 'image/*', 'aria-label': '写真を選ぶ' });
+    var altIn = text(alt, '例：鉄板に載ったハンバーグ');
+    file.addEventListener('change', async function () {
+      var f = file.files && file.files[0];
+      file.value = '';
+      if (!f) return;
+      var got = await crop(f, w, hh);
+      if (!got) return;
+      cur = { name: newPhotoName(), data: got.data, url: got.url };
+      pv.textContent = '';
+      pv.appendChild(h('img', { src: got.url, alt: '' }));
+      st.dirty = true;
+    });
+    var box = h('div', null, [
+      h('div', { class: 'photo' }, [pv, h('div', { class: 'photo-side' }, [
+        h('span', { class: 'btn btn-sm file-btn' }, [name ? '写真を変える' : '写真を選ぶ', file]),
+        h('span', { class: 'hint', text: '選んだ後、' + (w === hh ? '正方形' : '横長') + 'に切り取ります' })
+      ])]),
+      fld('写真の説明', 'なくてもよい', altIn, '目の不自由な方の読み上げに使います')
+    ]);
+    box.read = function () { return { name: cur.name, data: cur.data, url: cur.url, alt: altIn.value.trim() }; };
+    return box;
+  }
+
+  function newPhotoName() {
+    var d = new Date();
+    return 'u-' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '-' + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds()) + '-' + rand(4) + '.jpg';
+  }
+
+  /** 品の入力欄を作る。form.read() で品の形（データ/menu.json と同じ）と、新しい写真を返す */
+  function itemForm(type, it, size) {
+    var el = h('div'), get = {};
+    FIELDS[type].forEach(function (k) {
+      if (k === 'photo') { var p = photoField(it.photo, it.alt, size || [900, 675]); el.appendChild(fld('写真', null, p)); get.photo = p.read; }
+      else if (k === 'name') { var n = text(it.name, '例：超粗びきハンバーグ'); el.appendChild(fld('名前', null, n)); get.name = function () { return n.value.trim(); }; }
+      else if (k === 'sub') { var s = text(it.sub, '例：炊きたてご飯・コーンスープ'); el.appendChild(fld('小さい字の説明', 'なくてもよい', s)); get.sub = function () { return s.value.trim(); }; }
+      else if (k === 'price') { var pr = text(it.price, '例：1,150', 'text'); el.appendChild(fld('値段', '「円」は入れなくてよい', pr)); get.price = function () { return price(pr.value); }; }
+      else if (k === 'note') { var no = text(it.note, '例：ドレッシング：シーザー・ゴマ・和風'); el.appendChild(fld('一言', 'なくてもよい', no)); get.note = function () { return no.value.trim(); }; }
+      else if (k === 'copy') { var c = area(it.copy, 'お料理の説明'); el.appendChild(fld('説明', null, c)); get.copy = function () { return c.value.trim().replace(/\s*\n\s*/g, ''); }; }
+      else if (k === 'limit') { var l = text(it.limit, '例：1日20食限定'); el.appendChild(fld('赤い札', 'なくてもよい', l)); get.limit = function () { return l.value.trim(); }; }
+      else if (k === 'badges') {
+        var bs = rows(it.badges, function (b) {
+          var t = text(b.text, '例：人気No.1'), c = select(BADGE_COLORS, b.color);
+          var r = h('div', { class: 'pair is-badge' }, [t, c]);
+          r.read = function () { return t.value.trim() ? { text: t.value.trim(), color: c.value } : null; };
+          return r;
+        }, '＋ 札を足す', 4);
+        el.appendChild(fld('札', 'なくてもよい', bs)); get.badges = bs.read;
+      } else if (k === 'prices') {
+        var ps = rows(it.prices && it.prices.length ? it.prices : [{}], function (r0) {
+          var a = text(r0.label, type === 'mini' ? '例：ミニ' : '例：180g×1枚'), b = text(r0.price, '例：1,350');
+          var r = h('div', { class: 'pair' }, [a, b]);
+          r.read = function () { return b.value.trim() ? { label: a.value.trim(), price: price(b.value) } : null; };
+          return r;
+        }, '＋ 行を足す', 8);
+        el.appendChild(fld('値段', '左に量など、右に値段', ps)); get.prices = ps.read;
+      } else if (k === 'tip') {
+        var tl = text(it.tip && it.tip.label, '例：食べ方'), tt = text(it.tip && it.tip.text, '例：アツアツの焼石に載せて…');
+        el.appendChild(fld('一言', 'なくてもよい', h('div', { class: 'pair is-tip' }, [tl, tt])));
+        get.tip = function () { return tt.value.trim() ? { label: tl.value.trim(), text: tt.value.trim() } : null; };
+      }
+    });
+    var stat = radios(STATUS, it.status);
+    el.appendChild(fld('出し方', null, stat));
+    el.addEventListener('input', function () { st.dirty = true; });
+    el.addEventListener('change', function () { st.dirty = true; });
+    return {
+      el: el,
+      read: function () {
+        var out = {}, photos = [];
+        if (it.id) out.id = it.id;
+        Object.keys(get).forEach(function (k) {
+          var v = get[k]();
+          if (k === 'photo') {
+            if (v.name) out.photo = v.name;
+            if (v.alt) out.alt = v.alt;
+            if (v.data) photos.push({ name: v.name, data: v.data, url: v.url });
+          } else if (Array.isArray(v) ? v.length : v) out[k] = v;
+        });
+        if (stat.read()) out.status = stat.read();
+        return { item: out, photos: photos };
+      }
+    };
+  }
+
+  function check(type, it) {
+    if (!it.name) return '名前を入れてください。';
+    if (FIELDS[type].indexOf('photo') >= 0 && !it.photo) return '写真を選んでください。';
+    if (FIELDS[type].indexOf('price') >= 0 && !it.price) return '値段を入れてください。';
+    if (FIELDS[type].indexOf('prices') >= 0 && !(it.prices && it.prices.length)) return '値段を1つ以上入れてください。';
+    return '';
+  }
+
+  function group(menu, gid) { return menu.groups.filter(function (g) { return g.id === gid; })[0]; }
+
+  function editItem(gid, idx) {
+    var g = group(st.menu, gid), type = g.type === 'pic-set' ? 'plist' : g.type;
+    var it = idx == null ? {} : clone(g.items[idx]);
+    if (idx == null && type === 'mh') it.id = 'hb-' + rand(6);
+    var form = itemForm(type, it, g.size);
+    // 並び（何番目に出すか）
+    var n = g.items.length + (idx == null ? 1 : 0), opts = [];
+    for (var i = 0; i < n; i++) opts.push([String(i), (i + 1) + '番目']);
+    var pos = select(opts, String(idx == null ? n - 1 : idx));
+    form.el.appendChild(fld('並び', g.title + 'の中で', pos));
+
+    async function save() {
+      var got = form.read(), msg = check(type, got.item);
+      if (msg) return toast(msg, true);
+      var menu = clone(st.menu), gg = group(menu, gid);
+      if (idx != null) gg.items.splice(idx, 1);
+      gg.items.splice(Number(pos.value), 0, got.item);
+      await saveData('menu', menu, got.photos, 'メニュー：「' + got.item.name + '」を' + (idx == null ? '足しました' : '直しました'));
+    }
+    async function del() {
+      if (!confirm('「' + g.items[idx].name + '」を消しますか？\n（しばらく出さないだけなら「しばらくお休み」が便利です）')) return;
+      var menu = clone(st.menu);
+      group(menu, gid).items.splice(idx, 1);
+      await saveData('menu', menu, [], 'メニュー：「' + g.items[idx].name + '」を消しました');
+    }
+    openSheet(idx == null ? g.title + 'に足す' : it.name, form.el, [idx == null ? null : button('消す', 'btn-del', del), button('保存する', 'btn-main', save)]);
+  }
+
+  function editGroupPhoto(gid) {
+    var g = group(st.menu, gid), p = photoField(g.photo, g.alt, g.size || [900, 675]);
+    var el = h('div', null, [fld('「' + g.title + '」の写真', null, p)]);
+    el.addEventListener('input', function () { st.dirty = true; });
+    openSheet(g.title + 'の写真', el, [button('保存する', 'btn-main', async function () {
+      var v = p.read(), menu = clone(st.menu), gg = group(menu, gid);
+      gg.photo = v.name; if (v.alt) gg.alt = v.alt; else delete gg.alt;
+      await saveData('menu', menu, v.data ? [{ name: v.name, data: v.data, url: v.url }] : [], 'メニュー：「' + g.title + '」の写真を変えました');
+    })]);
+  }
+
+  function sortedNews() { return st.news.items.slice().sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; }); }
+
+  function editNews(id) {
+    var n = id ? clone(st.news.items.filter(function (x) { return x.id === id; })[0]) : { date: today(), cat: 'お知らせ' };
+    var date = h('input', { type: 'date', value: n.date }), cat = select(NEWS_CATS.map(function (c) { return [c, c]; }), n.cat);
+    var title = text(n.title, '例：年末年始の営業のお知らせ'), body = area(n.body, 'お知らせの文');
+    var lk = n.link || {}, href = select(LINKS, lk.href), ltext = text(lk.text, '例：メニューのページへ');
+    href.addEventListener('change', function () {
+      var o = LINKS.filter(function (x) { return x[0] === href.value; })[0];
+      if (href.value && !ltext.value.trim()) ltext.value = o[1] + 'のページへ';
+    });
+    var el = h('div', null, [
+      fld('日付', null, date), fld('種類', 'イベントだけ赤になります', cat), fld('見出し', null, title),
+      fld('本文', null, body, '改行したところで段落が分かれます'),
+      fld('下に付けるリンク', 'なくてもよい', href), fld('リンクの字', null, ltext)
+    ]);
+    el.addEventListener('input', function () { st.dirty = true; });
+    async function save() {
+      var item = { id: n.id || ('n-' + date.value.replace(/-/g, '') + '-' + rand(3)), date: date.value, cat: cat.value, title: title.value.trim(), body: body.value.trim() };
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(item.date)) return toast('日付を入れてください。', true);
+      if (!item.title) return toast('見出しを入れてください。', true);
+      if (href.value) item.link = { href: href.value, text: ltext.value.trim() || '詳しくはこちら' };
+      var news = clone(st.news), i = news.items.findIndex(function (x) { return x.id === item.id; });
+      if (i >= 0) news.items[i] = item; else news.items.push(item);
+      await saveData('news', news, [], 'お知らせ：「' + item.title + '」を' + (id ? '直しました' : '足しました'));
+    }
+    async function del() {
+      if (!confirm('「' + n.title + '」を消しますか？')) return;
+      var news = clone(st.news);
+      news.items = news.items.filter(function (x) { return x.id !== id; });
+      await saveData('news', news, [], 'お知らせ：「' + n.title + '」を消しました');
+    }
+    openSheet(id ? n.title : 'お知らせを足す', el, [id ? button('消す', 'btn-del', del) : null, button('保存する', 'btn-main', save)]);
+  }
+
+  /** 保存する。opts.stay なら画面を作り直さない（ページで直すとき）、opts.box は保存中に押せなくするボタンの入れ物。保存できたら true */
+  async function saveData(what, data, photos, note, opts) {
+    opts = opts || {};
+    var box = opts.box || $('sheet-ft');
+    setBusy(true, box);
+    try {
+      var r = await post({ action: 'save', what: what, data: data, sha: st.sha[what], note: note,
+        photos: photos.map(function (p) { return { name: p.name, data: p.data }; }) });
+      st[what] = r.data || data;
+      st.sha[what] = r.sha;
+      photos.forEach(function (p) { st.fresh[p.name] = p.url; });
+      if (!opts.stay) { closeSheet(true); show(st.tab); }
+      toast('保存しました。');
+      watch(r.commit);
+      return true;
+    } catch (e) {
+      if (e.code === 'conflict') {
+        try { await reload(); } catch (e2) { /* 読み込めなくても、知らせは出す */ }
+        closeSheet(true);
+        show(st.tab);
+      }
+      toast(errText(e), true);
+      return false;
+    } finally {
+      if (box.isConnected) setBusy(false, box);
+    }
+  }
+
+  /* ---------- ホームページに出たか ---------- */
+
+  function pub(kind, msg) { var p = $('pub'); p.className = 'pub' + (kind ? ' is-' + kind : ''); p.textContent = msg; }
+  function watch(commit) {
+    clearTimeout(st.watch);
+    var t0 = Date.now(), my = {};
+    st.watchId = my;
+    pub('work', 'ホームページに出しています…（2〜3分かかります）');
+    (async function tick() {
+      if (st.watchId !== my) return;
+      try {
+        var r = await post({ action: 'status', commit: commit });
+        if (st.watchId !== my) return;
+        if (r.state === 'done') return pub('done', 'ホームページに出ました（' + hm(new Date()) + '）');
+        if (r.state === 'failed') return pub('fail', 'ホームページに出せませんでした。Claude に知らせてください。');
+      } catch (e) { /* 次にまた聞く */ }
+      if (Date.now() - t0 > 8 * 60000) return pub('', '出るまで時間がかかっています。少し後でホームページを見てください。');
+      st.watch = setTimeout(tick, LOCAL ? 1500 : 15000);
+    })();
+  }
+
+  /* ---------- 前に戻す ---------- */
+
+  async function viewHistory(v) {
+    v.appendChild(h('p', { class: 'hint', text: '最近の変更です。「この形に戻す」を押すと、そのときのメニュー・お知らせ・ページの文章に戻します。写真は消えません。' }));
+    var list = h('ul', { class: 'list hist' }, [h('li', { class: 'empty', text: '読み込んでいます…' })]);
+    v.appendChild(h('div', { class: 'grp' }, [list]));
+    try {
+      var r = await post({ action: 'history' });
+      list.textContent = '';
+      r.list.forEach(function (c, i) {
+        var d = new Date(c.date), when = (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + hm(d);
+        list.appendChild(h('li', null, [
+          h('span', { class: 'row-main' }, [h('b', { text: c.message }), h('small', { text: when })]),
+          i === 0 ? h('small', { class: 'hint', text: '今の形' }) : button('この形に戻す', 'btn-sm', function () { restore(c, when); })
+        ]));
+      });
+      if (!r.list.length) list.appendChild(h('li', { class: 'empty', text: 'まだ変更はありません。' }));
+    } catch (e) {
+      list.textContent = '';
+      list.appendChild(h('li', { class: 'empty', text: errText(e) }));
+    }
+  }
+
+  async function restore(c, when) {
+    if (!confirm(when + ' の形（「' + c.message + '」の後）に戻しますか？')) return;
+    try {
+      var r = await post({ action: 'restore', commit: c.commit, note: '前に戻す：' + when + ' の形に戻しました' });
+      await reload();
+      show('history');
+      toast('戻しました。');
+      watch(r.commit);
+    } catch (e) {
+      toast(errText(e), true);
+    }
+  }
+
+  /* ---------- 写真の切り取り（枠は w×h の形。できた写真は w×h の JPEG） ---------- */
+
+  function crop(file, w, hh) {
+    return new Promise(function (done) {
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onerror = function () { URL.revokeObjectURL(url); toast('この写真は読めませんでした。他の写真を試してください。', true); done(null); };
+      img.onload = function () {
+        var box = $('crop-box'), cv = $('crop-cv'), zoom = $('crop-zoom'), pts = new Map();
+        var iw = img.naturalWidth, ih = img.naturalHeight, bw, bh, dpr, s0, s, x, y;
+        $('crop').hidden = false;
+        bw = box.clientWidth; bh = Math.round(bw * hh / w);
+        box.style.height = bh + 'px';
+        dpr = window.devicePixelRatio || 1;
+        cv.width = Math.round(bw * dpr); cv.height = Math.round(bh * dpr);
+        s0 = Math.max(bw / iw, bh / ih); s = s0;
+        x = (bw - iw * s) / 2; y = (bh - ih * s) / 2;
+        zoom.value = 1;
+        $('crop-warn').textContent = iw < w || ih < hh ? 'この写真は小さいので、少しぼやけるかもしれません。' : '';
+
+        function draw() {
+          x = Math.min(0, Math.max(bw - iw * s, x)); y = Math.min(0, Math.max(bh - ih * s, y));
+          var c = cv.getContext('2d');
+          c.setTransform(dpr, 0, 0, dpr, 0, 0);
+          c.imageSmoothingQuality = 'high';
+          c.fillStyle = '#000'; c.fillRect(0, 0, bw, bh);
+          c.drawImage(img, x, y, iw * s, ih * s);
+        }
+        function zoomTo(ns, cx, cy) {
+          ns = Math.max(s0, Math.min(s0 * 4, ns));
+          x = cx - (cx - x) * ns / s; y = cy - (cy - y) * ns / s; s = ns;
+          zoom.value = s / s0;
+          draw();
+        }
+        function at(e) { var r = box.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+        box.onpointerdown = function (e) { e.preventDefault(); box.setPointerCapture(e.pointerId); pts.set(e.pointerId, at(e)); };
+        box.onpointermove = function (e) {
+          if (!pts.has(e.pointerId)) return;
+          var p = at(e), prev = pts.get(e.pointerId);
+          pts.set(e.pointerId, p);
+          if (pts.size === 1) { x += p.x - prev.x; y += p.y - prev.y; return draw(); }
+          var other = null;
+          pts.forEach(function (q, id) { if (id !== e.pointerId) other = q; });
+          var d0 = Math.hypot(prev.x - other.x, prev.y - other.y), d1 = Math.hypot(p.x - other.x, p.y - other.y);
+          x += (p.x - prev.x) / 2; y += (p.y - prev.y) / 2;
+          if (d0 > 0) zoomTo(s * d1 / d0, (p.x + other.x) / 2, (p.y + other.y) / 2); else draw();
+        };
+        box.onpointerup = box.onpointercancel = function (e) { pts.delete(e.pointerId); };
+        box.onwheel = function (e) { e.preventDefault(); var p = at(e); zoomTo(s * (e.deltaY < 0 ? 1.08 : 1 / 1.08), p.x, p.y); };
+        zoom.oninput = function () { zoomTo(s0 * Number(zoom.value), bw / 2, bh / 2); };
+        function finish(ok) {
+          $('crop').hidden = true;
+          box.onpointerdown = box.onpointermove = box.onpointerup = box.onpointercancel = box.onwheel = zoom.oninput = null;
+          $('crop-ok').onclick = $('crop-cancel').onclick = null;
+          if (!ok) { URL.revokeObjectURL(url); return done(null); }
+          var out = document.createElement('canvas');
+          out.width = w; out.height = hh;
+          var c = out.getContext('2d');
+          c.imageSmoothingQuality = 'high';
+          c.drawImage(img, -x / s, -y / s, bw / s, bh / s, 0, 0, w, hh);
+          URL.revokeObjectURL(url);
+          var data = out.toDataURL('image/jpeg', 0.84);
+          done({ url: data, data: data.split(',')[1] });
+        }
+        $('crop-ok').onclick = function () { finish(true); };
+        $('crop-cancel').onclick = function () { finish(false); };
+        draw();
+      };
+      img.src = url;
+    });
+  }
+
+  /* ---------- はじめ ---------- */
+
+  function start() {
+    if (!LOCAL && CONF.site) $('site-link').href = CONF.site + '/';
+    // バグる Owner から開いたとき（?from=owner）だけ「🏠」を出す。Google が出す画面は、開いたアドレスを google.script.url で読む
+    if (GAS && google.script.url) google.script.url.getLocation(function (loc) { if (loc.parameter && loc.parameter.from === 'owner') $('owner-home').hidden = false; });
+    else if (/[?&]from=owner\b/.test(location.search)) $('owner-home').hidden = false;
+    document.querySelectorAll('.tabs button').forEach(function (b) { b.addEventListener('click', function () { if (leaveText()) show(b.dataset.tab); }); });
+    $('sheet-close').addEventListener('click', function () { closeSheet(false); });
+    $('sheet').addEventListener('click', function (e) { if (e.target === $('sheet')) closeSheet(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('sheet').hidden && $('crop').hidden) closeSheet(false); });
+    $('login-form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var pin = $('pin').value.trim();
+      if (!pin) return;
+      st.pin = pin;
+      try {
+        await post({ action: 'ping' });
+        keep(PIN_KEY, pin);
+        $('pin').value = '';
+        enter();
+      } catch (err) {
+        st.pin = '';
+        $('login-err').textContent = errText(err);
+      }
+    });
+    $('logout').addEventListener('click', function () {
+      if (!confirm('この端末で覚えている合言葉を消して、出ますか？')) return;
+      keep(PIN_KEY, ''); st.pin = '';
+      showLogin('');
+    });
+    st.pin = kept(PIN_KEY);
+    if (!LOCAL && !GAS) return showLogin(ERR.not_ready);
+    if (st.pin) enter(); else showLogin('');
+  }
+
+  start();
+})();
+</script>
+</body>
+</html>

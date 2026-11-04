@@ -1,0 +1,64 @@
+<section class="sec">
+  <div class="wrap">
+    <div class="order">
+      <div>
+        <p class="sh-en" style="color:var(--flame)">MOBILE ORDER</p>
+        <h2>{{t:takeout-1}}</h2>
+        <p>{{t:takeout-2}}</p>
+      </div>
+      <div>
+        <a class="btn btn-ember btn-wide" href="{{ORDER_URL}}"><svg class="i" aria-hidden="true"><use href="#i-phone2"/></svg>モバイルオーダーで注文</a>
+        <small>{{t:takeout-3}}<a href="{{TEL_LINK}}" style="color:#fff">{{TEL}}</a></small>
+      </div>
+    </div>
+    <p class="todo">注文のボタンは、会社の GitHub に公開した「店舗アプリ」の注文の画面につないでいる。まだ試作で、注文してもお店のタブレットに届かない。ホームページを公開する前に、届くようにするか、ボタンを電話の注文に替える</p>
+  </div>
+</section>
+
+<section class="sec sec-brick">
+  <div class="wrap">
+    <div class="sh">
+      <p class="sh-en">HOW TO ORDER</p>
+      <h2 class="sh-jp">{{t:takeout-4}}</h2>
+    </div>
+    <ol class="flow three">
+      <li><svg class="i" aria-hidden="true"><use href="#i-menu"/></svg><h3>{{t:takeout-5}}</h3><p>{{t:takeout-6}}</p></li>
+      <li><svg class="i" aria-hidden="true"><use href="#i-clock"/></svg><h3>{{t:takeout-7}}</h3><p>{{t:takeout-8}}</p></li>
+      <li><svg class="i" aria-hidden="true"><use href="#i-bag"/></svg><h3>{{t:takeout-9}}</h3><p>{{t:takeout-10}}</p></li>
+    </ol>
+    <p class="note">{{t:takeout-11}}</p>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="sh">
+      <p class="sh-en">TAKEOUT MENU</p>
+      <h2 class="sh-jp">{{t:takeout-12}}</h2>
+    </div>
+
+    <h3 class="sub-ttl">{{t:takeout-13}}<small>{{t:takeout-14}}</small></h3>
+    {{list:tk-box}}
+    <p class="tip" style="margin-top:12px">{{t:takeout-15}}</p>
+
+    <h3 class="sub-ttl">{{t:takeout-16}}<small>{{t:takeout-17}}</small></h3>
+    <div class="pic-cards">
+      {{list:tk-teishoku}}
+    </div>
+    <p class="tip" style="margin-top:12px">{{t:takeout-18}}</p>
+
+    <h3 class="sub-ttl">{{t:takeout-19}}<small>{{t:takeout-20}}</small></h3>
+    <div class="grid5">
+      {{list:tk-acai}}
+    </div>
+    <p class="tip" style="margin-top:12px">{{t:takeout-21}}</p>
+
+    <h3 class="sub-ttl">{{t:takeout-22}}</h3>
+    <div class="pic-cards is-side">
+      {{list:tk-side}}
+    </div>
+    <p class="hint pic-hint">{{t:takeout-23}}</p>
+    <p class="tax">{{t:takeout-24}}</p>
+    <p class="more"><a class="btn btn-ember" href="{{ORDER_URL}}"><svg class="i" aria-hidden="true"><use href="#i-phone2"/></svg>モバイルオーダーで注文</a></p>
+  </div>
+</section>
