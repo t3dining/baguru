@@ -279,6 +279,14 @@ address{font-style:normal}
 .steps b{flex:none; width:44px; height:44px; display:grid; place-items:center; background:var(--coal); color:#fff; font-family:var(--en); font-size:20px; border-radius:50%}
 .steps h3{font-size:18px; margin-bottom:4px}
 .steps p{margin:0; color:var(--muted); font-size:15px}
+/* スマホ：番号の丸は見出しの横だけに置き、説明の文は丸の下から行の端まで使う（2026-11-05 ko-dai さんの指示：「されます。まで入れてください」。
+   前は丸のぶん（44px＋すき間16px）文の幅が狭く、「…甘みがプラスされま／す。」と折り返していた） */
+@media (max-width:560px){
+  .steps li{display:grid; grid-template-columns:44px 1fr; column-gap:14px; align-items:center}
+  .steps li > div{display:contents}
+  .steps h3{margin:0}
+  .steps p{grid-column:1 / -1; margin-top:10px}
+}
 @media (max-width:820px){ .howto{grid-template-columns:1fr; gap:28px} }
 
 /* ---------- カード（ランチなど） ---------- */
