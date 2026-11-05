@@ -45,6 +45,10 @@ SITE_URL = 'https://t3dining.github.io/baguru'  # 会社の GitHub（無料）�
 #   中身は SITE_URL/PREVIEW/ に置く。そのアドレスはどこにも載せず、管理画面とバグる Owner からだけ開く
 #   ★会社の GitHub の置き場所は誰でも見られる（無料のため）ので、探せば中身も見える。本当の秘密は置かない
 #   本当に公開する日に COMING_SOON を False にする（中身が SITE_URL に出る）。バグる Owner のホームページのカードのアドレスも、そのとき直す
+# 即予約（15分以内に来店する、すぐ確定するネット予約）の画面（ご予約のページの「いますぐ行く（15分以内）」）。2026-11-05 に作った。
+#   決めごとは 店舗アプリ/バグる/即予約の決めごと.md。★ko-dai さんが「公開して」と言うまで False（ページ/reserve.html の <!--quick-->〜<!--/quick--> を出さない）。
+#   True にしても、予約ボードのスイッチが「受付中」で、受付時間の中のときだけ出る（js/quick.js が受け口の nowAvail を見る）
+QUICK_ON = False
 COMING_SOON = False   # 2026-11-04 夕方に外した（ko-dai さんの指示：「検索で出なければいいので、coming soon も外して」）。検索に出さないのは SAMPLE の noindex
 PREVIEW = 'naka-f90249acdb'
 BASE_URL = SITE_URL + '/' + PREVIEW if COMING_SOON else SITE_URL   # 中身のページの場所（canonical・OGP・管理画面が開くページ）
@@ -281,6 +285,8 @@ def qr_svg(rows, label):
 
 
 def fill(s):
+    # 即予約の画面（<!--quick-->〜<!--/quick-->）は、QUICK_ON のときだけ出す
+    s = re.sub(r'[ \t]*<!--quick-->.*?<!--/quick-->([ \t]*\n)?', (lambda m: m.group(0).replace('<!--quick-->', '').replace('<!--/quick-->', '')) if QUICK_ON else '', s, flags=re.S)
     s = s.replace('{{APP_QR}}', qr_svg(APP_QR, '公式アプリを開くQRコード'))
     for k, v in VARS.items():
         s = s.replace('{{%s}}' % k, html.escape(v, quote=True))
@@ -809,7 +815,7 @@ def add_wbr(page):
 
 # ページごとに足す JavaScript（ネット予約のフォームはご予約のページ、お問い合わせ・応募のフォームはお問い合わせと採用のページ）
 PAGE_JS = {'app': ['js/app-guide.js'],
-           'reserve': ['js/api.js', 'js/reserve.js'],      # js/config.js と js/main.js は、どのページにも入る
+           'reserve': ['js/api.js', 'js/reserve.js'] + (['js/quick.js'] if QUICK_ON else []),      # js/config.js と js/main.js は、どのページにも入る。quick.js は即予約
            'contact': ['js/api.js', 'js/contact.js'],
            'recruit': ['js/api.js', 'js/contact.js']}
 
@@ -967,7 +973,7 @@ def main():
     write_kanri()
     shutil.copy2(BUDOUX, OUT / 'js' / 'budoux-ja.json')    # 管理画面の「ページで直す」で、直した文の改行のところを作るのに使う（js/edit.js）
     # 版の印は、CSS と JavaScript の中身から作る。中身が変わればブラウザが読み直す
-    parts = ['css/style.css', 'js/main.js', 'js/config.js', 'js/api.js', 'js/reserve.js', 'js/contact.js', 'js/edit.js']
+    parts = ['css/style.css', 'js/main.js', 'js/config.js', 'js/api.js', 'js/reserve.js', 'js/quick.js', 'js/contact.js', 'js/edit.js', 'js/app-guide.js']
     ver = hashlib.sha1(b''.join((OUT / p).read_bytes() for p in parts if (OUT / p).exists())).hexdigest()[:8]
     for page in PAGES:
         if not (SRC / (page + '.html')).exists():

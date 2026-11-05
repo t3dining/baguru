@@ -785,6 +785,28 @@ address{font-style:normal}
 .rsv-no{font-size:15px}
 .rsv-no b{display:block; font-family:var(--en); font-size:40px; letter-spacing:.06em; line-height:1.2}
 .rsv-done .btns{margin-top:18px}
+/* 即予約「いますぐ行く（15分以内）」（ご予約のページ。js/quick.js。作る.py の QUICK_ON のときだけページに入る。2026-11-05） */
+.btn-quick{background:var(--flame); color:#fff}
+.quick{background:#fff6ee; border-top:4px solid var(--flame)}
+.quick-now{background:var(--coal); color:var(--on-dark); border-radius:var(--r); padding:18px 22px; margin-bottom:14px; text-align:center}
+.quick-now p{margin:0}
+.quick-now .hint{color:#cbbfb1}
+.quick-cap{font-size:18px; font-weight:700}
+.quick-cap b,.quick-by b{font-family:var(--en); font-size:30px; letter-spacing:.02em; color:var(--flame); margin:0 2px}
+.quick-at{margin-top:4px!important; color:#e9dfd3}
+.quick-at b{color:#fff; font-family:var(--en); font-size:20px}
+.quick-full{font-size:18px; font-weight:900}
+.quick-note{margin-top:2px!important; font-size:13px; color:#cbbfb1}
+.quick-now a,.quick-rules a,#q-people-note a{white-space:nowrap}
+.quick-now a{color:#fff; text-underline-offset:3px}
+#q-people{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px}
+#q-people .chip span{min-width:0; width:100%; padding:6px 2px; white-space:nowrap}
+.quick-rules{background:#fff; border:2px solid var(--flame); border-radius:var(--r); padding:16px 18px}
+.quick-rules p{margin:0 0 8px}
+.quick-rules b{color:var(--ember2)}
+.quick-rules .chk{margin-top:10px; font-weight:700}
+.quick-done{border-top-color:var(--flame)}
+.quick-by{font-size:18px; font-weight:700; margin-bottom:8px}
 @media (max-width:640px){
   .rsv-step{padding:18px 14px 16px}
   .fgrid{grid-template-columns:1fr}

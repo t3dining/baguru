@@ -8,11 +8,61 @@
       </div>
     </div>
     <div class="btns center" style="margin-top:22px">
+      <!--quick--><a class="btn btn-quick" href="#quick" data-quick-btn hidden><svg class="i" aria-hidden="true"><use href="#i-clock"/></svg>いますぐ行く（15分以内）</a><!--/quick-->
       <a class="btn btn-ember" href="#booking"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg>ネットで予約する</a>
       <a class="btn btn-outline" href="{{TEL_LINK}}"><svg class="i" aria-hidden="true"><use href="#i-phone"/></svg>電話で予約する</a>
     </div>
   </div>
 </section>
+
+<!--quick-->
+<section class="sec quick" id="quick" hidden>
+  <div class="wrap narrow">
+    <div class="sh">
+      <p class="sh-en">RIGHT NOW</p>
+      <h2 class="sh-jp">{{t:reserve-66}}</h2>
+      <p class="sh-lead">{{t:reserve-67}}</p>
+    </div>
+    <div class="quick-now" id="q-now" aria-live="polite"><p class="hint">{{t:reserve-68}}</p></div>
+
+    <form class="rsv quick-form" id="q-form" novalidate onsubmit="return false" hidden>
+      <fieldset class="rsv-step">
+        <legend>{{t:reserve-69}}</legend>
+        <div class="chips" id="q-people"></div>
+        <p class="hint" id="q-people-note"></p>
+      </fieldset>
+      <fieldset class="rsv-step">
+        <legend>{{t:reserve-70}}</legend>
+        <div class="fgrid">
+          <div><label for="q-name">{{t:reserve-71}}<span class="need">必須</span></label><input type="text" id="q-name" autocomplete="name" maxlength="40" placeholder="例：豊田 太郎"></div>
+          <div><label for="q-tel">{{t:reserve-72}}<span class="need">必須</span></label><input type="tel" id="q-tel" autocomplete="tel" inputmode="tel" maxlength="20" placeholder="例：090-1234-5678"></div>
+          <div class="full"><label for="q-email">{{t:reserve-73}}<span class="opt">任意</span></label><input type="email" id="q-email" autocomplete="email" inputmode="email" maxlength="120" placeholder="入れた方には、確定のメールをお送りします"></div>
+        </div>
+        <div class="hp" aria-hidden="true"><label for="q-website">ここには何も入れないでください</label><input type="text" id="q-website" tabindex="-1" autocomplete="off"></div>
+      </fieldset>
+      <div class="quick-rules">
+        <p>{{t:reserve-74}}</p>
+        <p>{{t:reserve-75}}<a href="{{TEL_LINK}}">{{TEL}}</a>{{t:reserve-76}}</p>
+        <div class="chk"><label><input type="checkbox" id="q-ok">{{t:reserve-77}}</label></div>
+      </div>
+      <p class="consent">{{t:reserve-78}}<a href="privacy.html">{{t:reserve-79}}</a>{{t:reserve-80}}</p>
+      <p class="form-msg" id="q-msg" role="alert" hidden></p>
+      <button class="btn btn-ember btn-wide" type="submit" id="q-send">この内容で予約する</button>
+    </form>
+
+    <div class="rsv-done quick-done" id="q-done" hidden>
+      <svg class="i" aria-hidden="true"><use href="#i-check"/></svg>
+      <h3>{{t:reserve-81}}</h3>
+      <p class="quick-by"><b id="q-by"></b>{{t:reserve-82}}</p>
+      <p class="rsv-no">{{t:reserve-83}} <b id="q-no"></b></p>
+      <p id="q-what"></p>
+      <p id="q-mailed" hidden>{{t:reserve-84}}</p>
+      <p>{{t:reserve-85}}<br><a href="{{TEL_LINK}}">{{TEL}}</a></p>
+      <div class="btns center"><a class="btn btn-dark" href="index.html">ホームへ</a></div>
+    </div>
+  </div>
+</section>
+<!--/quick-->
 
 <section class="sec sec-brick" id="booking">
   <div class="wrap narrow">
