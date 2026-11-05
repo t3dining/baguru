@@ -7,7 +7,13 @@
    ・送る前に「15分以内にお越しになれる方だけ」「取り消し・遅れるときはお電話で」を見せ、「15分以内にお店に行けます」に印を付けてもらう
    ・送ったあとは「予約が確定しました。○時○分までにお越しください」・予約番号・店の電話
    ・送るときに「受付の印（rid）」を付ける。返事が途中で切れて送り直しても、1件にしかならない
-   ・★作る.py の QUICK_ON が True のときだけ、ページに入る */
+   ・★作る.py の QUICK_ON が True のときだけ、ページに入る
+   ・バグる Owner の中（新しい場所の Owner の hp.html にはめ込まれ、Owner から来たとき。main.js の in-owner）だけ、
+     Owner が預かっている公式アプリのテスト用アカウントの鍵を postMessage でもらい、nowAvail・quickReserve に member・key を足す。
+     受け口（2026-11-06b〜）は、テスト用の会員なら、スイッチが止まっていても・受付時間の外でも・休みの日でも受け、答えに test: true を付ける。
+     （2026-11-06 ko-dai さんの指示「オーナーから開いたホームページもいつでも即予約ができるようにしてください」。バグるOwner のセッションに頼まれた）
+     知らせ：ここ → Owner { type: 'baguru-hp', kind: 'testAuth-hello' }、Owner → ここ { type: 'baguru-owner', kind: 'testAuth', auth: { no, key } | null }
+     ★鍵は覚えない（変数だけ。アドレスにも載せない）。お客さまがふつうに開いたとき（枠の外）は何も変えない */
 (function () {
   'use strict';
   var A = window.BaguruApi;
@@ -17,7 +23,44 @@
   var TEL = (window.BAGURU && window.BAGURU.tel) || '';
   var EVERY = 60000;                // いまの空きを読み直す間隔（来店時刻が1分ごとに進むため）
   var PEOPLE_MAX = 15;              // 選べる人数（ネット予約と同じ。それより多い方はお電話で）
-  var state = { avail: null, people: 0, rid: '', sending: false, done: false, closed: false };
+  var state = { avail: null, people: 0, rid: '', sending: false, done: false, closed: false, test: false };
+
+  /* ---------- バグる Owner の中：テスト用アカウント ---------- */
+  var inOwner = document.body.classList.contains('in-owner');   // main.js が付ける（枠の中・Owner から・?edit でない）
+  var OWNER_ORIGIN = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? location.origin : 'https://t3dining-store.github.io';
+  var auth = null;          // { no, key }。この変数だけに持つ
+  var ready = !inOwner;     // Owner の中では、鍵の返事（または1.5秒）を待ってから最初の nowAvail を送る
+  var TEST_BEFORE = 'テスト用アカウント：今すぐの予約を止めているとき・受付時間の外でも試せます（席の空きは本物と同じ。お店の予約ボードに届くので、試したら予約ボードで取り消してください）';
+  var TEST_AFTER = 'テスト用アカウントの試しの予約です。お店の予約ボードに「試」の印で届いています。確かめたら、予約ボードで取り消してください。';
+  var NO_TEST = 'いつでも即予約を試すには、先に Owner の「公式アプリ」でテスト用アカウントを作ってください。';
+  function askAuth() {
+    if (!inOwner) return Promise.resolve();
+    return new Promise(function (done) {
+      var over = false;
+      function end() { if (over) return; over = true; window.removeEventListener('message', onMsg); ready = true; done(); }
+      function onMsg(e) {
+        if (e.source !== window.parent || e.origin !== OWNER_ORIGIN) return;
+        var d = e.data;
+        if (!d || d.type !== 'baguru-owner' || d.kind !== 'testAuth') return;
+        var a = d.auth, no = a && (typeof a.no === 'string' || typeof a.no === 'number') ? String(a.no) : '';
+        auth = no && typeof a.key === 'string' && no.length <= 64 && a.key.length && a.key.length <= 256 ? { no: no, key: a.key } : null;
+        end();
+      }
+      window.addEventListener('message', onMsg);
+      try { window.parent.postMessage({ type: 'baguru-hp', kind: 'testAuth-hello' }, OWNER_ORIGIN); } catch (x) { end(); return; }
+      setTimeout(end, 1500);
+    });
+  }
+  function withAuth(body) {
+    if (auth) { body.member = auth.no; body.key = auth.key; }
+    return body;
+  }
+  // Owner の中だけの一言（テスト用アカウントで試せること・作り方の案内）
+  function ownerNote() {
+    if (!inOwner) return;
+    var now = $('q-now'), p = line('quick-test', state.test ? TEST_BEFORE : auth ? '' : NO_TEST);
+    if (p.textContent) now.insertBefore(p, now.firstChild);
+  }
 
   var MSG = {
     not_accepting: 'ただいま「今すぐ行く」の予約は受け付けていません。日時を選ぶネット予約か、お電話でどうぞ。',
@@ -57,10 +100,11 @@
 
   /* ---------- いまの空き ---------- */
   function load() {
-    if (state.done || state.sending) return Promise.resolve();
-    return A.post({ action: 'nowAvail' }).then(function (a) {
+    if (state.done || state.sending || !ready) return Promise.resolve();
+    return A.post(withAuth({ action: 'nowAvail' })).then(function (a) {
       state.avail = a;
-      if (!a.accepting) { if (!state.closed) showAll(false); else draw(); return; }
+      state.test = !!a.test;
+      if (!a.accepting) { if (inOwner) { showAll(true); draw(); } else if (!state.closed) showAll(false); else draw(); return; }   // Owner の中では、受けていないことと案内を出す
       state.closed = false;
       showAll(true);
       draw();
@@ -75,7 +119,8 @@
     return (a.people || []).map(Number).filter(function (n) { return n > 0 && n <= PEOPLE_MAX; });
   }
 
-  function draw() {
+  function draw() { drawMain(); ownerNote(); }
+  function drawMain() {
     var a = state.avail || {}, now = $('q-now'), form = $('q-form');
     now.textContent = '';
     var list = peopleList();
@@ -164,7 +209,7 @@
     var btn = $('q-send');
     state.sending = true;
     btn.disabled = true; btn.textContent = '押さえています…';
-    var body = { action: 'quickReserve', rid: state.rid, people: v.people, name: v.name, tel: v.tel, website: v.website };
+    var body = withAuth({ action: 'quickReserve', rid: state.rid, people: v.people, name: v.name, tel: v.tel, website: v.website });
     if (v.email) body.email = v.email;
     A.post(body).then(function (r) {
       state.done = true;
@@ -172,6 +217,7 @@
       $('q-no').textContent = r.no;
       $('q-what').textContent = r.people + '名　' + r.name + ' 様';
       $('q-mailed').hidden = !r.mailed;
+      if (r.test) { var tp = line('quick-test', TEST_AFTER); $('q-done').insertBefore(tp, $('q-done').querySelector('h3').nextSibling); }
       $('q-form').hidden = true;
       $('q-now').hidden = true;
       $('q-done').hidden = false;
@@ -190,5 +236,5 @@
   // 開いているあいだは1分ごとに、画面に戻ったときにも読み直す（来店時刻と空きが変わるため）
   setInterval(function () { if (document.visibilityState === 'visible') load(); }, EVERY);
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') load(); });
-  load();
+  askAuth().then(load);
 })();

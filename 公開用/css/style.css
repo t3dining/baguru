@@ -807,6 +807,7 @@ address{font-style:normal}
 .quick-rules .chk{margin-top:10px; font-weight:700}
 .quick-done{border-top-color:var(--flame)}
 .quick-by{font-size:18px; font-weight:700; margin-bottom:8px}
+.quick-test{margin:0 0 10px!important; padding:8px 12px; border-radius:var(--r); background:#fff3c4; color:#5b4300; font-size:13px; font-weight:700; line-height:1.6; text-align:left}   /* Owner の中だけ（テスト用アカウント） */
 @media (max-width:640px){
   .rsv-step{padding:18px 14px 16px}
   .fgrid{grid-template-columns:1fr}
