@@ -57,7 +57,7 @@ address{font-style:normal}
 .logo-b{font-size:30px; font-weight:900; letter-spacing:.1em}
 .gnav{margin-left:auto}
 .gnav ul{display:flex; gap:2px}
-.gnav li > a{display:flex; flex-direction:column; align-items:center; padding:6px 10px; text-decoration:none; font-size:14px; font-weight:700; line-height:1.25; border-radius:var(--r)}
+.gnav li > a{display:flex; flex-direction:column; align-items:center; padding:6px 7px; text-decoration:none; font-size:14px; font-weight:700; line-height:1.25; border-radius:var(--r)}
 .gnav .en{font-family:var(--en); font-size:10px; letter-spacing:.14em; color:var(--brass); font-weight:500; margin-bottom:2px}
 
 .gnav li > a[aria-current="page"]{color:#fff; box-shadow:inset 0 -3px 0 var(--ember)}
@@ -69,10 +69,10 @@ address{font-style:normal}
 .nav-toggle{display:none}
 @media (max-width:1320px){
   .hd-tel-n{display:none} .hd-tel-l{display:inline}
-  .gnav li > a{padding:6px 8px; font-size:13.5px}
+  .gnav li > a{padding:6px 5px; font-size:13.5px}
 }
 @media (max-width:1180px){
-  .gnav li > a{padding:6px 6px; font-size:13px}
+  .gnav li > a{padding:6px 4px; font-size:13px}
   .logo-b{font-size:26px}
   .logo img{width:54px; height:54px}
 }
@@ -84,10 +84,10 @@ address{font-style:normal}
   .hd-tel{flex-direction:column; justify-content:center; gap:2px; width:58px; height:52px; padding:4px 0}
   .hd-tel-l{font-size:11px; letter-spacing:.1em; line-height:1}
 }
-/* パソコン・タブレット（幅768以上）は、メニューを店名の右に全部並べる。幅が狭いほど字と余白を小さく */
+/* パソコン・タブレット（幅768以上）は、メニューを店名の右に全部並べる（2026-11-06 に「よくある質問」を足して10こ。すき間を少し詰めた）。幅が狭いほど字と余白を小さく */
 @media (min-width:768px) and (max-width:1100px){
   .hd-in{gap:12px}
-  .gnav li > a{padding:6px 5px; font-size:12.5px}
+  .gnav li > a{padding:6px 3px; font-size:12.5px}
   .gnav .en{font-size:9px; letter-spacing:.1em}
 }
 @media (min-width:768px) and (max-width:880px){
@@ -96,9 +96,15 @@ address{font-style:normal}
   .logo img{width:44px; height:44px}
   .logo-s{font-size:10px; letter-spacing:.12em}
   .logo-b{font-size:21px}
-  .gnav li > a{padding:6px 3px; font-size:12px}
+  .gnav li > a{padding:6px 2px; font-size:11.5px}
   .gnav .en{font-size:8.5px; letter-spacing:.06em}
   .hd-tel{width:52px}
+  .logo-s{display:none}      /* メニューが10こになったので、店名の上の小さな字はしまう（2026-11-06） */
+}
+@media (min-width:768px) and (max-width:810px){ .logo-txt{display:none} }   /* もっと狭いときは、ロゴの絵だけ */
+@media (min-width:881px) and (max-width:930px){
+  .hd-in{gap:10px}
+  .gnav li > a{padding:6px 2px; font-size:12px}
 }
 /* スマホ（幅767まで）は、右上の MENU を押すと開く */
 @media (max-width:767px){

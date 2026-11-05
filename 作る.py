@@ -94,6 +94,7 @@ NAV = [
     ('access', 'アクセス', 'ACCESS'),
     ('recruit', '採用', 'RECRUIT'),
     ('contact', 'お問い合わせ', 'CONTACT'),
+    ('faq', 'よくある質問', 'FAQ'),        # メニューの字は短く（ページの見出しは「よくあるご質問」）      # 2026-11-06 ko-dai さんの指示「お問い合わせページの隣によくあるご質問タブを作り、全てのよくあるご質問を入れて」
 ]
 
 # 系列店（全ページの下の欄に出す。ホットペッパーグルメのお店のページへ）。(店名, アドレス, GROUP_IMG のロゴ)
@@ -120,6 +121,7 @@ PAGES = {
     'contact': dict(en='CONTACT', img='ph-contact.jpg'),
     'privacy': dict(en='PRIVACY', img='ph-contact.jpg'),
     'app': dict(en='APP', img='ph-app.jpg'),
+    'faq': dict(en='FAQ', img='ph-contact.jpg'),   # 2026-11-06。問いと答えは各ページのもの（faq_all）
 }
 
 # 写真：(作る名前, もとの写真, 幅, 高さ, 切り抜く枠 or None)
@@ -847,9 +849,25 @@ def write_kanri():
     (HERE / '管理' / '受け口' / '画面.html').write_text(head + s, encoding='utf-8')
 
 
+# よくあるご質問のページ（ページ/faq.html）：{{FAQ:ページ}} の所に、そのページの <div class="faq">〜</div> をそのまま写す。
+# 文は元のページのキー（texts.json）のままなので、どちらのページで直しても両方に出る。開いておくのは、いちばん上の1つだけ
+def faq_all(src):
+    def one(m):
+        t = (SRC / (m.group(1) + '.html')).read_text(encoding='utf-8')
+        a = t.find('<div class="faq">')
+        if a < 0:
+            raise SystemExit('ページ/%s.html に <div class="faq"> がありません（よくあるご質問のページに写せません）' % m.group(1))
+        return t[a:t.find('</div>', a) + len('</div>')].replace('<details open>', '<details>')
+    src = re.sub(r'\{\{FAQ:([a-z]+)\}\}', one, src)
+    return src.replace('<details>', '<details open>', 1)
+
+
 def build_page(page, ver):
     p = meta(page)
-    body = put_texts(put_data((SRC / (page + '.html')).read_text(encoding='utf-8')))
+    src = (SRC / (page + '.html')).read_text(encoding='utf-8')
+    if page == 'faq':
+        src = faq_all(src)
+    body = put_texts(put_data(src))
     robots = '<meta name="robots" content="noindex">\n' if SAMPLE else ''
     sample = ('<p class="sample">サンプルページです。価格・営業時間などは公開前にお店で確かめます。</p>\n' if SAMPLE else '')
     preload = '<link rel="preload" as="image" href="img/hero.jpg">\n' if page == 'index' else ''

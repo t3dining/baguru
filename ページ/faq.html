@@ -1,0 +1,45 @@
+<nav class="jump" aria-label="よくあるご質問の中の移動">
+  <ul>
+    <li><a href="#faq-reserve">{{t:faq-1}}</a></li>
+    <li><a href="#faq-app">{{t:faq-2}}</a></li>
+    <li><a href="#faq-contact">{{t:faq-3}}</a></li>
+  </ul>
+</nav>
+
+<section class="sec">
+  <div class="wrap narrow">
+    <p class="faq-lead">{{t:faq-4}}<a href="contact.html">{{t:faq-5}}</a>{{t:faq-6}}</p>
+  </div>
+</section>
+
+<!-- 問いと答えは、各ページのものをそのまま入れる（作る.py の faq_all。{{FAQ:ページ}} の所に、そのページの <div class="faq"> を写す）。
+     文はそのページの文（texts.json の同じキー）なので、どちらで直しても両方に出る -->
+<section class="sec sec-brick" id="faq-reserve">
+  <div class="wrap narrow">
+    <div class="sh">
+      <p class="sh-en">RESERVATION</p>
+      <h2 class="sh-jp">{{t:faq-7}}</h2>
+    </div>
+    {{FAQ:reserve}}
+  </div>
+</section>
+
+<section class="sec" id="faq-app">
+  <div class="wrap narrow">
+    <div class="sh">
+      <p class="sh-en">OFFICIAL APP</p>
+      <h2 class="sh-jp">{{t:faq-8}}</h2>
+    </div>
+    {{FAQ:app}}
+  </div>
+</section>
+
+<section class="sec sec-brick" id="faq-contact">
+  <div class="wrap narrow">
+    <div class="sh">
+      <p class="sh-en">CONTACT</p>
+      <h2 class="sh-jp">{{t:faq-9}}</h2>
+    </div>
+    {{FAQ:contact}}
+  </div>
+</section>
