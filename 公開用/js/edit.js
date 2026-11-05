@@ -68,14 +68,29 @@
     return out;
   }
 
-  /** 字のかたまりを入れる。日本語なら文節ごとに <wbr> をはさむ（作る.py の add_wbr と同じ） */
+  /** 字のかたまりを入れる。日本語なら文節ごとに <wbr> をはさむ（作る.py の add_wbr と同じ）。
+   *  最後の文節は <bg-lp> で包んで割らない（作る.py の wbr_text・LP_MAX と同じ。2026-11-05）。変えるときは 作る.py・管理/画面/kanri.js も */
+  var LP_MAX = 10, LP_PUNCT = /[\s。、！？」』）】,.!?]/g;
   function putText(box, chunk) {
     if (!chunk) return;
-    var parts = model && JA.test(chunk) ? phrases(chunk) : [chunk];
-    parts.forEach(function (p, i) {
+    if (!(model && JA.test(chunk))) { box.appendChild(document.createTextNode(chunk)); return; }
+    var core = chunk.replace(/\s+$/, ''), tail = chunk.slice(core.length), parts = phrases(core), k = parts.length - 1;
+    var len = function (t) { return Array.from(t).length; };
+    while (k > 0 && len(parts.slice(k).join('').replace(LP_PUNCT, '')) < 2 && len(parts.slice(k - 1).join('').trim()) <= LP_MAX) k--;
+    var kept = parts.slice(k).join(''), n = len(kept.trim());
+    var keep = n >= 2 && n <= LP_MAX && JA.test(kept);
+    var upto = keep ? k : parts.length;
+    for (var i = 0; i < upto; i++) {
       if (i) box.appendChild(document.createElement('wbr'));
-      box.appendChild(document.createTextNode(p));
-    });
+      box.appendChild(document.createTextNode(parts[i]));
+    }
+    if (keep) {
+      if (upto) box.appendChild(document.createElement('wbr'));
+      var lp = document.createElement('bg-lp');
+      lp.textContent = kept;
+      box.appendChild(lp);
+    }
+    if (tail) box.appendChild(document.createTextNode(tail));
   }
 
   /** 文を入れかえる：** で囲んだところは <b>、改行は <br>（作る.py の rich と同じ）。メニューの字（m:）は ** を太字にしない（作る.py の mt と同じ） */
@@ -146,6 +161,7 @@
         if (d === 'none' || /^(SCRIPT|STYLE|WBR|svg|IMG|INPUT|SELECT|TEXTAREA|IFRAME)$/i.test(n.nodeName)) continue;
         if (n.nodeName === 'BG-T') { if (n === sp) mine = runs.length - 1; add({ k: n.getAttribute('data-t') }, n); continue; }
         if (n.nodeName === 'BR') { add({ br: true }, n); continue; }
+        if (d === 'contents') { walk(n); continue; }                  // <bg-lp>（最後の文節を割らない印。箱を作らない）は、中の字をそのまま
         if (!/^inline/.test(d)) { runs.push([]); continue; }          // 中の行の箱：ここで区切る（その中は別の枠）
         if (/^inline-(block|flex|grid)$/.test(d)) {                     // 札など：中に直せる文が1つなら、その文。無ければ直せない字
           var inner = n.querySelectorAll('bg-t');

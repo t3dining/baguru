@@ -751,8 +751,39 @@ def phrases(s):
     return chunks
 
 
+# 字のかたまりの終わりの文節は割らない（2026-11-05 ko-dai さんの指示：「最後の1文字だけが改行されてしまうなら、ある程度のまとまりごと自動で改行」）。
+# 本文は行の端まで字を入れて折り返す（css の word-break:normal）が、それだと「…とろっと濃／厚。」のように、最後の1〜2字だけが次の行に落ちることがある。
+# そこで、字のかたまり（タグとタグのあいだ。改行・太字・段落の終わりで区切られる）の最後の文節（「濃厚。」「されます。」など）を <bg-lp> で包み、
+# css の keep-all で、ひとかたまりにする。どのスマホの幅でも、最後の行には文節がまるごと入る。
+#   ・最後の文節が1字（句読点を除く）なら、前の文節もいっしょに包む（「旨い米」など）。包むのは LP_MAX 字まで（長いと、前の行に大きなすき間ができる）
+#   ・<bg-lp> の前には <wbr>（Safari でも、そこで折り返せるように）。<bg-lp> は display:contents（ボタンなどの flex の中で、別の箱にならないように）
+# ★同じ決まりを js/edit.js（ページで直す）と 管理/画面/kanri.js（直す欄）の putText でも使う。変えるときは3つとも
+LP_MAX = 10
+LP_PUNCT = re.compile(r'[\s。、！？」』）】,.!?]')
+
+
+def wbr_text(s):
+    """文に文節の切れ目（<wbr>）を入れ、最後の文節を <bg-lp> で包む"""
+    esc = lambda c: html.escape(c, quote=False)
+    core = s.rstrip()
+    tail = s[len(core):]
+    chunks = phrases(core)
+    if not chunks:
+        return esc(s)
+    k = len(chunks) - 1
+    while k > 0 and len(LP_PUNCT.sub('', ''.join(chunks[k:]))) < 2 and len(''.join(chunks[k - 1:]).strip()) <= LP_MAX:
+        k -= 1
+    kept = ''.join(chunks[k:])
+    n = len(kept.strip())
+    if n < 2 or n > LP_MAX or not JA_CHARS.search(kept):
+        return '<wbr>'.join(esc(c) for c in chunks) + esc(tail)
+    head = '<wbr>'.join(esc(c) for c in chunks[:k])
+    return head + ('<wbr>' if head else '') + '<bg-lp>' + esc(kept) + '</bg-lp>' + esc(tail)
+
+
 def add_wbr(page):
-    """<body> の中の文字（タグの外）だけに <wbr> を入れる。script・style・フォームの選択肢などには入れない"""
+    """<body> の中の文字（タグの外）だけに <wbr> を入れる。script・style・フォームの選択肢などには入れない。
+    字のかたまりの最後の文節は <bg-lp> で包む（上の LP_MAX の説明）"""
     if not BUDOUX.exists():
         print('  ★道具/budoux_ja.json がないので、文節の改行を入れませんでした')
         return page
@@ -770,7 +801,7 @@ def add_wbr(page):
                     skip.append(name)
             out.append(part)
         elif part and not skip and JA_CHARS.search(part):
-            out.append('<wbr>'.join(html.escape(c, quote=False) for c in phrases(html.unescape(part))))
+            out.append(wbr_text(html.unescape(part)))
         else:
             out.append(part)
     return head + sep + ''.join(out)

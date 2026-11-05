@@ -27,6 +27,9 @@ body{margin:0; font-family:var(--jp); font-size:16px; line-height:1.85; color:va
 /* 見出しも、行の端まで字を入れる（2026-11-05 ko-dai さんの指示「見出しも端まで」）。
    ボタン・質問・表の見出し・札・メニューなど、短い字は、今までどおり文節の切れ目で折る（語の途中で割らない） */
 .btn,button,summary,dt,th,.badge,.gnav,.ft-nav{word-break:keep-all}
+/* 字のかたまりの最後の文節（作る.py が <bg-lp> で包む）は割らない。最後の1〜2字だけが次の行に落ちないように（2026-11-05）。
+   display:contents … 箱を作らない（ボタンなどの flex の中で、別の箱になって、すき間が空かないように） */
+bg-lp{display:contents; word-break:keep-all}
 img{max-width:100%; height:auto; display:block}
 a{color:inherit}
 h1,h2,h3,h4{margin:0; line-height:1.35; font-weight:900; letter-spacing:.02em}

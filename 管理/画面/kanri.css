@@ -72,6 +72,8 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-
 /* 枠ごとまるごと直す欄：幅・字の形・字の大きさ・色は、ページの枠と同じものを kanri.js が入れる（だから改行の場所がページと同じ） */
 .m-ed-wrap{overflow-x:auto; margin:4px -4px 0; padding:4px}
 .mirror{box-sizing:content-box; min-height:1.4em; padding:10px 12px; border:1.5px dashed var(--ember); border-radius:8px; background:#fff; outline:none; line-height:1.7; font-size:16px; word-break:keep-all; overflow-wrap:anywhere}
+/* 行の終わりの文節は割らない（ページの css/style.css と同じ。kanri.js の putText が包む） */
+.mirror bg-lp{display:contents; word-break:keep-all}
 .mirror:focus{border-style:solid; box-shadow:0 0 0 3px rgba(199,54,29,.18)}
 .mirror .m-chip{background:rgba(199,54,29,.16); border-radius:3px; box-shadow:inset 0 -2px 0 rgba(199,54,29,.55)}
 @media (max-width:600px){.pv{height:44vh}}   /* スマホ：ページと直す欄が、いっしょに画面に入るように */

@@ -432,13 +432,29 @@
     }
     return out;
   }
+  /* 最後の文節を <bg-lp> で包んで割らない（作る.py の wbr_text・LP_MAX、js/edit.js の putText と同じ。2026-11-05）。ページと同じところで折り返すように。
+     直す欄の中でも、打った字は <bg-lp> の中に入ってよい（mirrorRead は中の字も読む） */
+  var LP_MAX = 10, LP_PUNCT = /[\s。、！？」』）】,.!?]/g, JA_RE = /[぀-ヿ㐀-鿿！-｠]/;
   function putText(box, chunk) {
     if (!chunk) return;
-    var parts = BX && /[぀-ヿ㐀-鿿！-｠]/.test(chunk) ? phrases(chunk) : [chunk];
-    parts.forEach(function (p, i) {
+    if (!(BX && JA_RE.test(chunk))) { box.appendChild(document.createTextNode(chunk)); return; }
+    var core = chunk.replace(/\s+$/, ''), tail = chunk.slice(core.length), parts = phrases(core), k = parts.length - 1;
+    var len = function (t) { return Array.from(t).length; };
+    while (k > 0 && len(parts.slice(k).join('').replace(LP_PUNCT, '')) < 2 && len(parts.slice(k - 1).join('').trim()) <= LP_MAX) k--;
+    var kept = parts.slice(k).join(''), n = len(kept.trim());
+    var keep = n >= 2 && n <= LP_MAX && JA_RE.test(kept);
+    var upto = keep ? k : parts.length;
+    for (var i = 0; i < upto; i++) {
       if (i) box.appendChild(document.createElement('wbr'));
-      box.appendChild(document.createTextNode(p));
-    });
+      box.appendChild(document.createTextNode(parts[i]));
+    }
+    if (keep) {
+      if (upto) box.appendChild(document.createElement('wbr'));
+      var lp = document.createElement('bg-lp');
+      lp.textContent = kept;
+      box.appendChild(lp);
+    }
+    if (tail) box.appendChild(document.createTextNode(tail));
   }
   /** 字の形を写す（値は CSSOM で入れるので、変な値は入らない） */
   function setStyle(el, cs) {
@@ -610,10 +626,12 @@
         r.dataset.k = p.k;
         setStyle(r, p.cs);
         var text = pe.cur[p.k] || '';
-        (isMenuKey(p.k) ? [text] : text.split(/\*\*([\s\S]+?)\*\*/)).forEach(function (piece, i) {   // メニューの字は ** を太字にしない
+        var pieces = isMenuKey(p.k) ? [text] : text.split(/\*\*([\s\S]+?)\*\*/);   // メニューの字は ** を太字にしない
+        pieces.forEach(function (piece, i) {
           var to = r;
           if (i % 2) { to = document.createElement('b'); r.appendChild(to); }
-          piece.split(BR_RE).forEach(function (line, j) {
+          var lines = piece.split(BR_RE);
+          lines.forEach(function (line, j) {
             if (j % 2) {     // 改行：いまの端末のものは <br>、もう片方のものは見えない印
               var d = devNow(), o = devOther();
               if (line === '\n' || line === BR_TOK[d]) { var br = document.createElement('br'); br.dataset.d = d; to.appendChild(br); }
@@ -621,7 +639,8 @@
               return;
             }
             // {{TEL}} は、お店の電話番号を、色を付けた打てない字にして出す（消すことはできる）
-            line.split(/\{\{(TEL)\}\}/).forEach(function (bit, n) {
+            var bits = line.split(/\{\{(TEL)\}\}/);
+            bits.forEach(function (bit, n) {
               if (!(n % 2)) return putText(to, bit);
               var v = h('span', { class: 'm-chip m-var', text: pe.tel || '電話番号' });
               v.contentEditable = 'false';
