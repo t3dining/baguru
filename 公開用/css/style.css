@@ -242,7 +242,7 @@ address{font-style:normal}
 @media (max-width:560px){
   .hb-grid{grid-template-columns:1fr; gap:12px}
   .hb a{flex-direction:row}
-  .hb figure{flex:0 0 38%; aspect-ratio:auto; min-height:150px}
+  .hb figure{flex:0 0 34%; aspect-ratio:auto; min-height:150px}   /* 写真を少し細くして、説明の文の幅を広げる（2026-11-05。430 の幅で「…自家製デミソース。」が1行に入るように。前は 38%） */
   .hb-body{padding:12px 14px 14px}
   .hb-body h3{font-size:17px; margin-bottom:4px}
   .hb-body p{font-size:13px; margin-bottom:8px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden}
