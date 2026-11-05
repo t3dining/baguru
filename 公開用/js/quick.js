@@ -63,7 +63,7 @@
   }
 
   var MSG = {
-    not_accepting: 'ただいま「今すぐ行く」の予約は受け付けていません。日時を選ぶネット予約か、お電話でどうぞ。',
+    not_accepting: '今は、今すぐ席を押さえるご予約を受け付けていません。日時を選ぶネット予約か、お電話でどうぞ。',
     full: '今、席が埋まりました。人数を選び直すか、お電話でどうぞ。',
     bad_people: '人数を選んでください。',
     need_name: 'お名前を入れてください。',
@@ -93,9 +93,12 @@
     var p = String(s || '').split(':');
     return p.length < 2 ? String(s || '') : Number(p[0]) + '時' + p[1] + '分';
   }
+  function topButtons(on) {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-quick-btn]'), function (b) { b.hidden = !on; });
+  }
   function showAll(on) {
     sec.hidden = !on;
-    Array.prototype.forEach.call(document.querySelectorAll('[data-quick-btn]'), function (b) { b.hidden = !on; });
+    topButtons(on);
   }
 
   /* ---------- いまの空き ---------- */
@@ -104,9 +107,9 @@
     return A.post(withAuth({ action: 'nowAvail' })).then(function (a) {
       state.avail = a;
       state.test = !!a.test;
-      // 入れている途中に止まったときは、急に消さずに「受け付けていません」を出す（15秒ごとに読み直すので、途中で切り替わることがある）
-      if (!a.accepting && !inOwner && !state.closed && !sec.hidden && (state.people || $('q-name').value || $('q-tel').value)) state.closed = true;
-      if (!a.accepting) { if (inOwner) { showAll(true); draw(); } else if (!state.closed) showAll(false); else draw(); return; }   // Owner の中では、受けていないことと案内を出す
+      // 受けていない（予約ボードで止めている・受付時間の外・休み）ときも、画面は隠さずに「受け付けていません」と電話のボタンを出す
+      // （2026-11-06 ko-dai さんの「そろえる」。公式アプリと同じ）。上の「今すぐ行く」のボタンだけは隠す。入れていた字は残る
+      if (!a.accepting) { sec.hidden = false; topButtons(false); draw(); return; }   // Owner の中では、受けていないことと案内を出す
       state.closed = false;
       showAll(true);
       draw();
@@ -127,10 +130,19 @@
     now.textContent = '';
     var list = peopleList();
     if (state.closed || !a.accepting) {
-      now.appendChild(line('quick-full', 'ただいま「今すぐ行く」の予約は受け付けていません。'));
-      var p = line('', '日時を選ぶネット予約か、お電話（');
-      p.appendChild(telLink()); p.appendChild(document.createTextNode('）でどうぞ。'));
-      now.appendChild(p);
+      // 公式アプリと同じ文：「今は、今すぐ席を押さえるご予約を受け付けていません」と、電話のボタン
+      var off = line('quick-full', '今は、今すぐ席を押さえるご予約を');
+      var offTail = document.createElement('bg-lp'); offTail.textContent = '受け付けていません。';   // 「受け付け／ていません」と割れないように
+      off.appendChild(document.createElement('wbr')); off.appendChild(offTail);
+      now.appendChild(off);
+      var bs = document.createElement('div');
+      bs.className = 'btns center quick-off-btns';
+      var call = document.createElement('a');
+      call.className = 'btn btn-ember'; call.href = 'tel:' + TEL.replace(/-/g, ''); call.textContent = '電話する ' + TEL;
+      var net = document.createElement('a');
+      net.className = 'btn btn-line'; net.href = '#booking'; net.textContent = '日時を選んでネット予約';
+      bs.appendChild(call); bs.appendChild(net);
+      now.appendChild(bs);
       form.hidden = true;
       return;
     }

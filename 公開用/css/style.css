@@ -808,6 +808,7 @@ address{font-style:normal}
 .quick-at{margin-top:4px!important; color:#e9dfd3}
 .quick-at b{color:#fff; font-family:var(--en); font-size:20px}
 .quick-full{font-size:18px; font-weight:900}
+.quick-off-btns{margin-top:14px}
 .quick-note{margin-top:2px!important; font-size:13px; color:#cbbfb1}
 .quick-now a,.quick-rules a,#q-people-note a{white-space:nowrap}
 .quick-now a{color:#fff; text-underline-offset:3px}
