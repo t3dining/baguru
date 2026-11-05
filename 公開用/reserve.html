@@ -99,8 +99,57 @@
       </div>
     </div>
     <div class="btns center" style="margin-top:22px">
+      <a class="btn btn-quick" href="#quick" data-quick-btn hidden><svg class="i" aria-hidden="true"><use href="#i-clock"/></svg>いますぐ<wbr>行く<wbr><bg-lp>（15分以内）</bg-lp></a>
       <a class="btn btn-ember" href="#booking"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg>ネットで<wbr><bg-lp>予約する</bg-lp></a>
       <a class="btn btn-outline" href="tel:0565857955"><svg class="i" aria-hidden="true"><use href="#i-phone"/></svg>電話で<wbr><bg-lp>予約する</bg-lp></a>
+    </div>
+  </div>
+</section>
+
+
+<section class="sec quick" id="quick" hidden>
+  <div class="wrap narrow">
+    <div class="sh">
+      <p class="sh-en">RIGHT NOW</p>
+      <h2 class="sh-jp"><!--t:reserve-66-->いますぐ<wbr>行く<wbr><bg-lp>（15分以内）</bg-lp><!--/t--></h2>
+      <p class="sh-lead"><!--t:reserve-67-->15分以内に<wbr>お店に<wbr>着ける方は、<wbr>ここから<wbr>予約すると<wbr>すぐに<wbr><bg-lp>確定します。</bg-lp><!--/t--></p>
+    </div>
+    <div class="quick-now" id="q-now" aria-live="polite"><p class="hint"><!--t:reserve-68-->いまの<wbr>空きを<wbr><bg-lp>読み込んでいます…</bg-lp><!--/t--></p></div>
+
+    <form class="rsv quick-form" id="q-form" novalidate onsubmit="return false" hidden>
+      <fieldset class="rsv-step">
+        <legend><!--t:reserve-69--><bg-lp>人数</bg-lp><!--/t--></legend>
+        <div class="chips" id="q-people"></div>
+        <p class="hint" id="q-people-note"></p>
+      </fieldset>
+      <fieldset class="rsv-step">
+        <legend><!--t:reserve-70-->お客様の<wbr><bg-lp>こと</bg-lp><!--/t--></legend>
+        <div class="fgrid">
+          <div><label for="q-name"><!--t:reserve-71--><bg-lp>お名前</bg-lp><!--/t--><span class="need"><bg-lp>必須</bg-lp></span></label><input type="text" id="q-name" autocomplete="name" maxlength="40" placeholder="例：豊田 太郎"></div>
+          <div><label for="q-tel"><!--t:reserve-72--><bg-lp>電話番号</bg-lp><!--/t--><span class="need"><bg-lp>必須</bg-lp></span></label><input type="tel" id="q-tel" autocomplete="tel" inputmode="tel" maxlength="20" placeholder="例：090-1234-5678"></div>
+          <div class="full"><label for="q-email"><!--t:reserve-73--><bg-lp>メールアドレス</bg-lp><!--/t--><span class="opt"><bg-lp>任意</bg-lp></span></label><input type="email" id="q-email" autocomplete="email" inputmode="email" maxlength="120" placeholder="入れた方には、確定のメールをお送りします"></div>
+        </div>
+        <div class="hp" aria-hidden="true"><label for="q-website">ここには<wbr>何も<wbr><bg-lp>入れないでください</bg-lp></label><input type="text" id="q-website" tabindex="-1" autocomplete="off"></div>
+      </fieldset>
+      <div class="quick-rules">
+        <p><!--t:reserve-74--><b>15分以内に<wbr>お越しに<wbr>なれる<wbr><bg-lp>方だけ</bg-lp></b>、<wbr>ご予約いただけます。<wbr>送ると<wbr>すぐに<wbr>確定して、<wbr>席を<wbr><bg-lp>ご用意します。</bg-lp><!--/t--></p>
+        <p><!--t:reserve-75-->取り消し・<wbr>遅れる<wbr>ときは、<wbr><bg-lp>お電話（</bg-lp><!--/t--><a href="tel:0565857955">0565-85-7955</a><!--t:reserve-76-->）で<wbr><bg-lp>お知らせください。</bg-lp><!--/t--></p>
+        <div class="chk"><label><input type="checkbox" id="q-ok"><!--t:reserve-77-->15分以内に<wbr>お店に<wbr><bg-lp>行けます</bg-lp><!--/t--></label></div>
+      </div>
+      <p class="consent"><!--t:reserve-78--><bg-lp>送ると、</bg-lp><!--/t--><a href="privacy.html"><!--t:reserve-79--><bg-lp>プライバシーポリシー</bg-lp><!--/t--></a><!--t:reserve-80-->に<wbr>同意したことになります。<!--/t--></p>
+      <p class="form-msg" id="q-msg" role="alert" hidden></p>
+      <button class="btn btn-ember btn-wide" type="submit" id="q-send">この<wbr>内容で<wbr><bg-lp>予約する</bg-lp></button>
+    </form>
+
+    <div class="rsv-done quick-done" id="q-done" hidden>
+      <svg class="i" aria-hidden="true"><use href="#i-check"/></svg>
+      <h3><!--t:reserve-81-->予約が<wbr><bg-lp>確定しました</bg-lp><!--/t--></h3>
+      <p class="quick-by"><b id="q-by"></b><!--t:reserve-82-->までに<wbr><bg-lp>お越しください。</bg-lp><!--/t--></p>
+      <p class="rsv-no"><!--t:reserve-83--><bg-lp>予約番号</bg-lp><!--/t--> <b id="q-no"></b></p>
+      <p id="q-what"></p>
+      <p id="q-mailed" hidden><!--t:reserve-84-->確定の<wbr>メールを<wbr><bg-lp>お送りしました。</bg-lp><!--/t--></p>
+      <p><!--t:reserve-85-->取り消し・<wbr>遅れる<wbr>ときは、<wbr>お電話で<wbr><bg-lp>お知らせください。</bg-lp><!--/t--><br><a href="tel:0565857955">0565-85-7955</a></p>
+      <div class="btns center"><a class="btn btn-dark" href="index.html"><bg-lp>ホームへ</bg-lp></a></div>
     </div>
   </div>
 </section>
@@ -272,5 +321,6 @@
 <script src="js/main.js?v=d02e5632" defer></script>
 <script src="js/api.js?v=d02e5632" defer></script>
 <script src="js/reserve.js?v=d02e5632" defer></script>
+<script src="js/quick.js?v=d02e5632" defer></script>
 </body>
 </html>

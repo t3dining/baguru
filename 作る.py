@@ -48,7 +48,7 @@ SITE_URL = 'https://t3dining.github.io/baguru'  # 会社の GitHub（無料）�
 # 即予約（15分以内に来店する、すぐ確定するネット予約）の画面（ご予約のページの「いますぐ行く（15分以内）」）。2026-11-05 に作った。
 #   決めごとは 店舗アプリ/バグる/即予約の決めごと.md。★ko-dai さんが「公開して」と言うまで False（ページ/reserve.html の <!--quick-->〜<!--/quick--> を出さない）。
 #   True にしても、予約ボードのスイッチが「受付中」で、受付時間の中のときだけ出る（js/quick.js が受け口の nowAvail を見る）
-QUICK_ON = False
+QUICK_ON = True   # 2026-11-05 ko-dai さんの「公開してください」で True にした
 COMING_SOON = False   # 2026-11-04 夕方に外した（ko-dai さんの指示：「検索で出なければいいので、coming soon も外して」）。検索に出さないのは SAMPLE の noindex
 PREVIEW = 'naka-f90249acdb'
 BASE_URL = SITE_URL + '/' + PREVIEW if COMING_SOON else SITE_URL   # 中身のページの場所（canonical・OGP・管理画面が開くページ）
