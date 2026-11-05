@@ -20,9 +20,12 @@
 @media (max-width:820px){ br.br-pc{display:none} }
 @media (min-width:821px){ br.br-sp{display:none} }
 html{-webkit-text-size-adjust:100%; scroll-behavior:smooth; scroll-padding-top:calc(var(--hd) + 12px)}
-/* 文の途中では改行しない。改行するのは、作る.py が入れた文節の切れ目（<wbr>）だけ。
-   それでも入りきらない長い語は、はみ出さないように折る（overflow-wrap） */
-body{margin:0; font-family:var(--jp); font-size:16px; line-height:1.85; color:var(--text); background:var(--paper); -webkit-font-smoothing:antialiased; word-break:keep-all; line-break:strict; overflow-wrap:anywhere}
+/* 本文は、行の端（余白）まで字を入れて折り返す（2026-11-05 ko-dai さんの指示：「スマホもパソコンも全体的に余白ギリギリまで文字を書けるように」）。
+   句読点や小さい「っ」などが行の頭に来ないように折る（line-break:strict）。入りきらない長い英数字も、はみ出さないように折る（overflow-wrap）。
+   前は、作る.py が入れた文節の切れ目（<wbr>）でだけ折っていた（keep-all）ので、行の終わりにすき間ができていた */
+body{margin:0; font-family:var(--jp); font-size:16px; line-height:1.85; color:var(--text); background:var(--paper); -webkit-font-smoothing:antialiased; word-break:normal; line-break:strict; overflow-wrap:anywhere}
+/* 見出し・ボタン・質問・表の見出しなど、短く大きな字は、今までどおり文節の切れ目で折る（語の途中で割らない） */
+h1,h2,h3,h4,h5,h6,.btn,button,summary,dt,th,.badge,.gnav,.ft-nav,.bnav{word-break:keep-all}
 img{max-width:100%; height:auto; display:block}
 a{color:inherit}
 h1,h2,h3,h4{margin:0; line-height:1.35; font-weight:900; letter-spacing:.02em}
