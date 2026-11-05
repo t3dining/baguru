@@ -87,6 +87,8 @@
       var br = document.createElement('br');
       if (part === SP_BR) br.className = 'br-sp'; else if (part === PC_BR) br.className = 'br-pc';
       box.appendChild(br);
+      // 端末だけの改行は、もう一方の幅では消えるので、そこで折り返せるように <wbr> を付ける（作る.py の breaks と同じ。2026-11-05）
+      if (br.className) box.appendChild(document.createElement('wbr'));
     });
   }
   function render(span, text, plain) {

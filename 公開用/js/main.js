@@ -57,6 +57,7 @@
       if (inOwner) return;   // はめ込まれているときは、上の target="_top" のまま Owner へ
       var to = '';
       try { to = sessionStorage.getItem('bg.owner') || ''; } catch (x) { to = ''; }
+      if (to.indexOf('https://t3dining.github.io/baguru-owner') === 0) to = '';   // 前の場所の Owner は「引っ越しました」のページ（2026-11-05）。リンクの行き先（新しい場所）へ
       if (to) { e.preventDefault(); location.href = to; }
     });
   }

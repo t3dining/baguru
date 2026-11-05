@@ -505,8 +505,11 @@ SP_BR, PC_BR = '【スマホ改行】', '【パソコン改行】'
 
 
 def breaks(s):
-    """エスケープした文の改行を <br> にする（スマホだけ・パソコンだけの改行も）"""
-    return s.replace(SP_BR, '<br class="br-sp">').replace(PC_BR, '<br class="br-pc">').replace('\n', '<br>')
+    """エスケープした文の改行を <br> にする（スマホだけ・パソコンだけの改行も）。
+    スマホだけ・パソコンだけの改行は、もう一方の幅では消える。そのとき、そこで折り返せるように <wbr> を後ろに付ける
+    （2026-11-05。付けないと、消えた改行の前後がひとかたまりになり、iPhone の Safari では手前で折り返していた。管理画面の Chrome とずれた）。
+    ★js/edit.js の putLines も同じ"""
+    return s.replace(SP_BR, '<br class="br-sp"><wbr>').replace(PC_BR, '<br class="br-pc"><wbr>').replace('\n', '<br>')
 
 
 def rich(s):
@@ -624,7 +627,7 @@ def header(page):
         items.append('<li><a href="%s.html"%s><span class="en">%s</span>%s</a></li>' % (key, cur, en, ja))
     return '''<header class="hd">
   <div class="hd-in wrap">
-    <a class="owner-home" href="https://t3dining.github.io/baguru-owner/" hidden aria-label="バグる Owner にもどる">🏠<span> ホーム</span></a>
+    <a class="owner-home" href="https://t3dining-store.github.io/baguru-owner/" hidden aria-label="バグる Owner にもどる">🏠<span> ホーム</span></a>
     <a class="logo" href="index.html" aria-label="炭焼ハンバーグ バグる ホームへ">
       <img src="img/logo.png" width="60" height="57" alt="" data-eager>
       <span class="logo-txt"><span class="logo-s">炭焼ハンバーグ</span><span class="logo-b">バグる</span></span>

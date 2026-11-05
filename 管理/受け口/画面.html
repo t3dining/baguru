@@ -78,7 +78,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-
 .tbar .seg{flex-wrap:nowrap}
 .tbar .seg label{flex:1; justify-content:center; padding:9px 6px}
 .hint.where{margin:0 0 12px}
-/* ページで直す：本物のページを縮めて出す（幅はスマホ 390px・パソコン 1280px） */
+/* ページで直す：本物のページを縮めて出す（幅はスマホ 430px・パソコン 1280px。スマホは ko-dai さんの iPhone の幅。kanri.js の DEVICE） */
 .pv{position:relative; height:56vh; min-height:300px; scroll-margin-top:8px; margin-top:10px; border:1px solid var(--line2); border-radius:var(--r); overflow:hidden; background:#fff}
 .pv iframe{position:absolute; top:0; left:0; border:0; transform-origin:0 0; background:#fff}
 .ed{margin-top:10px; padding:14px; background:var(--paper); border:1px solid var(--line); border-radius:var(--r)}
@@ -602,7 +602,8 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ember); outline-
        太字は太字のまま出す（「太字」のボタンで付ける・外す）。保存するときは **…** の形にする
      ・打った文は、その場でページに入れて見せる。保存は「保存する」を押したときだけ
      ・知らせを受けるのは、そのページの場所（ホームページ）からだけ */
-  var DEVICE = { sp: 390, pc: 1280 };
+  // スマホの幅は、ko-dai さんの iPhone（Pro Max の 430）に合わせる（2026-11-05。前の 390 だと、本物のスマホと並びや折り返しがちがった）
+  var DEVICE = { sp: 430, pc: 1280 };
   var pe = null;          // ページで直している途中のこと { frame, pv, ed, keys, orig, cur, piece, box, dirty }
   var MARK = '\uE000';    // 打っている所の印（直す欄を作り直すあいだだけ使う）
   var ZW = '\u200B';      // 空の文や、改行の後ろに置く、見えない字（打つ所を作るため。保存しない）
