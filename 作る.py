@@ -632,7 +632,8 @@ def header(page):
     items = []
     for key, ja, en in NAV:
         cur = ' aria-current="page"' if key == page else ''
-        items.append('<li><a href="%s.html"%s><span class="en">%s</span>%s</a></li>' % (key, cur, en, ja))
+        # 日本語の字は <span class="ja"> に包む（中の文節の印 <wbr>・<bg-lp> が、縦に並ぶ箱の中で別々の段にならないように。2026-11-06）
+        items.append('<li><a href="%s.html"%s><span class="en">%s</span><span class="ja">%s</span></a></li>' % (key, cur, en, ja))
     return '''<header class="hd">
   <div class="hd-in wrap">
     <a class="owner-home" href="https://t3dining-store.github.io/baguru-owner/" hidden aria-label="バグる Owner にもどる">🏠<span> ホーム</span></a>
@@ -714,13 +715,14 @@ def footer():
 
 
 def bottom_bar():
+    # 並びは 電話・メニュー・テイクアウト・予約・地図（2026-11-06 ko-dai さんの指示）。テイクアウトは赤いまま
     return '''<nav class="bbar" aria-label="すぐに使うメニュー">
   <a href="{{TEL_LINK}}">%s<span>電話</span></a>
-  <a href="{{MAP_LINK}}" target="_blank" rel="noopener">%s<span>地図</span></a>
   <a href="menu.html">%s<span>メニュー</span></a>
-  <a href="reserve.html#booking">%s<span>予約</span></a>
   <a class="is-ember" href="takeout.html">%s<span>テイクアウト</span></a>
-</nav>''' % (icon('phone'), icon('pin'), icon('menu'), icon('cal'), icon('bag'))
+  <a href="reserve.html#booking">%s<span>予約</span></a>
+  <a href="{{MAP_LINK}}" target="_blank" rel="noopener">%s<span>地図</span></a>
+</nav>''' % (icon('phone'), icon('menu'), icon('bag'), icon('cal'), icon('pin'))
 
 
 # ---------- 文節で改行する ----------

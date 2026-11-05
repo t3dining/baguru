@@ -57,7 +57,8 @@ address{font-style:normal}
 .logo-b{font-size:30px; font-weight:900; letter-spacing:.1em}
 .gnav{margin-left:auto}
 .gnav ul{display:flex; gap:2px}
-.gnav li > a{display:flex; flex-direction:column; align-items:center; padding:6px 7px; text-decoration:none; font-size:14px; font-weight:700; line-height:1.25; border-radius:var(--r)}
+.gnav li > a{display:flex; flex-direction:column; align-items:center; padding:6px 7px; text-decoration:none; font-size:14px; font-weight:700; line-height:1.25; border-radius:var(--r); white-space:nowrap}   /* メニューの字は途中で折らない（2026-11-06） */
+.hd-in.wrap{max-width:1400px}   /* 広い画面（全画面など）では、ヘッダーを本文より広く使う。メニューが10こあるので（2026-11-06） */
 .gnav .en{font-family:var(--en); font-size:10px; letter-spacing:.14em; color:var(--brass); font-weight:500; margin-bottom:2px}
 
 .gnav li > a[aria-current="page"]{color:#fff; box-shadow:inset 0 -3px 0 var(--ember)}
@@ -101,7 +102,9 @@ address{font-style:normal}
   .hd-tel{width:52px}
   .logo-s{display:none}      /* メニューが10こになったので、店名の上の小さな字はしまう（2026-11-06） */
 }
-@media (min-width:768px) and (max-width:810px){ .logo-txt{display:none} }   /* もっと狭いときは、ロゴの絵だけ */
+@media (min-width:768px) and (max-width:832px){ .logo-txt{display:none} }   /* もっと狭いときは、ロゴの絵だけ */
+@media (min-width:768px) and (max-width:800px){ .gnav li > a{font-size:11px} }   /* いちばん狭いタブレット（Owner の 🏠 があるときも1行に） */
+@media (min-width:768px) and (max-width:790px){ .from-owner .hd-in{gap:6px} .from-owner .owner-home{padding:0 6px} }
 @media (min-width:881px) and (max-width:930px){
   .hd-in{gap:10px}
   .gnav li > a{padding:6px 2px; font-size:12px}
@@ -436,6 +439,9 @@ address{font-style:normal}
   .bbar .i{width:22px; height:22px}
   .bbar .is-ember{background:var(--ember); color:#fff}
   body{padding-bottom:calc(60px + env(safe-area-inset-bottom))}
+  /* バグる Owner の中（枠の中）では、画面の下の余白（safe-area）が 0 になり、右下の角が欠けていた（2026-11-06）。少し上げる */
+  .in-owner .bbar{padding-bottom:max(env(safe-area-inset-bottom), 18px)}
+  body.in-owner{padding-bottom:calc(60px + max(env(safe-area-inset-bottom), 18px))}
 }
 
 /* ---------- 下の階層：上の大きな見出し ---------- */
@@ -612,7 +618,7 @@ address{font-style:normal}
 /* バグる Owner から開いたときだけ出す「🏠 ホーム」（main.js。公式アプリの .owner-home と同じ形） */
 .owner-home{flex:none; display:inline-flex; align-items:center; height:36px; padding:0 12px; border:1px solid rgba(255,255,255,.35); border-radius:999px; background:rgba(255,255,255,.08); color:#fff; font-size:13px; font-weight:700; text-decoration:none; white-space:nowrap}
 .owner-home[hidden]{display:none}
-@media (max-width:1100px){.owner-home{padding:0 9px}.owner-home span{display:none}}
+.owner-home{padding:0 9px}.owner-home span{display:none}   /* どの幅でも 🏠 だけ（2026-11-06。全画面でメニューの字が折れていたため） */
 @media (min-width:768px) and (max-width:1100px){.from-owner .logo-txt{display:none}}   /* メニューを横に並べる幅。🏠 のぶんの場所を空ける */
 @media (max-width:420px){.from-owner .logo-txt{display:none}}
 /* 臨時の営業・お休み（main.js が T3Works のマネージの定休日から作る。無いときは隠れたまま） */
