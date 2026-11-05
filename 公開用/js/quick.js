@@ -1,8 +1,9 @@
-/* 即予約「いますぐ行く（15分以内）」（ご予約のページ。2026-11-05）
+/* 即予約「今すぐ行く（15分以内）」（ご予約のページ。2026-11-05）
+   ・言い方は公式アプリにそろえる（2026-11-06 ko-dai さんの「そろえて公開する」：今すぐ・お席を押さえる）
    ・15分以内に来店する方だけの、すぐ確定するネット予約。決めごとは 店舗アプリ/バグる/即予約の決めごと.md
    ・受け口（予約ボードと同じ）の nowAvail で「いま何名まで入れるか」を読み、quickReserve で送る。席は受け口が選ぶ
    ・受け口が受けていないとき（予約ボードのスイッチが「止めている」・受付時間の外・休み・受け口がまだ古い・つながらない）は、
-     この画面も、上の「いますぐ行く」のボタンも出さない
+     この画面も、上の「今すぐ行く」のボタンも出さない
    ・送る前に「15分以内にお越しになれる方だけ」「取り消し・遅れるときはお電話で」を見せ、「15分以内にお店に行けます」に印を付けてもらう
    ・送ったあとは「予約が確定しました。○時○分までにお越しください」・予約番号・店の電話
    ・送るときに「受付の印（rid）」を付ける。返事が途中で切れて送り直しても、1件にしかならない
@@ -19,8 +20,8 @@
   var state = { avail: null, people: 0, rid: '', sending: false, done: false, closed: false };
 
   var MSG = {
-    not_accepting: 'ただいま「いますぐ行く」の予約は受け付けていません。日時を選ぶネット予約か、お電話でどうぞ。',
-    full: 'いま、席が埋まりました。人数を選び直すか、お電話でどうぞ。',
+    not_accepting: 'ただいま「今すぐ行く」の予約は受け付けていません。日時を選ぶネット予約か、お電話でどうぞ。',
+    full: '今、席が埋まりました。人数を選び直すか、お電話でどうぞ。',
     bad_people: '人数を選んでください。',
     need_name: 'お名前を入れてください。',
     bad_tel: '電話番号を正しく入れてください（例：090-1234-5678）。',
@@ -34,7 +35,7 @@
   };
   function message(e) {
     var d = e.data || {};
-    if (e.code === 'too_many') return 'いまは' + (d.maxPeople || '') + '名までお受けできます。人数を選び直すか、お電話でどうぞ。';
+    if (e.code === 'too_many') return '今は' + (d.maxPeople || '') + '名までお受けできます。人数を選び直すか、お電話でどうぞ。';
     return MSG[e.code] || MSG.no_answer;
   }
   function say(t) { var m = $('q-msg'); m.textContent = t || ''; m.hidden = !t; }
@@ -79,7 +80,7 @@
     now.textContent = '';
     var list = peopleList();
     if (state.closed || !a.accepting) {
-      now.appendChild(line('quick-full', 'ただいま「いますぐ行く」の予約は受け付けていません。'));
+      now.appendChild(line('quick-full', 'ただいま「今すぐ行く」の予約は受け付けていません。'));
       var p = line('', '日時を選ぶネット予約か、お電話（');
       p.appendChild(telLink()); p.appendChild(document.createTextNode('）でどうぞ。'));
       now.appendChild(p);
@@ -87,22 +88,25 @@
       return;
     }
     if (!list.length) {
-      now.appendChild(line('quick-full', 'いまは満席です。'));
+      now.appendChild(line('quick-full', '今は満席です。'));
       var q = line('', '少し時間を置くか、お電話（');
       q.appendChild(telLink()); q.appendChild(document.createTextNode('）でお問い合わせください。'));
       now.appendChild(q);
       form.hidden = true;
       return;
     }
-    var cap = line('quick-cap', 'いま ');
+    var cap = line('quick-cap', '今 ');
     var b = document.createElement('b'); b.textContent = Math.max.apply(null, list) + '名';
     cap.appendChild(b); cap.appendChild(document.createTextNode(' まで入れます'));
     now.appendChild(cap);
-    var at = line('quick-at', '');
+    // 「押さえたら ○時○分（今から15分）までにお越しください」（公式アプリと同じ言い方）
+    var at = line('quick-at', '押さえたら ');
     var t = document.createElement('b'); t.textContent = hm(a.arriveBy);
-    at.appendChild(t); at.appendChild(document.createTextNode(' までにお越しください'));
+    at.appendChild(t); at.appendChild(document.createTextNode('（今から' + (a.minutes || 15) + '分）'));
+    var tail = document.createElement('bg-lp');     // 「までにお越しください」は割らない（css の bg-lp。作る.py の最後の文節と同じ）
+    tail.textContent = 'までにお越しください';
+    at.appendChild(document.createElement('wbr')); at.appendChild(tail);
     now.appendChild(at);
-    now.appendChild(line('quick-note', 'いま予約したときの時刻です（' + (a.minutes || 15) + '分後）'));
     form.hidden = false;
     renderPeople(list);
     // 受け口はもっと入れても、ここで選べるのは15名まで。それより多い方はお電話で（ネット予約と同じ）
@@ -159,7 +163,7 @@
     if (!state.rid) state.rid = A.rid();     // 同じ内容の送り直しは同じ印（2回届いても1件）
     var btn = $('q-send');
     state.sending = true;
-    btn.disabled = true; btn.textContent = '送っています…';
+    btn.disabled = true; btn.textContent = '押さえています…';
     var body = { action: 'quickReserve', rid: state.rid, people: v.people, name: v.name, tel: v.tel, website: v.website };
     if (v.email) body.email = v.email;
     A.post(body).then(function (r) {
@@ -179,7 +183,7 @@
       if (e.code === 'full' || e.code === 'too_many') { state.sending = false; load(); }
     }).then(function () {
       state.sending = false;
-      btn.disabled = false; btn.textContent = 'この内容で予約する';
+      btn.disabled = false; btn.textContent = '今すぐ席を押さえる（予約を確定）';
     });
   });
 
