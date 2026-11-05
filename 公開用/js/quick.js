@@ -21,7 +21,7 @@
   if (!sec || !A) return;
   var $ = function (id) { return document.getElementById(id); };
   var TEL = (window.BAGURU && window.BAGURU.tel) || '';
-  var EVERY = 60000;                // いまの空きを読み直す間隔（来店時刻が1分ごとに進むため）
+  var EVERY = 15000;                // 今の空きを読み直す間隔。予約ボードのスイッチの入り切りが早く出るように15秒（2026-11-06 ko-dai さんの指示。前は1分）。画面を見ていないときは読まない
   var PEOPLE_MAX = 15;              // 選べる人数（ネット予約と同じ。それより多い方はお電話で）
   var state = { avail: null, people: 0, rid: '', sending: false, done: false, closed: false, test: false };
 
@@ -104,6 +104,8 @@
     return A.post(withAuth({ action: 'nowAvail' })).then(function (a) {
       state.avail = a;
       state.test = !!a.test;
+      // 入れている途中に止まったときは、急に消さずに「受け付けていません」を出す（15秒ごとに読み直すので、途中で切り替わることがある）
+      if (!a.accepting && !inOwner && !state.closed && !sec.hidden && (state.people || $('q-name').value || $('q-tel').value)) state.closed = true;
       if (!a.accepting) { if (inOwner) { showAll(true); draw(); } else if (!state.closed) showAll(false); else draw(); return; }   // Owner の中では、受けていないことと案内を出す
       state.closed = false;
       showAll(true);
@@ -233,7 +235,7 @@
     });
   });
 
-  // 開いているあいだは1分ごとに、画面に戻ったときにも読み直す（来店時刻と空きが変わるため）
+  // 開いているあいだは15秒ごとに、画面に戻ったときにも読み直す（スイッチの入り切り・来店時刻・空きが変わるため）
   setInterval(function () { if (document.visibilityState === 'visible') load(); }, EVERY);
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') load(); });
   askAuth().then(load);
