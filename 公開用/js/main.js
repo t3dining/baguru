@@ -42,7 +42,11 @@
         u.searchParams.delete('from');
         u.searchParams.delete('openExternalBrowser');
         var to = u.pathname.slice('/baguru-app/'.length) + u.search;
-        a.href = OWNER_URL + 'app.html' + (to ? '?to=' + encodeURIComponent(to) : '') + u.hash;
+        // back＝戻り先のホームページのページ（2026-11-07 ko-dai さんの指示「ホームページに戻るボタンも付けて」。左からスワイプするしか戻る方法がなかった）。
+        // Owner の app.html が「ホームページに戻る」を出し、押すと hp.html（このページ）へ戻す
+        var back = (location.pathname.split('/').pop() || 'index.html') + location.hash;
+        var qs = (to ? 'to=' + encodeURIComponent(to) + '&' : '') + 'back=' + encodeURIComponent(back);
+        a.href = OWNER_URL + 'app.html?' + qs + u.hash;
         a.target = '_top';
         return;
       }
