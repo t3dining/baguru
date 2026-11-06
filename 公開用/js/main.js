@@ -73,6 +73,27 @@
       } catch (x) {}
     });
   }
+  /* ---------- トップのバナー（.cta3）：題と下の説明を、それぞれ1行に収める（2026-11-07 ko-dai さんの指示） ----------
+     枠の幅に合わせて、入りきるまで字を小さくする。いちばん大きい字は css の大きさ、小さくするのは 10px まで（それでも入らないときは … で切る）。
+     2行に折れていないか（高さ）も見る（Chrome は、折らない指定でも文節の印 <wbr> で折ることがあるため） */
+  var fitTargets = document.querySelectorAll('.cta3-t, .cta3-item small');
+  function fitCta() {
+    Array.prototype.forEach.call(fitTargets, function (el) {
+      el.style.fontSize = '';
+      var size = parseFloat(getComputedStyle(el).fontSize) || 16;
+      var lh = parseFloat(getComputedStyle(el).lineHeight) / size || 1.45;
+      while ((el.scrollWidth > el.clientWidth + 0.5 || el.offsetHeight > size * lh * 1.5) && size > 10) {
+        size -= 0.5;
+        el.style.fontSize = size + 'px';
+      }
+    });
+  }
+  if (fitTargets.length) {
+    fitCta();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitCta);   // 字の形（Web フォント）が読めたら、もう一度
+    var fitRaf = 0;
+    window.addEventListener('resize', function () { cancelAnimationFrame(fitRaf); fitRaf = requestAnimationFrame(fitCta); });
+  }
   var toggle = document.querySelector('.nav-toggle');
   function closeNav() {
     body.classList.remove('nav-open');

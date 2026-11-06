@@ -225,41 +225,37 @@ address{font-style:normal}
   .hero-btns .btn-tel .nw{font-family:var(--en); font-size:24px; font-weight:600; letter-spacing:.04em; margin-left:4px}
 }
 
-/* ---------- ホーム：ご予約・テイクアウト・配達のバナー（2026-11-06）。左（ご予約）は、右の2つを合わせた高さ ---------- */
-.cta3{background:var(--coal); padding:24px 0}   /* 1つ目は上のメニューのすぐ下（2026-11-07）、2つ目は「看板のデザート」の下 */
-.cta3-in{display:grid; grid-template-columns:1fr 1fr; grid-template-rows:auto auto; gap:12px}
-.cta3-item{position:relative; display:flex; flex-direction:column; justify-content:center; gap:4px; padding:18px 44px 18px 22px; border-radius:var(--r); color:#fff; text-decoration:none; min-height:96px; transition:transform .2s, filter .2s}
-.cta3-item::after{content:"›"; position:absolute; right:18px; top:50%; transform:translateY(-52%); font-size:30px; line-height:1; font-family:var(--en)}
-.cta3-item .i{width:30px; height:30px}
-.cta3-t{font-size:clamp(17px,2vw,24px); font-weight:900; line-height:1.35}
-.cta3-item small{font-size:13px; font-weight:500; opacity:.92; line-height:1.5}
-.cta3-rsv{grid-row:1 / span 2; background:var(--ember); align-items:flex-start}
-.cta3-rsv .i{width:40px; height:40px}
-.cta3-rsv .cta3-t{font-size:clamp(20px,2.8vw,32px)}
+/* ---------- ホーム：ご予約・テイクアウト・配達のバナー（2026-11-06）。左（ご予約）は、右の2つを合わせた高さ ----------
+   ・題と下の説明は、それぞれ1行に収める（2026-11-07 ko-dai さんの指示）。枠の幅に合わせて、main.js が字を小さくする（fitCta）。絵は字の左
+   ・枠が狭い（700px まで）ときは、3つを縦に1列に並べる（スマホ・パソコンのトップの左の板の中。2列だと字が小さくなりすぎるため） */
+.cta3{background:var(--coal); padding:22px 0}   /* 1つ目はトップの左の板の中（店名の札のすぐ上）、2つ目は「看板のデザート」の下 */
+.cta3-hero,.cta3 > .wrap{container-type:inline-size}
+.cta3-in{display:grid; grid-template-columns:1fr 1fr; grid-template-rows:auto auto; gap:10px}
+.cta3-item{position:relative; display:grid; grid-template-columns:auto minmax(0,1fr); column-gap:12px; row-gap:1px; align-content:center; align-items:center;
+  padding:12px 38px 12px 16px; border-radius:var(--r); color:#fff; text-decoration:none; transition:transform .2s, filter .2s}
+.cta3-item::after{content:"›"; position:absolute; right:14px; top:50%; transform:translateY(-52%); font-size:26px; line-height:1; font-family:var(--en)}
+.cta3-item .i{grid-row:1 / span 2; width:28px; height:28px}
+.cta3-t,.cta3-item small{display:block; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.cta3-t{font-size:20px; font-weight:900; line-height:1.3}
+.cta3-item small{font-size:13px; font-weight:500; opacity:.92; line-height:1.45}
+.cta3-rsv{grid-row:1 / span 2; background:var(--ember)}
+.cta3-rsv .i{width:38px; height:38px}
+.cta3-rsv .cta3-t{font-size:26px}
 .cta3-to{background:var(--flame)}
 /* 配達・大量注文は、金色の地に黒い字で目立たせる（2026-11-07 ko-dai さんの指示「もっと目立たせて」） */
 .cta3-dl{background:linear-gradient(135deg,#e2b65c,var(--brass)); color:var(--coal); box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}
 .cta3-dl small{font-weight:700; opacity:1}
 .cta3-dl .cta3-t{text-shadow:0 1px 0 rgba(255,255,255,.25)}
 @media (hover:hover){ .cta3-item:hover{transform:translateY(-2px); filter:brightness(1.06)} }
-/* 1つ目はトップの左の板の中、店名の札のすぐ上（2026-11-07）。板の幅に合わせて字を少し小さく */
+/* 1つ目はトップの左の板の中、店名の札のすぐ上（2026-11-07） */
 .cta3-hero{background:none; padding:0; margin:0 0 24px; animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
-.cta3-hero .cta3-item{min-height:88px; padding:14px 40px 14px 18px}
-.cta3-hero .cta3-item::after{right:14px}
-.cta3-hero .cta3-t{font-size:clamp(15px,1.45vw,20px)}
-.cta3-hero .cta3-rsv .cta3-t{font-size:clamp(18px,2vw,27px)}
-.cta3-hero .cta3-item small{font-size:12px}
-
-@media (max-width:640px){
-  .cta3{padding:18px 0}
-  .cta3-in{gap:8px}
-  .cta3-item{padding:12px 26px 12px 12px; min-height:86px}
-  .cta3-item::after{right:8px; font-size:24px}
-  .cta3-item .i{width:24px; height:24px}
-  .cta3-t{font-size:15px}
-  .cta3-item small{font-size:11px}
-  .cta3-rsv .i{width:32px; height:32px}
-  .cta3-rsv .cta3-t{font-size:19px}
+@container (max-width:700px){
+  .cta3-in{grid-template-columns:1fr; grid-template-rows:none; gap:8px}
+  .cta3-rsv{grid-row:auto}
+  .cta3-rsv .i{width:28px; height:28px}
+  .cta3-rsv .cta3-t{font-size:20px}
+  .cta3-item{padding:11px 34px 11px 14px}
+  .cta3-item::after{right:12px; font-size:24px}
 }
    /* 左の板の中の幅に合わせる（ここは上の @media より後に置く） */
 
