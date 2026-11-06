@@ -52,6 +52,8 @@ QUICK_ON = True   # 2026-11-05 ko-dai さんの「公開してください」で
 COMING_SOON = False   # 2026-11-04 夕方に外した（ko-dai さんの指示：「検索で出なければいいので、coming soon も外して」）。検索に出さないのは SAMPLE の noindex
 PREVIEW = 'naka-f90249acdb'
 BASE_URL = SITE_URL + '/' + PREVIEW if COMING_SOON else SITE_URL   # 中身のページの場所（canonical・OGP・管理画面が開くページ）
+# 配達の申請（公式アプリの注文だけの画面の「配達・大量注文の申請」。カートが空なら、決まりと「メニューを選ぶ」が出る）。トップの「配達ご希望の方はこちら！」のバナー（2026-11-06）
+DELIVERY_URL = 'https://t3dining.github.io/baguru-app/takeout.html#request'
 ORDER_URL = 'https://t3dining.github.io/baguru-app/takeout.html#menu'  # ★モバイルオーダーの受け口（会社の GitHub の店舗アプリの、注文だけの画面。order.html はお店のタブレットの画面なので、つながない）
 # 公式アプリ（会社の GitHub の店舗アプリ）。ページ/app.html の「アプリを開く」と QR。?openExternalBrowser=1 は、LINE の中で押しても、ふだんのブラウザで開くための印（お店の POP の QR と同じ）
 APP_URL = 'https://t3dining.github.io/baguru-app/?openExternalBrowser=1'
@@ -77,6 +79,7 @@ VARS = {
     'TEL': SHOP['tel'],
     'TEL_LINK': 'tel:' + SHOP['tel'].replace('-', ''),
     'ORDER_URL': ORDER_URL,
+    'DELIVERY_URL': DELIVERY_URL,
     'APP_URL': APP_URL,
     'MAP_EMBED': 'https://www.google.com/maps?q=%s&output=embed&hl=ja' % _q,
     'MAP_LINK': 'https://www.google.com/maps/search/?api=1&query=%s' % _q,
@@ -605,6 +608,7 @@ SPRITE = '''<svg width="0" height="0" style="position:absolute" aria-hidden="tru
 <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6.5-8 12-8 12s-8-5.5-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
 <symbol id="i-menu" viewBox="0 0 24 24"><path d="M6 2v8a2 2 0 0 0 4 0V2M8 10v12M18 22V2c-2.5 1.5-4 4.5-4 8v4h4"/></symbol>
 <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8h14l-1.2 13H6.2L5 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></symbol>
+<symbol id="i-truck" viewBox="0 0 24 24"><path d="M2 6h11v10H2z"/><path d="M13 9h4l3 3.5V16h-7z"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="16.5" cy="17.5" r="1.8"/></symbol>
 <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
 <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
 <symbol id="i-car" viewBox="0 0 24 24"><path d="M3 17v-4l2.2-5.5A2 2 0 0 1 7 6h10a2 2 0 0 1 1.8 1.5L21 13v4z"/><path d="M3 13h18"/><circle cx="7.5" cy="17" r="1.8"/><circle cx="16.5" cy="17" r="1.8"/></symbol>
@@ -869,6 +873,11 @@ def build_page(page, ver):
     src = (SRC / (page + '.html')).read_text(encoding='utf-8')
     if page == 'faq':
         src = faq_all(src)
+    if '{{CTA}}' in src:   # トップの「ご予約・テイクアウト・配達」のバナーを、もう1か所に写す（2026-11-06）
+        m = re.search(r'<!--cta-->(.*?)<!--/cta-->', src, re.S)
+        if not m:
+            raise SystemExit('ページ/%s.html に <!--cta-->〜<!--/cta--> がありません（{{CTA}} に写せません）' % page)
+        src = src.replace('{{CTA}}', m.group(1).strip())
     body = put_texts(put_data(src))
     robots = '<meta name="robots" content="noindex">\n' if SAMPLE else ''
     sample = ('<p class="sample">サンプルページです。価格・営業時間などは公開前にお店で確かめます。</p>\n' if SAMPLE else '')

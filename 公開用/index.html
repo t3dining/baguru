@@ -21,7 +21,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
-<link rel="stylesheet" href="css/style.css?v=f3b58b74">
+<link rel="stylesheet" href="css/style.css?v=62b23204">
 <link rel="preload" as="image" href="img/hero.jpg">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Restaurant", "@id": "https://t3dining.github.io/baguru/#restaurant", "name": "炭焼ハンバーグ バグる", "alternateName": "お肉に愛を込めて 炭焼ハンバーグ バグる", "url": "https://t3dining.github.io/baguru/", "image": "https://t3dining.github.io/baguru/img/og.jpg", "logo": "https://t3dining.github.io/baguru/img/logo.png", "telephone": "+81-565-85-7955", "address": {"@type": "PostalAddress", "streetAddress": "若林西町茶屋間1-3", "addressLocality": "豊田市", "addressRegion": "愛知県", "addressCountry": "JP"}, "servesCuisine": ["ハンバーグ", "洋食"], "priceRange": "¥1,000〜¥2,000", "acceptsReservations": "https://t3dining.github.io/baguru/reserve.html", "hasMenu": "https://t3dining.github.io/baguru/menu.html", "paymentAccepted": "Cash, Credit Card, QRコード決済", "smokingAllowed": false, "sameAs": ["https://www.instagram.com/baguru.hamburg/"], "openingHoursSpecification": [{"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Wednesday", "Thursday", "Friday"], "opens": "11:00", "closes": "15:00"}, {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Wednesday", "Thursday", "Friday"], "opens": "17:00", "closes": "22:30"}, {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday", "Sunday"], "opens": "11:00", "closes": "22:30"}]}</script>
 </head>
@@ -33,6 +33,7 @@
 <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6.5-8 12-8 12s-8-5.5-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
 <symbol id="i-menu" viewBox="0 0 24 24"><path d="M6 2v8a2 2 0 0 0 4 0V2M8 10v12M18 22V2c-2.5 1.5-4 4.5-4 8v4h4"/></symbol>
 <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8h14l-1.2 13H6.2L5 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></symbol>
+<symbol id="i-truck" viewBox="0 0 24 24"><path d="M2 6h11v10H2z"/><path d="M13 9h4l3 3.5V16h-7z"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="16.5" cy="17.5" r="1.8"/></symbol>
 <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
 <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
 <symbol id="i-car" viewBox="0 0 24 24"><path d="M3 17v-4l2.2-5.5A2 2 0 0 1 7 6h10a2 2 0 0 1 1.8 1.5L21 13v4z"/><path d="M3 13h18"/><circle cx="7.5" cy="17" r="1.8"/><circle cx="16.5" cy="17" r="1.8"/></symbol>
@@ -83,6 +84,7 @@
 <section class="hero">
   <div class="hero-txt">
     <p class="hero-eyebrow"><span><!--t:index-1-->豊田市・国道419号沿い<!--/t--></span><span><!--t:index-2--><bg-lp>炭焼ハンバーグ専門店</bg-lp><!--/t--></span></p>
+    <a class="hero-tel" href="tel:0565857955" aria-label="電話する 0565-85-7955"><svg class="i" aria-hidden="true"><use href="#i-phone"/></svg><span>0565-85-7955</span></a>   <!-- スマホだけ。電話番号を大きく（2026-11-06） -->
     <h1 class="hero-ttl"><span class="hero-ttl-s"><!--t:index-3-->お肉に<wbr>愛を<wbr><bg-lp>込めて</bg-lp><!--/t--></span><span class="hero-ttl-m"><!--t:index-4--><bg-lp>炭焼ハンバーグ</bg-lp><!--/t--></span><br><span class="hero-ttl-b"><!--t:index-5--><bg-lp>バグる</bg-lp><!--/t--></span></h1>
     <p class="hero-lead"><!--t:index-6-->炭火で<wbr>一気に<wbr>焼き上げる、<wbr>4種の<wbr><bg-lp>ハンバーグ。</bg-lp><br>炊きたての<wbr>旨い米と<wbr>一緒に<wbr><bg-lp>どうぞ。</bg-lp><!--/t--></p>
     <div class="btns hero-btns">
@@ -112,6 +114,17 @@
     <li><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><div><span class="k"><!--t:index-11--><bg-lp>ご予約</bg-lp><!--/t--></span><a class="v" href="reserve.html#booking"><!--t:index-12--><bg-lp>ネット予約OK</bg-lp><!--/t--></a></div></li>
   </ul>
 </section>
+
+<!-- ご予約・テイクアウト・配達のバナー（2026-11-06 ko-dai さんの指示）。左は2段ぶんの高さ。「看板のデザート」の下にも同じものを出す（下の CTA の印の所に、作る.py が写す） -->
+<!--cta-->
+<section class="cta3" aria-label="ご予約とテイクアウト">
+  <div class="cta3-in wrap">
+    <a class="cta3-item cta3-rsv" href="reserve.html"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><span class="cta3-t"><!--t:index-105-->お席の<wbr>ご予約は<wbr><bg-lp>こちら！</bg-lp><!--/t--></span><small><!--t:index-106-->ネット予約・今すぐ<wbr>行く<wbr><bg-lp>（15分以内）</bg-lp><!--/t--></small></a>
+    <a class="cta3-item cta3-to" href="https://t3dining.github.io/baguru-app/takeout.html#menu"><svg class="i" aria-hidden="true"><use href="#i-bag"/></svg><span class="cta3-t"><!--t:index-107-->テイクアウトを<wbr><bg-lp>注文！</bg-lp><!--/t--></span><small><!--t:index-108-->スマホで<wbr>注文して、<wbr>お店で<wbr><bg-lp>受け取り</bg-lp><!--/t--></small></a>
+    <a class="cta3-item cta3-dl" href="https://t3dining.github.io/baguru-app/takeout.html#request"><svg class="i" aria-hidden="true"><use href="#i-truck"/></svg><span class="cta3-t"><!--t:index-109-->配達ご希望の<wbr>方は<wbr><bg-lp>こちら！</bg-lp><!--/t--></span><small><!--t:index-110-->10食以上で<wbr>無料配達<wbr><bg-lp>（原則7km圏内）</bg-lp><!--/t--></small></a>
+  </div>
+</section>
+<!--/cta-->
 
 <section class="sec sec-dark" id="hamburg" data-deco="HAMBURG">
   <div class="wrap">
@@ -261,6 +274,14 @@
   </div>
 </section>
 
+<section class="cta3" aria-label="ご予約とテイクアウト">
+  <div class="cta3-in wrap">
+    <a class="cta3-item cta3-rsv" href="reserve.html"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><span class="cta3-t"><!--t:index-105-->お席の<wbr>ご予約は<wbr><bg-lp>こちら！</bg-lp><!--/t--></span><small><!--t:index-106-->ネット予約・今すぐ<wbr>行く<wbr><bg-lp>（15分以内）</bg-lp><!--/t--></small></a>
+    <a class="cta3-item cta3-to" href="https://t3dining.github.io/baguru-app/takeout.html#menu"><svg class="i" aria-hidden="true"><use href="#i-bag"/></svg><span class="cta3-t"><!--t:index-107-->テイクアウトを<wbr><bg-lp>注文！</bg-lp><!--/t--></span><small><!--t:index-108-->スマホで<wbr>注文して、<wbr>お店で<wbr><bg-lp>受け取り</bg-lp><!--/t--></small></a>
+    <a class="cta3-item cta3-dl" href="https://t3dining.github.io/baguru-app/takeout.html#request"><svg class="i" aria-hidden="true"><use href="#i-truck"/></svg><span class="cta3-t"><!--t:index-109-->配達ご希望の<wbr>方は<wbr><bg-lp>こちら！</bg-lp><!--/t--></span><small><!--t:index-110-->10食以上で<wbr>無料配達<wbr><bg-lp>（原則7km圏内）</bg-lp><!--/t--></small></a>
+  </div>
+</section>
+
 <section class="band">
   <img loading="lazy" decoding="async" width="1650" height="1100" src="img/takeout.jpg" alt="">
   <div class="band-in">
@@ -381,7 +402,7 @@
   <a href="reserve.html#booking"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><span><bg-lp>予約</bg-lp></span></a>
   <a href="https://www.google.com/maps/search/?api=1&amp;query=%E7%82%AD%E7%84%BC%E3%83%8F%E3%83%B3%E3%83%90%E3%83%BC%E3%82%B0%20%E3%83%90%E3%82%B0%E3%82%8B%20%E6%84%9B%E7%9F%A5%E7%9C%8C%E8%B1%8A%E7%94%B0%E5%B8%82%E8%8B%A5%E6%9E%97%E8%A5%BF%E7%94%BA%E8%8C%B6%E5%B1%8B%E9%96%931-3" target="_blank" rel="noopener"><svg class="i" aria-hidden="true"><use href="#i-pin"/></svg><span><bg-lp>地図</bg-lp></span></a>
 </nav>
-<script src="js/config.js?v=f3b58b74" defer></script>
-<script src="js/main.js?v=f3b58b74" defer></script>
+<script src="js/config.js?v=62b23204" defer></script>
+<script src="js/main.js?v=62b23204" defer></script>
 </body>
 </html>

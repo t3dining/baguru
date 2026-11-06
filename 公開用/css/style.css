@@ -212,7 +212,45 @@ address{font-style:normal}
   .hero-btns .btn{flex:1 1 100%}
 }
 
-@supports (width:1cqw){ .hero-ttl{font-size:min(13.2cqw, 96px)} }   /* 左の板の中の幅に合わせる（ここは上の @media より後に置く） */
+@supports (width:1cqw){ .hero-ttl{font-size:min(13.2cqw, 96px)} }
+/* スマホだけ：「炭焼ハンバーグ専門店」の下に、電話番号を大きく（2026-11-06）。パソコンは下の「電話する」のボタンを大きく */
+.hero-tel{display:none}
+@media (max-width:820px){
+  .hero-tel{display:inline-flex; align-items:center; gap:10px; align-self:flex-start; margin:-8px 0 20px; font-family:var(--en); font-size:clamp(28px,8.4vw,38px); font-weight:600; letter-spacing:.04em; line-height:1.2; color:#fff; text-decoration:none}
+  .hero-tel .i{width:.85em; height:.85em; color:var(--flame)}
+}
+@media (min-width:821px){
+  .hero-btns .btn-tel{min-height:62px; padding:14px 30px; font-size:18px}
+  .hero-btns .btn-tel .i{width:24px; height:24px}
+  .hero-btns .btn-tel .nw{font-family:var(--en); font-size:24px; font-weight:600; letter-spacing:.04em; margin-left:4px}
+}
+
+/* ---------- ホーム：ご予約・テイクアウト・配達のバナー（2026-11-06）。左（ご予約）は、右の2つを合わせた高さ ---------- */
+.cta3{background:var(--coal); padding:28px 0; border-top:1px solid var(--line-d)}
+.cta3-in{display:grid; grid-template-columns:1fr 1fr; grid-template-rows:auto auto; gap:12px}
+.cta3-item{position:relative; display:flex; flex-direction:column; justify-content:center; gap:4px; padding:18px 44px 18px 22px; border-radius:var(--r); color:#fff; text-decoration:none; min-height:96px; transition:transform .2s, filter .2s}
+.cta3-item::after{content:"›"; position:absolute; right:18px; top:50%; transform:translateY(-52%); font-size:30px; line-height:1; font-family:var(--en)}
+.cta3-item .i{width:30px; height:30px}
+.cta3-t{font-size:clamp(17px,2vw,24px); font-weight:900; line-height:1.35}
+.cta3-item small{font-size:13px; font-weight:500; opacity:.92; line-height:1.5}
+.cta3-rsv{grid-row:1 / span 2; background:var(--ember); align-items:flex-start}
+.cta3-rsv .i{width:40px; height:40px}
+.cta3-rsv .cta3-t{font-size:clamp(20px,2.8vw,32px)}
+.cta3-to{background:var(--flame)}
+.cta3-dl{background:var(--coal3); border:1px solid rgba(255,255,255,.18)}
+@media (hover:hover){ .cta3-item:hover{transform:translateY(-2px); filter:brightness(1.06)} }
+@media (max-width:640px){
+  .cta3{padding:18px 0}
+  .cta3-in{gap:8px}
+  .cta3-item{padding:12px 26px 12px 12px; min-height:86px}
+  .cta3-item::after{right:8px; font-size:24px}
+  .cta3-item .i{width:24px; height:24px}
+  .cta3-t{font-size:15px}
+  .cta3-item small{font-size:11px}
+  .cta3-rsv .i{width:32px; height:32px}
+  .cta3-rsv .cta3-t{font-size:19px}
+}
+   /* 左の板の中の幅に合わせる（ここは上の @media より後に置く） */
 
 /* 今日の営業・定休日・駐車場・予約 */
 .today{background:var(--coal2); color:var(--on-dark); border-top:1px solid var(--line-d)}

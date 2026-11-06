@@ -1,6 +1,7 @@
 <section class="hero">
   <div class="hero-txt">
     <p class="hero-eyebrow"><span>{{t:index-1}}</span><span>{{t:index-2}}</span></p>
+    <a class="hero-tel" href="{{TEL_LINK}}" aria-label="電話する {{TEL}}"><svg class="i" aria-hidden="true"><use href="#i-phone"/></svg><span>{{TEL}}</span></a>   <!-- スマホだけ。電話番号を大きく（2026-11-06） -->
     <h1 class="hero-ttl"><span class="hero-ttl-s">{{t:index-3}}</span><span class="hero-ttl-m">{{t:index-4}}</span><br><span class="hero-ttl-b">{{t:index-5}}</span></h1>
     <p class="hero-lead">{{t:index-6}}</p>
     <div class="btns hero-btns">
@@ -30,6 +31,17 @@
     <li><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><div><span class="k">{{t:index-11}}</span><a class="v" href="reserve.html#booking">{{t:index-12}}</a></div></li>
   </ul>
 </section>
+
+<!-- ご予約・テイクアウト・配達のバナー（2026-11-06 ko-dai さんの指示）。左は2段ぶんの高さ。「看板のデザート」の下にも同じものを出す（下の CTA の印の所に、作る.py が写す） -->
+<!--cta-->
+<section class="cta3" aria-label="ご予約とテイクアウト">
+  <div class="cta3-in wrap">
+    <a class="cta3-item cta3-rsv" href="reserve.html"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><span class="cta3-t">{{t:index-105}}</span><small>{{t:index-106}}</small></a>
+    <a class="cta3-item cta3-to" href="{{ORDER_URL}}"><svg class="i" aria-hidden="true"><use href="#i-bag"/></svg><span class="cta3-t">{{t:index-107}}</span><small>{{t:index-108}}</small></a>
+    <a class="cta3-item cta3-dl" href="{{DELIVERY_URL}}"><svg class="i" aria-hidden="true"><use href="#i-truck"/></svg><span class="cta3-t">{{t:index-109}}</span><small>{{t:index-110}}</small></a>
+  </div>
+</section>
+<!--/cta-->
 
 <section class="sec sec-dark" id="hamburg" data-deco="HAMBURG">
   <div class="wrap">
@@ -178,6 +190,8 @@
     </div>
   </div>
 </section>
+
+{{CTA}}
 
 <section class="band">
   <img src="img/takeout.jpg" alt="">
