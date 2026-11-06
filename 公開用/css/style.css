@@ -242,6 +242,14 @@ address{font-style:normal}
 .cta3-dl small{font-weight:700; opacity:1}
 .cta3-dl .cta3-t{text-shadow:0 1px 0 rgba(255,255,255,.25)}
 @media (hover:hover){ .cta3-item:hover{transform:translateY(-2px); filter:brightness(1.06)} }
+/* 1つ目はトップの左の板の中、店名の札のすぐ上（2026-11-07）。板の幅に合わせて字を少し小さく */
+.cta3-hero{background:none; padding:0; margin:0 0 24px; animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+.cta3-hero .cta3-item{min-height:88px; padding:14px 40px 14px 18px}
+.cta3-hero .cta3-item::after{right:14px}
+.cta3-hero .cta3-t{font-size:clamp(15px,1.45vw,20px)}
+.cta3-hero .cta3-rsv .cta3-t{font-size:clamp(18px,2vw,27px)}
+.cta3-hero .cta3-item small{font-size:12px}
+
 @media (max-width:640px){
   .cta3{padding:18px 0}
   .cta3-in{gap:8px}
