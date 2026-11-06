@@ -226,7 +226,7 @@ address{font-style:normal}
 }
 
 /* ---------- ホーム：ご予約・テイクアウト・配達のバナー（2026-11-06）。左（ご予約）は、右の2つを合わせた高さ ---------- */
-.cta3{background:var(--coal); padding:28px 0; border-top:1px solid var(--line-d)}
+.cta3{background:var(--coal); padding:24px 0}   /* 1つ目は上のメニューのすぐ下（2026-11-07）、2つ目は「看板のデザート」の下 */
 .cta3-in{display:grid; grid-template-columns:1fr 1fr; grid-template-rows:auto auto; gap:12px}
 .cta3-item{position:relative; display:flex; flex-direction:column; justify-content:center; gap:4px; padding:18px 44px 18px 22px; border-radius:var(--r); color:#fff; text-decoration:none; min-height:96px; transition:transform .2s, filter .2s}
 .cta3-item::after{content:"›"; position:absolute; right:18px; top:50%; transform:translateY(-52%); font-size:30px; line-height:1; font-family:var(--en)}
@@ -237,7 +237,10 @@ address{font-style:normal}
 .cta3-rsv .i{width:40px; height:40px}
 .cta3-rsv .cta3-t{font-size:clamp(20px,2.8vw,32px)}
 .cta3-to{background:var(--flame)}
-.cta3-dl{background:var(--coal3); border:1px solid rgba(255,255,255,.18)}
+/* 配達・大量注文は、金色の地に黒い字で目立たせる（2026-11-07 ko-dai さんの指示「もっと目立たせて」） */
+.cta3-dl{background:linear-gradient(135deg,#e2b65c,var(--brass)); color:var(--coal); box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}
+.cta3-dl small{font-weight:700; opacity:1}
+.cta3-dl .cta3-t{text-shadow:0 1px 0 rgba(255,255,255,.25)}
 @media (hover:hover){ .cta3-item:hover{transform:translateY(-2px); filter:brightness(1.06)} }
 @media (max-width:640px){
   .cta3{padding:18px 0}

@@ -23,6 +23,36 @@
      "name": "ページの初め",
      "texts": [
       {
+       "key": "index-105",
+       "tag": "span",
+       "text": "お席のご予約はこちら！"
+      },
+      {
+       "key": "index-106",
+       "tag": "small",
+       "text": "ネット予約・今すぐ行く（15分以内）"
+      },
+      {
+       "key": "index-107",
+       "tag": "span",
+       "text": "テイクアウトを注文！"
+      },
+      {
+       "key": "index-108",
+       "tag": "small",
+       "text": "スマホで注文して、お店で受け取り"
+      },
+      {
+       "key": "index-109",
+       "tag": "span",
+       "text": "配達・大量注文の方はこちら！"
+      },
+      {
+       "key": "index-110",
+       "tag": "small",
+       "text": "10食以上で無料配達・15食以上の大量注文も"
+      },
+      {
        "key": "index-1",
        "tag": "span",
        "text": "豊田市・国道419号沿い"
@@ -81,36 +111,6 @@
        "key": "index-12",
        "tag": "a",
        "text": "ネット予約OK"
-      },
-      {
-       "key": "index-105",
-       "tag": "span",
-       "text": "お席のご予約はこちら！"
-      },
-      {
-       "key": "index-106",
-       "tag": "small",
-       "text": "ネット予約・今すぐ行く（15分以内）"
-      },
-      {
-       "key": "index-107",
-       "tag": "span",
-       "text": "テイクアウトを注文！"
-      },
-      {
-       "key": "index-108",
-       "tag": "small",
-       "text": "スマホで注文して、お店で受け取り"
-      },
-      {
-       "key": "index-109",
-       "tag": "span",
-       "text": "配達ご希望の方はこちら！"
-      },
-      {
-       "key": "index-110",
-       "tag": "small",
-       "text": "10食以上で無料配達（原則7km圏内）"
       }
      ]
     },
