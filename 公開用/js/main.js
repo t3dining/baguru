@@ -15,6 +15,20 @@
     if (/[?&]from=owner\b/.test(location.search)) sessionStorage.setItem('bg.fromOwner', '1');
     fromOwner = sessionStorage.getItem('bg.fromOwner') === '1';
   } catch (e) { fromOwner = /[?&]from=owner\b/.test(location.search); }
+  /* バグる Staff（社員用の入口。t3dining-store.github.io/baguru-staff/）から開いたとき（印 hub=staff。2026-11-08）：
+     🏠 と、公式アプリへ移ったあとの戻り先を Staff にする。★Staff から来た人を、Owner の画面（マネージ・管理画面のカードがある）に行かせないため
+     （ko-dai さんの指示「バグるStaffにもテスト用アカウントの公式アプリとホームページを入れれますか？ 管理画面とマネージは絶対に入れないでください」）。
+     印の覚え方は公式アプリ（js/app.js の FROM_STAFF）と同じ：?from=owner で開いたとき、hub=staff があれば、このタブの sessionStorage の bg.fromHub に 'staff'、なければ消す。
+     ほかのページに移って ? が消えても、bg.fromHub を見る */
+  var fromStaff = false;
+  try {
+    if (/[?&]from=owner\b/.test(location.search)) {
+      if (/[?&]hub=staff\b/.test(location.search)) sessionStorage.setItem('bg.fromHub', 'staff'); else sessionStorage.removeItem('bg.fromHub');
+    }
+    fromStaff = fromOwner && sessionStorage.getItem('bg.fromHub') === 'staff';
+  } catch (e) { fromStaff = fromOwner && /[?&]hub=staff\b/.test(location.search); }
+  var STAFF_URL = 'https://t3dining-store.github.io/baguru-staff/';
+  if (ownerHome && fromStaff) { ownerHome.href = STAFF_URL; ownerHome.setAttribute('aria-label', 'バグる Staff にもどる'); }
   /* 新しい場所の Owner（t3dining-store.github.io。2026-11-05 にお店用のアプリだけ引っ越した）は、このページを枠（iframe）にはめ込んで開く。
      はめ込まれていて Owner から来たときだけ（管理画面の「ページで直す」＝ ?edit は別）：
      ・🏠 は、枠の外の窓ごと Owner に戻す（target="_top"）
@@ -26,7 +40,7 @@
   var OWNER_URL = 'https://t3dining-store.github.io/baguru-owner/';
   if (inOwner) {
     body.classList.add('in-owner');
-    if (ownerHome) { ownerHome.href = OWNER_URL; ownerHome.target = '_top'; }
+    if (ownerHome) { ownerHome.href = fromStaff ? STAFF_URL : OWNER_URL; ownerHome.target = '_top'; }
     var siteRoot = location.href.split(/[?#]/)[0].replace(/[^/]*$/, '');   // このページのフォルダ（公開先では …/baguru/）
     document.addEventListener('click', function (e) {
       var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
@@ -35,18 +49,20 @@
       try { u = new URL(a.getAttribute('href'), location.href); } catch (x) { return; }
       if (/^(tel|mailto|sms):$/.test(u.protocol)) { a.target = '_top'; return; }
       if (!/^https?:$/.test(u.protocol) || u.href.indexOf(siteRoot) === 0) return;   // ホームページの中は、枠の中のまま
-      if (u.href.indexOf(OWNER_URL) === 0) { a.target = '_top'; return; }   // Owner のページ（下で替えたあとの、2回目に押したときも）
+      if (u.href.indexOf(OWNER_URL) === 0 || u.href.indexOf(STAFF_URL) === 0) { a.target = '_top'; return; }   // Owner・Staff のページ（下で替えたあとの、2回目に押したときも）
       if (u.hostname === 't3dining.github.io' && u.pathname.indexOf('/baguru-app/') === 0) {
         // 公式アプリは、Owner の中で公式アプリをはめ込むページ（app.html?to=アプリの中のページ）で開く（2026-11-05。バグるOwner のセッションが決めた形）。
         // from=owner は app.html が付け、openExternalBrowser は LINE の中から開くときの印なので、to には入れない。# はそのまま渡る
         u.searchParams.delete('from');
         u.searchParams.delete('openExternalBrowser');
+        u.searchParams.delete('hub');   // Staff の印は下で app.html のアドレスに付ける（to の中には入れない）
         var to = u.pathname.slice('/baguru-app/'.length) + u.search;
         // back＝戻り先のホームページのページ（2026-11-07 ko-dai さんの指示「ホームページに戻るボタンも付けて」。左からスワイプするしか戻る方法がなかった）。
         // Owner の app.html が「ホームページに戻る」を出し、押すと hp.html（このページ）へ戻す
         var back = (location.pathname.split('/').pop() || 'index.html') + location.hash;
         var qs = (to ? 'to=' + encodeURIComponent(to) + '&' : '') + 'back=' + encodeURIComponent(back);
-        a.href = OWNER_URL + 'app.html?' + qs + u.hash;
+        // Staff から来たときは hub=staff も付ける（app.html が公式アプリに渡し、公式アプリの 🏠 が Staff に戻る。2026-11-08）。app.html はこのまま Owner の下（中身ははめ込むだけ）
+        a.href = OWNER_URL + 'app.html?' + qs + (fromStaff ? '&hub=staff' : '') + u.hash;
         a.target = '_top';
         return;
       }
@@ -58,7 +74,8 @@
     ownerHome.hidden = false;
     body.classList.add('from-owner');
     ownerHome.addEventListener('click', function (e) {
-      if (inOwner) return;   // はめ込まれているときは、上の target="_top" のまま Owner へ
+      if (inOwner) return;   // はめ込まれているときは、上の target="_top" のまま Owner（Staff から来たときは Staff）へ
+      if (fromStaff) return;   // Staff から来たときは、リンクの行き先（上で Staff にした）のまま。bg.owner は読まない
       var to = '';
       try { to = sessionStorage.getItem('bg.owner') || ''; } catch (x) { to = ''; }
       if (to.indexOf('https://t3dining.github.io/baguru-owner') === 0) to = '';   // 前の場所の Owner は「引っ越しました」のページ（2026-11-05）。リンクの行き先（新しい場所）へ
@@ -73,6 +90,7 @@
         var u = new URL(a.href);
         if (u.hostname !== 't3dining.github.io' || u.pathname.indexOf('/baguru-app/') !== 0) return;
         u.searchParams.set('from', 'owner');
+        if (fromStaff) u.searchParams.set('hub', 'staff');   // 公式アプリの 🏠 も Staff に戻るように（2026-11-08）
         a.href = u.href;
       } catch (x) {}
     });
