@@ -68,7 +68,8 @@
     bad_people: '人数を選んでください。',
     need_name: 'お名前を入れてください。',
     bad_tel: '電話番号を正しく入れてください（例：090-1234-5678）。',
-    bad_email: 'メールアドレスの形が違います（入れなくても予約できます）。',
+    need_email: 'メールアドレスを入れてください（確定のメールをお送りします）。',   // 2026-11-08 から必須（ko-dai さんの指示「予約も注文も必ずメールが送られるように」）
+    bad_email: 'メールアドレスの形が違います。',
     bad_kana: 'フリガナはカタカナで入れてください。',
     need_ok: '「15分以内にお店に行けます」に印を付けてください。',
     too_many_bookings: '同じ電話番号でのご予約が多いため、受け付けられませんでした。お電話でどうぞ。',
@@ -208,7 +209,8 @@
     if (!v.people) return MSG.bad_people;
     if (!v.name) return MSG.need_name;
     if (!/^0\d{9,10}$/.test(v.tel.replace(/[^\d]/g, ''))) return MSG.bad_tel;
-    if (v.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.email)) return MSG.bad_email;
+    if (!v.email) return MSG.need_email;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.email)) return MSG.bad_email;
     if (!$('q-ok').checked) return MSG.need_ok;
     return '';
   }
@@ -224,7 +226,7 @@
     state.sending = true;
     btn.disabled = true; btn.textContent = '押さえています…';
     var body = withAuth({ action: 'quickReserve', rid: state.rid, people: v.people, name: v.name, tel: v.tel, website: v.website });
-    if (v.email) body.email = v.email;
+    body.email = v.email;
     A.post(body).then(function (r) {
       state.done = true;
       $('q-by').textContent = hm(r.arriveBy || r.time);
