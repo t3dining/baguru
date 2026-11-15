@@ -917,9 +917,10 @@ def build_page(page, ver):
     robots = '<meta name="robots" content="noindex">\n' if SAMPLE else ''
     sample = ('<p class="sample">サンプルページです。価格・営業時間などは公開前にお店で確かめます。</p>\n' if SAMPLE else '')
     # 肉の日の帯（2026-11-15 ko-dai さんの指示）。ふだんは隠し、前の日は「明日は肉の日！」、当日は「本日は肉の日！」を main.js（renderNiku）が出す。
-    # 肉の日は毎月29日、2月だけ9日。お休みの日も出す。スクロールしても上に残る。字は texts.json の common-9〜11（管理画面の「一覧で直す」の全ページ共通）
+    # 肉の日は毎月29日、2月だけ9日（1/30〜2/7 は「2月は2/9が肉の日！」）。お休みの日も出す。スクロールしても上に残る。字は texts.json の common-9〜11（管理画面の「一覧で直す」の全ページ共通）
     niku = put_texts('<a class="niku" href="news.html#n-niku" data-niku hidden><span class="niku-ttl">'
-                     '<span data-niku-day="28" hidden>{{t:common-9}}</span><span data-niku-day="29" hidden>{{t:common-10}}</span></span>'
+                     '<span data-niku-day="28" hidden>{{t:common-9}}</span><span data-niku-day="29" hidden>{{t:common-10}}</span>'
+                     '<span data-niku-day="feb" hidden>{{t:common-12}}</span></span>'
                      '<span class="niku-sub">{{t:common-11}}</span></a>\n')
     preload = '<link rel="preload" as="image" href="img/hero.jpg">\n' if page == 'index' else ''
     out = '''<!doctype html>
