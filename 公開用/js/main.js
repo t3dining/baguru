@@ -253,15 +253,38 @@
   }
   function toMin(t) { var p = t.split(':'); return Number(p[0]) * 60 + Number(p[1]); }
 
-  /* 肉の日（毎月29日）の帯（作る.py の niku。2026-11-15 ko-dai さんの指示）：28日は「明日は肉の日！」、29日は「本日は肉の日！」。
-     29日がお休み（定休日・臨時休業）なら出さない（28日の「明日は」も）。2月の28日など、次の日が29日でなければ出さない */
+  /* 肉の日の帯（作る.py の niku。2026-11-15 ko-dai さんの指示）：前の日は「明日は肉の日！」、当日は「本日は肉の日！」。
+     肉の日は毎月29日。★2月だけは9日（2/8 に「明日は」、2/9 に「本日は」。2月の28日・29日は出さない）。
+     お休みの日（火曜の29日など）も出す（2026-11-15 ko-dai さんの指示「火曜日の29日も表示させて」）。
+     data-niku-day="28" は「明日は」、"29" は「本日は」の字（作る.py の印の名前のまま）
+     ・帯は、上のメニューといっしょに、スクロールしても上に残す（css の .niku・.has-niku .hd）。帯の高さは --niku-h に入れる
+     ・下へスクロールしたら細くする（is-mini）。字が飛ばないよう、細くするのは 120px より下、太く戻すのは 20px より上 */
+  function nikuDay(d) { return d.getMonth() === 1 ? 9 : 29; }
+  var nikuSize = null;
+  function setNikuH() {
+    var el = document.querySelector('[data-niku]');
+    var h = el && !el.hidden ? el.getBoundingClientRect().height : 0;
+    document.documentElement.style.setProperty('--niku-h', Math.round(h) + 'px');
+  }
   function renderNiku() {
     var el = document.querySelector('[data-niku]');
     if (!el) return;
     var now = new Date(), tmr = addDays(now, 1);
-    var which = (now.getDate() === 29 && !isClosedDay(now)) ? '29' : (tmr.getDate() === 29 && !isClosedDay(tmr)) ? '28' : '';
+    var which = now.getDate() === nikuDay(now) ? '29' : tmr.getDate() === nikuDay(tmr) ? '28' : '';
     Array.prototype.forEach.call(el.querySelectorAll('[data-niku-day]'), function (s) { s.hidden = s.getAttribute('data-niku-day') !== which; });
     el.hidden = !which;
+    body.classList.toggle('has-niku', !!which);
+    setNikuH();
+    if (which && !nikuSize) {
+      if (window.ResizeObserver) { nikuSize = new ResizeObserver(setNikuH); nikuSize.observe(el); }
+      else { nikuSize = true; window.addEventListener('resize', setNikuH); }
+      var mini = function () {
+        var y = window.scrollY || window.pageYOffset;
+        if (y > 120) el.classList.add('is-mini'); else if (y < 20) el.classList.remove('is-mini');
+      };
+      window.addEventListener('scroll', mini, { passive: true });
+      mini();
+    }
   }
 
   function renderToday() {
