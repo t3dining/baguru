@@ -41,6 +41,7 @@ BUDOUX = HERE / '道具' / 'budoux_ja.json'      # 文節に分ける BudouX（G
 
 SAMPLE = False   # 2026-11-15 ko-dai さんの指示「サンプルページの表記を消して実際にホームページも公開してください」。帯を消し、検索に出す（noindex を外す）
 SITE_URL = 'https://t3dining.github.io/baguru'  # 会社の GitHub（無料）。ドメインを買ったら直す
+# ★公開用/googlef1e751db4ea77f2b.html は Google Search Console の所有権の確認ファイル（2026-11-15）。消すと確認が外れるので、消さない
 # ★Coming soon（2026-11-04 ko-dai さんの指示）：公開はするが、お客さまには SITE_URL で「Coming soon」だけを見せる（write_pages）。
 #   中身は SITE_URL/PREVIEW/ に置く。そのアドレスはどこにも載せず、管理画面とバグる Owner からだけ開く
 #   ★会社の GitHub の置き場所は誰でも見られる（無料のため）ので、探せば中身も見える。本当の秘密は置かない
