@@ -420,6 +420,33 @@ def mini(it, r):
     return ['<article class="%s">%s<div><h4>%s%s</h4><p>%s</p></div></article>' % (cls('mini', it), pic(it), mt(r + 'name', it['name'], True), sold(it), ps)]
 
 
+# テイクアウトの品と、公式アプリの品の id・選ぶもの（受け口の appContent の content。Order受付・バグるマネージで品切れにできる）の対応（2026-11-08）。
+# ページに data-app="id …" を付け、js/soldout.js が、どれかが品切れなら「売り切れ」を出す。名前の字で決めるので、名前を大きく変えたらここも直す
+# ★id は公式アプリの js/data.js（ITEMS）と、Order受付のセッションが知らせてくれたもの
+APP_SAUCES = ('自家製肉ダレ', 'デミソース', 'オニオンソース', 'ガーリック醤油')
+APP_ACAI = {'プレーン': 'acai_plain', 'バナナ': 'acai_banana', 'ベリーベリー': 'acai_berry', 'トロピカル': 'acai_tropical', 'ベリーベリーバナナ': 'acai_bbb'}
+APP_WORDS = {'tk-teishoku': (('唐揚げ', 'karaage'), ('タコライス', 'taco')),
+             'tk-side': (('唐揚げ', 's_karaage'), ('メンチ', 's_menchi'), ('ポテト', 's_potato'), ('ソーセージ', 's_sausage'), ('サラダ', 's_salad'),
+                         ('ペプシ', 'd_pepsi'), ('烏龍茶', 'd_oolong'))}
+
+
+def app_ids(gid, it):
+    name = (it.get('name') or '').replace('\n', '')
+    if gid == 'tk-box':
+        return ['hbox'] + ['sauce/' + x for x in APP_SAUCES if x in name]
+    if gid == 'tk-acai':
+        return [APP_ACAI[name.strip()]] if name.strip() in APP_ACAI else []
+    return [i for w, i in APP_WORDS.get(gid, ()) if w in name][:1]
+
+
+def with_app(line, gid, it):
+    """品の、いちばん外のタグ（<li>・<article>）に data-app を付ける"""
+    ids = app_ids(gid, it)
+    if not ids:
+        return line
+    return re.sub(r'^(\s*<(?:li|article))', lambda m: m.group(1) + ' data-app="%s"' % at(' '.join(ids)), line, count=1)
+
+
 def group_lines(g):
     items = [('%s.%d.' % (g['id'], i), it) for i, it in enumerate(g['items']) if it.get('status') != 'paused']
     k = g['type']
@@ -427,13 +454,19 @@ def group_lines(g):
         return [li(it, r) for r, it in items]
     if k == 'pic-set':
         return (['<div class="pic-set">', '  <figure class="pic-fig">%s</figure>' % sized(g), '  <ul class="plist">']
-                + ['    ' + li(it, r) for r, it in items] + ['  </ul>', '</div>'])
+                + ['    ' + with_app(li(it, r), g['id'], it) for r, it in items] + ['  </ul>', '</div>'])
     if k == 'mini':
-        return [x for r, it in items for x in mini(it, r)]
+        return [with_app(x, g['id'], it) for r, it in items for x in mini(it, r)]
     if k == 'mh':
         blocks = [mh(it, n + 1, r) for n, (r, it) in enumerate(items)]
     else:
-        blocks = [{'card': card, 'pic-card': pic_card, 'duo': duo}[k](it, r) for r, it in items]
+        blocks = []
+        for r, it in items:
+            b = {'card': card, 'pic-card': pic_card, 'duo': duo}[k](it, r)
+            b[0] = with_app(b[0], g['id'], it)
+            if 'karaage' in app_ids(g['id'], it):   # 唐揚げ定食の味の品切れ（taste/…）を、品の下に出す所
+                b.insert(len(b) - 2, '    <p class="sold-note" data-app-choices="taste" hidden></p>')
+            blocks.append(b)
     out = []
     for b in blocks:
         out += ([''] if out and k == 'mh' else []) + b
@@ -825,6 +858,7 @@ def add_wbr(page):
 PAGE_JS = {'app': ['js/app-guide.js'],
            'reserve': ['js/api.js', 'js/reserve.js'] + (['js/quick.js'] if QUICK_ON else []),      # js/config.js と js/main.js は、どのページにも入る。quick.js は即予約
            'contact': ['js/api.js', 'js/contact.js'],
+           'takeout': ['js/api.js', 'js/soldout.js'],      # 品切れ（受け口の appContent）を出す（2026-11-08）
            'recruit': ['js/api.js', 'js/contact.js']}
 
 
@@ -1002,7 +1036,7 @@ def main():
     write_kanri()
     shutil.copy2(BUDOUX, OUT / 'js' / 'budoux-ja.json')    # 管理画面の「ページで直す」で、直した文の改行のところを作るのに使う（js/edit.js）
     # 版の印は、CSS と JavaScript の中身から作る。中身が変わればブラウザが読み直す
-    parts = ['css/style.css', 'js/main.js', 'js/config.js', 'js/api.js', 'js/reserve.js', 'js/quick.js', 'js/contact.js', 'js/edit.js', 'js/app-guide.js']
+    parts = ['css/style.css', 'js/main.js', 'js/config.js', 'js/api.js', 'js/reserve.js', 'js/quick.js', 'js/contact.js', 'js/edit.js', 'js/app-guide.js', 'js/soldout.js']
     ver = hashlib.sha1(b''.join((OUT / p).read_bytes() for p in parts if (OUT / p).exists())).hexdigest()[:8]
     for page in PAGES:
         if not (SRC / (page + '.html')).exists():

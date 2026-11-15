@@ -679,6 +679,8 @@ address{font-style:normal}
 /* 管理画面で「売り切れ」にした品（作る.py が付ける） */
 .sold{display:inline-block; margin-left:8px; padding:1px 7px; border-radius:2px; background:var(--coal); color:#fff; font-size:11px; font-weight:900; line-height:1.6; letter-spacing:.04em; vertical-align:middle; white-space:nowrap}
 .is-soldout img{filter:grayscale(.75); opacity:.72}
+.sold-note{margin:6px 0 0; font-size:13px; font-weight:700; color:var(--ember)}   /* 味・セット・トッピングの品切れ（js/soldout.js。2026-11-08） */
+.plist li.is-soldout .nm{opacity:.75}
 @media (max-width:640px){
   .pic-cards.is-side{grid-template-columns:1fr 1fr; gap:10px}
   .is-side .pic-body{padding:10px 11px 12px}
