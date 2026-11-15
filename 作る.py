@@ -39,7 +39,7 @@ APP_IMG = HERE.parent / '店舗アプリ' / 'バグる' / 'img'   # ロゴとア
 GROUP_IMG = HERE.parent / 'T3Works' / 'img'                # 系列店のロゴ（T3 Works のもの）
 BUDOUX = HERE / '道具' / 'budoux_ja.json'      # 文節に分ける BudouX（Google・Apache License 2.0）の日本語モデル
 
-SAMPLE = True
+SAMPLE = False   # 2026-11-15 ko-dai さんの指示「サンプルページの表記を消して実際にホームページも公開してください」。帯を消し、検索に出す（noindex を外す）
 SITE_URL = 'https://t3dining.github.io/baguru'  # 会社の GitHub（無料）。ドメインを買ったら直す
 # ★Coming soon（2026-11-04 ko-dai さんの指示）：公開はするが、お客さまには SITE_URL で「Coming soon」だけを見せる（write_pages）。
 #   中身は SITE_URL/PREVIEW/ に置く。そのアドレスはどこにも載せず、管理画面とバグる Owner からだけ開く
