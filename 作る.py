@@ -916,6 +916,11 @@ def build_page(page, ver):
     body = put_texts(put_data(src))
     robots = '<meta name="robots" content="noindex">\n' if SAMPLE else ''
     sample = ('<p class="sample">サンプルページです。価格・営業時間などは公開前にお店で確かめます。</p>\n' if SAMPLE else '')
+    # 肉の日（毎月29日）の帯（2026-11-15 ko-dai さんの指示）。ふだんは隠し、28日は「明日は肉の日！」、29日は「本日は肉の日！」を main.js（renderNiku）が出す。
+    # 29日がお休みの日なら出さない。字は texts.json の common-9〜11（管理画面の「一覧で直す」の全ページ共通）
+    niku = put_texts('<a class="niku" href="news.html#n-niku" data-niku hidden><span class="niku-ttl">'
+                     '<span data-niku-day="28" hidden>{{t:common-9}}</span><span data-niku-day="29" hidden>{{t:common-10}}</span></span>'
+                     '<span class="niku-sub">{{t:common-11}}</span></a>\n')
     preload = '<link rel="preload" as="image" href="img/hero.jpg">\n' if page == 'index' else ''
     out = '''<!doctype html>
 <html lang="ja">
@@ -944,7 +949,7 @@ def build_page(page, ver):
 </head>
 <body class="page-{page}">
 <a class="skip" href="#main">本文へ移動</a>
-{sample}{sprite}
+{sample}{niku}{sprite}
 {header}
 <main id="main">
 {hero}{body}
@@ -959,7 +964,7 @@ def build_page(page, ver):
         pagejs=''.join('<script src="%s?v=%s" defer></script>\n' % (j, ver) for j in PAGE_JS.get(page, [])),
         title=html.escape(p['title']), desc=html.escape(p['desc']), robots=robots, url=url(page),
         ogtype='website' if page == 'index' else 'article', site=BASE_URL, ver=ver, preload=preload,
-        ld=jsonld(page, body), page=page, sample=sample, sprite=SPRITE, header=header(page),
+        ld=jsonld(page, body), page=page, sample=sample, niku=niku, sprite=SPRITE, header=header(page),
         hero='' if page == 'index' else page_hero(page) + '\n', body=body, footer=put_texts(footer()), bbar=bottom_bar())
     out = add_wbr(fix_imgs(fill(out)))
     (OUT / (page + '.html')).write_text(out, encoding='utf-8')

@@ -216,6 +216,7 @@
       try { localStorage.setItem(DAYS_KEY, JSON.stringify(d)); } catch (e) { /* 覚えられなくても、このページでは使う */ }
       renderDays();
       renderToday();
+      renderNiku();
     }).catch(function () { /* 読めないときは、前に読めた分のまま */ });
   }
 
@@ -252,6 +253,17 @@
   }
   function toMin(t) { var p = t.split(':'); return Number(p[0]) * 60 + Number(p[1]); }
 
+  /* 肉の日（毎月29日）の帯（作る.py の niku。2026-11-15 ko-dai さんの指示）：28日は「明日は肉の日！」、29日は「本日は肉の日！」。
+     29日がお休み（定休日・臨時休業）なら出さない（28日の「明日は」も）。2月の28日など、次の日が29日でなければ出さない */
+  function renderNiku() {
+    var el = document.querySelector('[data-niku]');
+    if (!el) return;
+    var now = new Date(), tmr = addDays(now, 1);
+    var which = (now.getDate() === 29 && !isClosedDay(now)) ? '29' : (tmr.getDate() === 29 && !isClosedDay(tmr)) ? '28' : '';
+    Array.prototype.forEach.call(el.querySelectorAll('[data-niku-day]'), function (s) { s.hidden = s.getAttribute('data-niku-day') !== which; });
+    el.hidden = !which;
+  }
+
   function renderToday() {
     var els = document.querySelectorAll('[data-today]');
     if (!els.length) return;
@@ -285,8 +297,9 @@
   }
   renderDays();
   renderToday();
+  renderNiku();
   loadDays();
-  setInterval(function () { renderToday(); loadDays(); }, 60000);
+  setInterval(function () { renderToday(); renderNiku(); loadDays(); }, 60000);
 
   /* ---------- 飾りと動き ----------
      ・「動きを減らす」設定の端末では、現れる動き・火の粉・透かしを動かすのはしない（進み具合の線だけ） */
