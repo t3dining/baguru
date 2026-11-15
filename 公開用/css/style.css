@@ -44,16 +44,23 @@ address{font-style:normal}
 :focus-visible{outline:3px solid var(--flame); outline-offset:2px}
 .i{width:1.2em; height:1.2em; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex:none}
 
-/* 肉の日の帯（毎月28日・29日だけ。main.js の renderNiku。2026-11-15） */
-.niku{display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:4px 14px; padding:10px 16px; text-align:center; text-decoration:none; color:#fff;
-  background:linear-gradient(90deg, var(--ember2), var(--ember) 30%, var(--flame)); box-shadow:inset 0 -2px 0 rgba(0,0,0,.18)}
+/* 肉の日の帯（毎月28日・29日だけ。main.js の renderNiku。2026-11-15）。
+   もっと目立つように（2026-11-15 ko-dai さんの指示）：大きな字・縞模様・光が流れる・「肉の日」がゆっくり脈打つ。下の説明は白い札 */
+.niku{position:relative; overflow:hidden; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:8px 20px; padding:16px 16px 17px;
+  text-align:center; text-decoration:none; color:#fff; border-bottom:3px solid var(--brass);
+  background:repeating-linear-gradient(-45deg, rgba(255,255,255,.08) 0 14px, transparent 14px 28px), linear-gradient(90deg, #8f220f, var(--ember) 35%, var(--flame))}
 .niku[hidden],.niku [hidden]{display:none}
-.niku-ttl{font-size:20px; font-weight:900; letter-spacing:.12em; line-height:1.3}
-.niku-ttl::before{content:"🍖"; margin-right:6px}
-.niku-sub{font-size:14px; font-weight:700; line-height:1.5}
+.niku::after{content:""; position:absolute; top:0; bottom:0; left:-40%; width:28%; pointer-events:none;
+  background:linear-gradient(100deg, transparent, rgba(255,255,255,.38), transparent); transform:skewX(-20deg); animation:niku-shine 3.2s ease-in-out infinite}
+@keyframes niku-shine{0%{left:-40%} 55%,100%{left:125%}}
+.niku-ttl{display:inline-block; font-size:30px; font-weight:900; letter-spacing:.14em; line-height:1.25; text-shadow:0 3px 0 rgba(0,0,0,.28); animation:niku-pop 1.6s ease-in-out infinite}
+.niku-ttl::before{content:"🍖"; margin-right:8px}
+@keyframes niku-pop{0%,100%{transform:scale(1)} 50%{transform:scale(1.07)}}
+.niku-sub{position:relative; z-index:1; font-size:16px; font-weight:900; line-height:1.5; background:#fff; color:var(--ember2); padding:6px 16px; border-radius:12px; box-shadow:0 2px 0 rgba(0,0,0,.18)}
 .niku-sub::after{content:"›"; margin-left:8px; font-family:var(--en)}
-@media (hover:hover){ .niku:hover{filter:brightness(1.06)} }
-@media (max-width:640px){ .niku{padding:8px 12px} .niku-ttl{font-size:18px} .niku-sub{font-size:12.5px} }
+@media (hover:hover){ .niku:hover{filter:brightness(1.07)} }
+@media (max-width:640px){ .niku{padding:12px 12px 13px; gap:8px} .niku-ttl{font-size:25px} .niku-sub{font-size:13px; padding:5px 12px} }
+@media (prefers-reduced-motion:reduce){ .niku::after,.niku-ttl{animation:none} }
 
 /* サンプルの帯 */
 .sample{margin:0; background:var(--brass); color:#1d160f; font-size:12px; text-align:center; padding:4px 12px; line-height:1.5; font-weight:700}
