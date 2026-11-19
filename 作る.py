@@ -58,6 +58,9 @@ LIMITED_TEST = True
 #   枠の中の「12/24（木）・12/25（金）」はここから作る（{{LIMITED_DAYS}}）。最後の日が過ぎると、ページから消える（{{LIMITED_UNTIL}}・main.js の data-until）。
 #   ★マネージでアプリの日を変えたら、ここも直す
 LIMITED_DAYS = ('2026-12-24', '2026-12-25')
+# 期間限定と同じく、まだお客さまに出さないお知らせ（データ/news.json の id。2026-11-19 公式アプリのセッション経由の ko-dai さんの指示「ローストチキンのお知らせ」）。
+#   LIMITED_TEST のあいだは data-test-only hidden（Owner・Staff・管理画面だけ）。id で決めるのは、管理画面でお知らせを直しても id は残るため（ほかの欄は作り直される）
+LIMITED_NEWS = ('n-chicken',)
 COMING_SOON = False   # 2026-11-04 夕方に外した（ko-dai さんの指示：「検索で出なければいいので、coming soon も外して」）。検索に出さないのは SAMPLE の noindex
 PREVIEW = 'naka-f90249acdb'
 BASE_URL = SITE_URL + '/' + PREVIEW if COMING_SOON else SITE_URL   # 中身のページの場所（canonical・OGP・管理画面が開くページ）
@@ -488,16 +491,41 @@ def group_lines(g):
     return out
 
 
+def news_test(n):
+    """まだお客さまに出さないお知らせか（LIMITED_NEWS）"""
+    return LIMITED_TEST and n.get('id') in LIMITED_NEWS
+
+
+def news_title(t):
+    """お知らせの見出し。空白で区切った最後のことば（2〜10字の日本語）は割らない（<bg-lp>）。
+    「クリスマス限定 炭焼ローストチキン」が「…ローストチキ／ン」と1字だけ次の行に落ちないように（2026-11-19。文節の印が入らない、カタカナの長いことば）"""
+    m = re.match(r'^(.*[ \u3000])(\S{2,10})$', (t or '').strip(), re.S)
+    if m and JA_CHARS.search(m.group(2)):
+        return tx(m.group(1)) + '<bg-lp>' + tx(m.group(2)) + '</bg-lp>'
+    return tx(t)
+
+
+def test_tag(n):
+    return ' <span class="test-tag is-sm">テスト用だけ</span>' if news_test(n) else ''
+
+
+def home_news(news):
+    """トップに出すお知らせ：お客さまに出す新しい3つ（テスト用だけのお知らせは、それとは別に足す。お客さまには3つのまま）"""
+    pub = [n for n in news if not news_test(n)][:3]
+    return sorted([n for n in news if news_test(n)] + pub, key=lambda n: n['date'], reverse=True)
+
+
 def news_row(n, href):
-    return ('<li><a class="news-row" href="%s#%s"><time class="news-date" datetime="%s">%s</time>'
+    li = '<li data-test-only hidden>' if news_test(n) else '<li>'
+    return (li + '<a class="news-row" href="%s#%s"><time class="news-date" datetime="%s">%s</time>'
             '<span class="news-cat%s">%s</span><p class="news-ttl">%s</p></a></li>') % (
-        href, at(n['id']), at(n['date']), n['date'].replace('-', '.'), NEWS_CAT.get(n['cat'], ''), tx(n['cat']), tx(n['title']))
+        href, at(n['id']), at(n['date']), n['date'].replace('-', '.'), NEWS_CAT.get(n['cat'], ''), tx(n['cat']), news_title(n['title']) + test_tag(n))
 
 
 def news_art(n):
-    out = ['<article class="news-art" id="%s">' % at(n['id']),
+    out = ['<article class="news-art" id="%s"%s>' % (at(n['id']), ' data-test-only hidden' if news_test(n) else ''),
            '  <header><time class="news-date" datetime="%s">%s</time><span class="news-cat%s">%s</span><h2>%s</h2></header>' % (
-               at(n['date']), n['date'].replace('-', '.'), NEWS_CAT.get(n['cat'], ''), tx(n['cat']), tx(n['title']))]
+               at(n['date']), n['date'].replace('-', '.'), NEWS_CAT.get(n['cat'], ''), tx(n['cat']), news_title(n['title']) + test_tag(n))]
     out += ['  <p>%s</p>' % tx(line) for line in n.get('body', '').split('\n') if line.strip()]
     if n.get('link'):
         out.append('  <p><a href="%s">%s</a></p>' % (at(n['link']['href']), tx(n['link']['text'])))
@@ -524,7 +552,7 @@ def put_data(s):
                 raise SystemExit('データ/menu.json に「%s」がありません' % key)
             lines = group_lines(d['groups'][key])
         elif key == 'home':
-            lines = [news_row(n, 'news.html') for n in d['news'][:3]]
+            lines = [news_row(n, 'news.html') for n in home_news(d['news'])]
         elif key == 'list':
             lines = [news_row(n, '') for n in d['news']]
         else:
