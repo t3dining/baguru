@@ -666,7 +666,7 @@ address{font-style:normal}
 @media (max-width:820px){ .limited-desc{margin:2px 0 12px; font-size:14px; line-height:1.9; letter-spacing:.02em} }
 @media (max-width:380px){ .limited-desc{font-size:13px; letter-spacing:0} }   /* 幅360のスマホでも、1行ずつに収める */
 .limited-days{display:flex; align-items:center; gap:8px; margin:0 0 12px; padding:9px 14px; border-radius:12px; background:#fff; border:1.5px dashed rgba(199,54,29,.45);
-  font-size:15px; font-weight:700; line-height:1.6}
+  font-size:15px; font-weight:700; line-height:1.6; word-break:keep-all}   /* 日の帯は短いので、文節の切れ目で折る（「テイクアウ／ト）」のように割らない） */
 .limited-days .i{color:var(--ember)}
 .limited-days b{color:var(--ember); font-size:17px; white-space:nowrap}   /* 日は途中で折らない（「12/25」と「（金）」が分かれないように） */
 .limited-days b wbr{display:none}
@@ -692,6 +692,16 @@ address{font-style:normal}
 .limited-btns{justify-content:center; margin:16px 0 2px}
 .limited-btns .btn{min-width:220px}
 @media (max-width:820px){ .home-limited{padding:28px 0} .limited-btns .btn{flex:1 1 100%; min-width:0} }
+/* トップの枠のローストチキンの写真（2026-11-19 ko-dai さんの指示「ここにもローストチキンの写真を1枚入れて」）。
+   パソコンは左に写真・右に説明と値段。スマホは写真を上に。値段は1列に並べる */
+.limited-body{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:26px; align-items:center}
+.limited-fig{margin:0; border-radius:8px; overflow:hidden; border:3px solid #fff; box-shadow:0 6px 16px rgba(143,34,15,.22)}
+.limited-fig img{width:100%; height:auto; aspect-ratio:3/2; object-fit:cover}
+.limited.has-photo .plist{grid-template-columns:1fr}
+.limited.has-photo .plist li{border-bottom:1px dashed var(--line)}
+.limited.has-photo .plist li:last-child{border-bottom:0}
+.limited.has-photo .limited-days{margin-bottom:10px}
+@media (max-width:820px){ .limited-body{grid-template-columns:1fr; gap:14px} }
 /* 「テスト用だけ」の札（作る.py の LIMITED_TEST のあいだだけ。お客さまには出ない） */
 .test-tag{display:inline-block; margin:0 0 10px; background:#ffe14d; color:#3d3200; font-size:12px; font-weight:900; line-height:1.6; padding:1px 10px; border-radius:2px}
 .badges{display:flex; flex-wrap:wrap; gap:6px; margin:0 0 12px}

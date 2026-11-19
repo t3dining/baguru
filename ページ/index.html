@@ -44,14 +44,19 @@
      品は データ/menu.json の limited（メニューのページと同じもの）、売る日は 作る.py の LIMITED_DAYS。LIMITED_TEST のあいだは、Owner・Staff・管理画面でだけ出る。最後の日が過ぎると消える -->
 <section class="sec home-limited" id="limited" data-test-only hidden data-until="{{LIMITED_UNTIL}}">
   <div class="wrap">
-    <div class="limited">
+    <div class="limited has-photo">
       <div class="limited-head"><h2 class="limited-ribbon">{{t:index-111}}</h2><p class="limited-en">LIMITED</p></div>
       <!--test--><p class="test-tag">テスト用だけ（お客さまには、まだ出ていません）</p><!--/test-->
-      <p class="limited-desc">{{LIMITED_DESC}}</p>
-      <p class="limited-days"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><span>{{t:index-112}}</span></p>
-      <ul class="plist">
-        {{list:limited}}
-      </ul>
+      <div class="limited-body">
+        <figure class="limited-fig"><img src="img/roast-chicken.jpg" alt="炭火でじっくり焼き上げた炭焼ローストチキン"></figure>
+        <div class="limited-txt">
+          <p class="limited-desc">{{LIMITED_DESC}}</p>
+          <p class="limited-days"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><span>{{t:index-112}}</span></p>
+          <ul class="plist">
+            {{list:limited}}
+          </ul>
+        </div>
+      </div>
       <div class="btns limited-btns">
         <a class="btn btn-ember" href="{{ORDER_URL}}"><svg class="i" aria-hidden="true"><use href="#i-bag"/></svg>テイクアウトで注文</a>
         <a class="btn btn-outline" href="menu.html#limited"><svg class="i" aria-hidden="true"><use href="#i-menu"/></svg>メニューで見る</a>
