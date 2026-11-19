@@ -53,7 +53,7 @@ QUICK_ON = True   # 2026-11-05 ko-dai さんの「公開してください」で
 # 期間限定のメニュー（テイクアウトのページのいちばん上。データ/menu.json の tk-limited。2026-11-19 ko-dai さんの指示「公式アプリを参考にして期間限定メニューをホームページにも」）。
 #   公式アプリ（js/data.js の limited。testOnly）と同じく、★まだお客さまには出さない。バグる Owner・Staff から開いたときと、管理画面の中だけ出す（js/main.js の data-test-only）。
 #   お客さまに出すときは、ここを False にする（公式アプリの data.js の testOnly も、同じときに消す）。品がぜんぶ「お休み」なら、見出しごと出ない（limited_block）
-LIMITED_TEST = True
+LIMITED_TEST = False   # 2026-11-19 22時すぎ ko-dai さんの「ホームページの期間限定を公開してください」で False にした（お知らせ n-chicken も一緒に出る）
 # 期間限定の品を売る日（公式アプリの js/data.js の CHICKEN_DAYS と同じ。2026-11-19 アプリで「12/24と12/25のみ」になった）。
 #   枠の中の「12/24（木）・12/25（金）」はここから作る（{{LIMITED_DAYS}}）。最後の日が過ぎると、ページから消える（{{LIMITED_UNTIL}}・main.js の data-until）。
 #   ★マネージでアプリの日を変えたら、ここも直す
