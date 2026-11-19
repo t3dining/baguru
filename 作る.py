@@ -990,6 +990,7 @@ def build_page(page, ver):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="bg-ver" content="__BG_VER__">
 <title>{title}</title>
 <meta name="description" content="{desc}">
 {robots}<link rel="canonical" href="{url}">
@@ -1112,6 +1113,14 @@ def main():
             print('  まだ本文がありません: ページ/%s.html（飛ばしました）' % page)
             continue
         build_page(page, ver)
+    # ページの中身の印（2026-11-19 ko-dai さんの「ページを何度も更新しても写真が反映されません」）。
+    # GitHub Pages はページを端末に10分まで取っておく（max-age=600）。バグる Owner の枠の中では、更新しても枠の中のページは読み直されない。
+    # 全ページの中身から印を作り、各ページの <meta name="bg-ver"> と ver.json に入れる。js/main.js が ver.json を取っておかずに読み、違えば開き直す
+    built = sorted(OUT / (p + '.html') for p in PAGES if (OUT / (p + '.html')).exists())
+    pagever = hashlib.sha1(b''.join(f.read_bytes() for f in built)).hexdigest()[:10]
+    for f in built:
+        f.write_text(f.read_text(encoding='utf-8').replace('__BG_VER__', pagever), encoding='utf-8')
+    (OUT / 'ver.json').write_text(json.dumps({'v': pagever}) + '\n', encoding='utf-8')
     today = datetime.date.today().isoformat()
     sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for page in PAGES:

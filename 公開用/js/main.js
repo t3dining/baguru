@@ -441,6 +441,31 @@
   if (!still && canIO) { reveal(); sparks(); }
   onScroll();
 
+  /* ---------- 新しい版が出ていたら、読み直す（2026-11-19 ko-dai さんの「ページを何度も更新しても写真が反映されません」） ----------
+     ・GitHub Pages は、ページを端末に10分まで取っておく。バグる Owner の枠の中では、更新しても枠の中のページは新しくならない
+     ・作る.py が、全ページの中身の印を、このページの <meta name="bg-ver"> と ver.json に入れる。ver.json を取っておかずに読み、
+       印が違えば（このページが古い）、アドレスに bgv=新しい印 を付けて開き直す（取っておいたページを使わせない）
+     ・同じページ・同じ印では1回だけ（それでも古いときは、くり返さない）。管理画面の中（?edit）では、直している途中なので読み直さない
+     ・新しいページで開けたら、アドレスの bgv は消す（見た目のアドレスを元に戻す） */
+  (function () {
+    var m = document.querySelector('meta[name="bg-ver"]');
+    if (!m || !window.fetch || !/^https?:$/.test(location.protocol) || /[?&]edit\b/.test(location.search)) return;
+    var mine = m.getAttribute('content'), key = 'bg.verTried:' + location.pathname;
+    if (/[?&]bgv=/.test(location.search) && window.history && history.replaceState) {
+      try { var c = new URL(location.href); c.searchParams.delete('bgv'); history.replaceState(history.state, '', c.href); } catch (e) {}
+    }
+    fetch('ver.json?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (!j || !j.v || j.v === mine) return;
+      var tried = '';
+      try { tried = sessionStorage.getItem(key) || ''; } catch (e) {}
+      if (tried === j.v) return;
+      try { sessionStorage.setItem(key, j.v); } catch (e) {}
+      var u = new URL(location.href);
+      u.searchParams.set('bgv', j.v);
+      location.replace(u.href);
+    }).catch(function () {});
+  })();
+
   /* ---------- 管理画面の「ページで直す」 ----------
      ・管理画面の中に ?edit で開かれたときだけ js/edit.js を読む（ふだんのお客さまには読ませない） */
   if (/[?&]edit\b/.test(location.search) && window.parent !== window) {
