@@ -928,6 +928,9 @@ def limited_block(src):
             b = b.replace(' data-test-only hidden', '')
             b = re.sub(r'<!--test-->.*?<!--/test-->', '', b, flags=re.S)
         return b.replace('<!--test-->', '').replace('<!--/test-->', '')
+    # ローストチキンの説明（2026-11-19 ko-dai さんの指示「ローストチキンの全ての箇所に説明文を加えて」）。トップ・メニュー・テイクアウトの枠で同じ文なので、
+    # 全ページ共通の1つの文（管理画面の「一覧で直す」の全ページ共通）にした。ページ/ には {{LIMITED_DESC}} と書く
+    src = src.replace('{{LIMITED_DESC}}', '{{t:common-13}}')
     return re.sub(r'[ \t]*<!--limited:([\w-]+)-->[ \t]*\n?(.*?)[ \t]*<!--/limited-->[ \t]*\n?', rep, src, flags=re.S)
 
 

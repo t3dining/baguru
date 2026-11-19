@@ -661,6 +661,10 @@ address{font-style:normal}
   box-shadow:0 3px 0 rgba(143,34,15,.35)}
 .limited-ribbon::before{content:"★"; font-size:14px; letter-spacing:0}
 .limited-en{margin:0; font-family:var(--en); font-size:13px; font-weight:600; letter-spacing:.2em; color:var(--ember)}
+/* ローストチキンの説明（全ページ共通の文 common-13。2026-11-19）。行ごとに区切った文なので、まん中にそろえる */
+.limited-desc{margin:4px 0 16px; text-align:center; font-size:17px; font-weight:700; line-height:2; letter-spacing:.05em; color:var(--coal2)}
+@media (max-width:820px){ .limited-desc{margin:2px 0 12px; font-size:14px; line-height:1.9; letter-spacing:.02em} }
+@media (max-width:380px){ .limited-desc{font-size:13px; letter-spacing:0} }   /* 幅360のスマホでも、1行ずつに収める */
 .limited-days{display:flex; align-items:center; gap:8px; margin:0 0 12px; padding:9px 14px; border-radius:12px; background:#fff; border:1.5px dashed rgba(199,54,29,.45);
   font-size:15px; font-weight:700; line-height:1.6}
 .limited-days .i{color:var(--ember)}
