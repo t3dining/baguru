@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
-<link rel="stylesheet" href="css/style.css?v=cf4aa08a">
+<link rel="stylesheet" href="css/style.css?v=07adb0fd">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Restaurant", "@id": "https://t3dining.github.io/baguru/#restaurant", "name": "炭焼ハンバーグ バグる", "alternateName": "お肉に愛を込めて 炭焼ハンバーグ バグる", "url": "https://t3dining.github.io/baguru/", "image": "https://t3dining.github.io/baguru/img/og.jpg", "logo": "https://t3dining.github.io/baguru/img/logo.png", "telephone": "+81-565-85-7955", "address": {"@type": "PostalAddress", "streetAddress": "若林西町茶屋間1-3", "addressLocality": "豊田市", "addressRegion": "愛知県", "addressCountry": "JP"}, "servesCuisine": ["ハンバーグ", "洋食"], "priceRange": "¥1,000〜¥2,000", "acceptsReservations": "https://t3dining.github.io/baguru/reserve.html", "hasMenu": "https://t3dining.github.io/baguru/menu.html", "paymentAccepted": "Cash, Credit Card, QRコード決済", "smokingAllowed": false, "sameAs": ["https://www.instagram.com/baguru.hamburg/"], "openingHoursSpecification": [{"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Wednesday", "Thursday", "Friday"], "opens": "11:00", "closes": "15:00"}, {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Wednesday", "Thursday", "Friday"], "opens": "17:00", "closes": "22:30"}, {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday", "Sunday"], "opens": "11:00", "closes": "22:30"}]}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "ホーム", "item": "https://t3dining.github.io/baguru/"}, {"@type": "ListItem", "position": 2, "name": "メニュー", "item": "https://t3dining.github.io/baguru/menu.html"}]}</script>
 </head>
@@ -91,6 +91,7 @@
 <nav class="crumb wrap" aria-label="パンくずリスト"><ol><li><a href="index.html"><bg-lp>ホーム</bg-lp></a></li><li aria-current="page"><bg-lp>メニュー</bg-lp></li></ol></nav>
 <nav class="jump" aria-label="メニューの中の移動">
   <ul>
+    <li class="is-limited" data-test-only hidden data-until="2026-12-25"><a href="#limited"><!--t:menu-31--><bg-lp>期間限定</bg-lp><!--/t--></a></li>
     <li><a href="#hamburg"><!--t:menu-1--><bg-lp>ハンバーグ</bg-lp><!--/t--></a></li>
     <li><a href="#rice"><!--t:menu-2-->ご飯・<wbr><bg-lp>セット</bg-lp><!--/t--></a></li>
     <li><a href="#lunch"><!--t:menu-3--><bg-lp>平日ランチ</bg-lp><!--/t--></a></li>
@@ -100,6 +101,23 @@
     <li><a href="#drink"><!--t:menu-7--><bg-lp>ドリンク</bg-lp><!--/t--></a></li>
   </ul>
 </nav>
+
+<!-- 期間限定（2026-11-19 ko-dai さんの指示「メニュータブにも期間限定でローストチキンを載せて」。公式アプリの店内のメニューの期間限定と同じ。
+     品は データ/menu.json の limited、売る日は 作る.py の LIMITED_DAYS。LIMITED_TEST のあいだは、Owner・Staff・管理画面でだけ出る） -->
+<section class="sec menu-sec menu-limited" id="limited" data-test-only hidden data-until="2026-12-25">
+  <div class="wrap">
+    <div class="limited">
+      <div class="limited-head"><h2 class="limited-ribbon"><!--t:menu-32--><bg-lp>期間限定</bg-lp><!--/t--></h2><p class="limited-en">LIMITED</p></div>
+      <p class="test-tag">テスト用だけ<wbr>（お客さまには、<wbr>まだ<wbr><bg-lp>出ていません）</bg-lp></p>
+      <p class="limited-days"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><span><!--t:menu-33--><b>12/24<wbr>（木）<wbr>・12/25<wbr><bg-lp>（金）</bg-lp></b> だけの<wbr><bg-lp>販売です</bg-lp><!--/t--></span></p>
+      <ul class="plist">
+        <li><span class="nm"><!--m:limited.0.name-->炭焼ローストチキン<wbr><bg-lp>（1本）</bg-lp><!--/m--></span><span class="pr"><!--m:limited.0.price-->880<!--/m--><small>円</small></span></li>
+        <li><span class="nm"><!--m:limited.1.name-->炭焼ローストチキン<wbr><bg-lp>（2本セット）</bg-lp><!--/m--></span><span class="pr"><!--m:limited.1.price-->1,600<!--/m--><small>円</small></span></li>
+        <li><span class="nm"><!--m:limited.2.name-->炭焼ローストチキン<wbr><bg-lp>（5本セット）</bg-lp><!--/m--></span><span class="pr"><!--m:limited.2.price-->3,800<!--/m--><small>円</small></span></li>
+      </ul>
+    </div>
+  </div>
+</section>
 
 <section class="sec menu-sec" id="hamburg" data-deco="HAMBURG">
   <div class="wrap">
@@ -422,7 +440,7 @@
   <a href="reserve.html#booking"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><span><bg-lp>予約</bg-lp></span></a>
   <a href="https://www.google.com/maps/search/?api=1&amp;query=%E7%82%AD%E7%84%BC%E3%83%8F%E3%83%B3%E3%83%90%E3%83%BC%E3%82%B0%20%E3%83%90%E3%82%B0%E3%82%8B%20%E6%84%9B%E7%9F%A5%E7%9C%8C%E8%B1%8A%E7%94%B0%E5%B8%82%E8%8B%A5%E6%9E%97%E8%A5%BF%E7%94%BA%E8%8C%B6%E5%B1%8B%E9%96%931-3" target="_blank" rel="noopener"><svg class="i" aria-hidden="true"><use href="#i-pin"/></svg><span><bg-lp>地図</bg-lp></span></a>
 </nav>
-<script src="js/config.js?v=cf4aa08a" defer></script>
-<script src="js/main.js?v=cf4aa08a" defer></script>
+<script src="js/config.js?v=07adb0fd" defer></script>
+<script src="js/main.js?v=07adb0fd" defer></script>
 </body>
 </html>

@@ -37,12 +37,13 @@
       <h2 class="sh-jp">{{t:takeout-12}}</h2>
     </div>
 
-    <!--limited-->
-    <!-- 期間限定（2026-11-19。品は データ/menu.json の tk-limited。作る.py の limited_block：LIMITED_TEST のあいだは、Owner・Staff・管理画面でだけ出る） -->
-    <div class="limited" id="limited" data-test-only hidden>
-      <p class="limited-en">LIMITED</p>
+    <!--limited:tk-limited-->
+    <!-- 期間限定（2026-11-19。品は データ/menu.json の tk-limited、売る日は 作る.py の LIMITED_DAYS。作る.py の limited_block：LIMITED_TEST のあいだは、Owner・Staff・管理画面でだけ出る）。
+         見た目は公式アプリの期間限定の枠と同じ（赤い縁・★期間限定の札・白い帯の日） -->
+    <div class="limited" id="limited" data-test-only hidden data-until="{{LIMITED_UNTIL}}">
+      <div class="limited-head"><h3 class="limited-ribbon">{{t:takeout-25}}</h3><p class="limited-en">LIMITED</p></div>
       <!--test--><p class="test-tag">テスト用だけ（お客さまには、まだ出ていません）</p><!--/test-->
-      <h3 class="sub-ttl">{{t:takeout-25}}</h3>
+      <p class="limited-days"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><span>{{t:takeout-26}}</span></p>
       <ul class="plist">
         {{list:tk-limited}}
       </ul>

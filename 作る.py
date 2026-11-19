@@ -54,6 +54,10 @@ QUICK_ON = True   # 2026-11-05 ko-dai さんの「公開してください」で
 #   公式アプリ（js/data.js の limited。testOnly）と同じく、★まだお客さまには出さない。バグる Owner・Staff から開いたときと、管理画面の中だけ出す（js/main.js の data-test-only）。
 #   お客さまに出すときは、ここを False にする（公式アプリの data.js の testOnly も、同じときに消す）。品がぜんぶ「お休み」なら、見出しごと出ない（limited_block）
 LIMITED_TEST = True
+# 期間限定の品を売る日（公式アプリの js/data.js の CHICKEN_DAYS と同じ。2026-11-19 アプリで「12/24と12/25のみ」になった）。
+#   枠の中の「12/24（木）・12/25（金）」はここから作る（{{LIMITED_DAYS}}）。最後の日が過ぎると、ページから消える（{{LIMITED_UNTIL}}・main.js の data-until）。
+#   ★マネージでアプリの日を変えたら、ここも直す
+LIMITED_DAYS = ('2026-12-24', '2026-12-25')
 COMING_SOON = False   # 2026-11-04 夕方に外した（ko-dai さんの指示：「検索で出なければいいので、coming soon も外して」）。検索に出さないのは SAMPLE の noindex
 PREVIEW = 'naka-f90249acdb'
 BASE_URL = SITE_URL + '/' + PREVIEW if COMING_SOON else SITE_URL   # 中身のページの場所（canonical・OGP・管理画面が開くページ）
@@ -89,6 +93,8 @@ VARS = {
     'MAP_EMBED': 'https://www.google.com/maps?q=%s&output=embed&hl=ja' % _q,
     'MAP_LINK': 'https://www.google.com/maps/search/?api=1&query=%s' % _q,
     'INSTAGRAM': SHOP['instagram'],
+    'LIMITED_DAYS': '・'.join('%d/%d（%s）' % (int(d[5:7]), int(d[8:]), '月火水木金土日'[__import__('datetime').date.fromisoformat(d).weekday()]) for d in LIMITED_DAYS),
+    'LIMITED_UNTIL': max(LIMITED_DAYS),
 }
 
 # ユーザーが決めた並び（ホーム、コンセプト、予約、メニュー、テイクアウト、ニュース、アクセス、採用）。お問い合わせは最後に足した
@@ -909,18 +915,20 @@ def faq_all(src):
 
 
 def limited_block(src):
-    """<!--limited-->〜<!--/limited-->（期間限定のメニュー）。品がぜんぶお休みなら、見出しごと消す。
-    LIMITED_TEST のあいだは data-test-only hidden（main.js が Owner・Staff・管理画面でだけ出す）と「テスト用だけ」の札を残す"""
+    """<!--limited:群-->〜<!--/limited-->（期間限定。群は データ/menu.json の id）。群の品がぜんぶお休みなら、かたまりごと消す。
+    LIMITED_TEST のあいだは data-test-only hidden（main.js が Owner・Staff・管理画面でだけ出す）と「テスト用だけ」の札（<!--test-->〜<!--/test-->）を残す"""
     def rep(m):
-        g = load_data()['groups'].get('tk-limited')
-        if not g or not any(it.get('status') != 'paused' for it in g['items']):
+        g = load_data()['groups'].get(m.group(1))
+        if not g:
+            raise SystemExit('データ/menu.json に「%s」がありません（<!--limited:%s-->）' % (m.group(1), m.group(1)))
+        if not any(it.get('status') != 'paused' for it in g['items']):
             return ''
-        b = m.group(1)
+        b = m.group(2)
         if not LIMITED_TEST:
             b = b.replace(' data-test-only hidden', '')
             b = re.sub(r'<!--test-->.*?<!--/test-->', '', b, flags=re.S)
         return b.replace('<!--test-->', '').replace('<!--/test-->', '')
-    return re.sub(r'[ \t]*<!--limited-->\n?(.*?)[ \t]*<!--/limited-->[ \t]*\n?', rep, src, flags=re.S)
+    return re.sub(r'[ \t]*<!--limited:([\w-]+)-->[ \t]*\n?(.*?)[ \t]*<!--/limited-->[ \t]*\n?', rep, src, flags=re.S)
 
 
 def build_page(page, ver):

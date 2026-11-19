@@ -1366,6 +1366,11 @@
      "name": "ページの初め",
      "texts": [
       {
+       "key": "menu-31",
+       "tag": "a",
+       "text": "期間限定"
+      },
+      {
        "key": "menu-1",
        "tag": "a",
        "text": "ハンバーグ"
@@ -1399,6 +1404,21 @@
        "key": "menu-7",
        "tag": "a",
        "text": "ドリンク"
+      }
+     ]
+    },
+    {
+     "name": "期間限定",
+     "texts": [
+      {
+       "key": "menu-32",
+       "tag": "h2",
+       "text": "期間限定"
+      },
+      {
+       "key": "menu-33",
+       "tag": "span",
+       "text": "**{{LIMITED_DAYS}}** だけの販売です"
       }
      ]
     },
@@ -1655,6 +1675,11 @@
        "key": "takeout-25",
        "tag": "h3",
        "text": "期間限定"
+      },
+      {
+       "key": "takeout-26",
+       "tag": "span",
+       "text": "受け取りは **{{LIMITED_DAYS}}** だけ"
       },
       {
        "key": "takeout-13",

@@ -1,5 +1,8 @@
 <nav class="jump" aria-label="メニューの中の移動">
   <ul>
+    <!--limited:limited-->
+    <li class="is-limited" data-test-only hidden data-until="{{LIMITED_UNTIL}}"><a href="#limited">{{t:menu-31}}</a></li>
+    <!--/limited-->
     <li><a href="#hamburg">{{t:menu-1}}</a></li>
     <li><a href="#rice">{{t:menu-2}}</a></li>
     <li><a href="#lunch">{{t:menu-3}}</a></li>
@@ -9,6 +12,23 @@
     <li><a href="#drink">{{t:menu-7}}</a></li>
   </ul>
 </nav>
+
+<!--limited:limited-->
+<!-- 期間限定（2026-11-19 ko-dai さんの指示「メニュータブにも期間限定でローストチキンを載せて」。公式アプリの店内のメニューの期間限定と同じ。
+     品は データ/menu.json の limited、売る日は 作る.py の LIMITED_DAYS。LIMITED_TEST のあいだは、Owner・Staff・管理画面でだけ出る） -->
+<section class="sec menu-sec menu-limited" id="limited" data-test-only hidden data-until="{{LIMITED_UNTIL}}">
+  <div class="wrap">
+    <div class="limited">
+      <div class="limited-head"><h2 class="limited-ribbon">{{t:menu-32}}</h2><p class="limited-en">LIMITED</p></div>
+      <!--test--><p class="test-tag">テスト用だけ（お客さまには、まだ出ていません）</p><!--/test-->
+      <p class="limited-days"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><span>{{t:menu-33}}</span></p>
+      <ul class="plist">
+        {{list:limited}}
+      </ul>
+    </div>
+  </div>
+</section>
+<!--/limited-->
 
 <section class="sec menu-sec" id="hamburg" data-deco="HAMBURG">
   <div class="wrap">

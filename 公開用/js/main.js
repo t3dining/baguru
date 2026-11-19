@@ -42,6 +42,13 @@
   if (fromOwner || (framed && /[?&]edit\b/.test(location.search))) {
     Array.prototype.forEach.call(document.querySelectorAll('[data-test-only]'), function (el) { el.hidden = false; });
   }
+  /* 期間限定（data-until＝売る最後の日。作る.py の LIMITED_DAYS）は、その日が過ぎたら、だれにも出さない（公式アプリの itemEnded と同じ。2026-11-19） */
+  (function () {
+    var d = new Date(), key = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+    Array.prototype.forEach.call(document.querySelectorAll('[data-until]'), function (el) {
+      if (el.getAttribute('data-until') < key) el.parentNode.removeChild(el);
+    });
+  })();
   var OWNER_URL = 'https://t3dining-store.github.io/baguru-owner/';
   if (inOwner) {
     body.classList.add('in-owner');
