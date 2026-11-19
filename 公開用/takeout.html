@@ -130,16 +130,21 @@
 
     <!-- 期間限定（2026-11-19。品は データ/menu.json の tk-limited、売る日は 作る.py の LIMITED_DAYS。作る.py の limited_block：LIMITED_TEST のあいだは、Owner・Staff・管理画面でだけ出る）。
          見た目は公式アプリの期間限定の枠と同じ（赤い縁・★期間限定の札・白い帯の日） -->
-    <div class="limited" id="limited" data-test-only hidden data-until="2026-12-25">
+    <div class="limited has-photo" id="limited" data-test-only hidden data-until="2026-12-25">
       <div class="limited-head"><h3 class="limited-ribbon"><!--t:takeout-25--><bg-lp>期間限定</bg-lp><!--/t--></h3><p class="limited-en">LIMITED</p></div>
       <p class="test-tag">テスト用だけ<wbr>（お客さまには、<wbr>まだ<wbr><bg-lp>出ていません）</bg-lp></p>
-      <p class="limited-desc"><!--t:common-13-->自家製の<wbr>タレに<wbr>48時間しっかり<wbr><bg-lp>つけ込み</bg-lp><br>中まで<wbr>味が<wbr>染み渡った<wbr>至高の<wbr><bg-lp>チキン</bg-lp><br>炭火で<wbr>じっくり<wbr>焼き上げ、<wbr>旨みを<wbr><bg-lp>閉じ込めました</bg-lp><br>ふっくらジューシーな<wbr><bg-lp>チキンを</bg-lp><br>クリスマスの<wbr>食卓に<wbr><bg-lp>お届けいたします</bg-lp><!--/t--></p>
-      <p class="limited-days"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><span><!--t:takeout-26--><bg-lp>受け取りは</bg-lp> <b>12/24<wbr>（木）<wbr>・12/25<wbr><bg-lp>（金）</bg-lp></b><bg-lp> だけ</bg-lp><!--/t--></span></p>
-      <ul class="plist">
-        <li data-app="l_chicken1"><span class="nm"><!--m:tk-limited.0.name-->炭焼ローストチキン<wbr><bg-lp>（1本）</bg-lp><!--/m--></span><span class="pr"><!--m:tk-limited.0.price-->880<!--/m--><small>円</small></span></li>
-        <li data-app="l_chicken2"><span class="nm"><!--m:tk-limited.1.name-->炭焼ローストチキン<wbr><bg-lp>（2本セット）</bg-lp><!--/m--></span><span class="pr"><!--m:tk-limited.1.price-->1,600<!--/m--><small>円</small></span></li>
-        <li data-app="l_chicken5"><span class="nm"><!--m:tk-limited.2.name-->炭焼ローストチキン<wbr><bg-lp>（5本セット）</bg-lp><!--/m--></span><span class="pr"><!--m:tk-limited.2.price-->3,800<!--/m--><small>円</small></span></li>
-      </ul>
+      <div class="limited-body">
+        <figure class="limited-fig"><img loading="lazy" decoding="async" width="1200" height="800" src="img/roast-chicken.jpg" alt="炭火でじっくり焼き上げた炭焼ローストチキン"></figure>
+        <div class="limited-txt">
+          <p class="limited-desc"><!--t:common-13-->自家製の<wbr>タレに<wbr>48時間しっかり<wbr><bg-lp>つけ込み</bg-lp><br>中まで<wbr>味が<wbr>染み渡った<wbr>至高の<wbr><bg-lp>チキン</bg-lp><br>炭火で<wbr>じっくり<wbr>焼き上げ、<wbr>旨みを<wbr><bg-lp>閉じ込めました</bg-lp><br>ふっくらジューシーな<wbr><bg-lp>チキンを</bg-lp><br>クリスマスの<wbr>食卓に<wbr><bg-lp>お届けいたします</bg-lp><!--/t--></p>
+          <p class="limited-days"><svg class="i" aria-hidden="true"><use href="#i-cal"/></svg><span><!--t:takeout-26--><bg-lp>受け取りは</bg-lp> <b>12/24<wbr>（木）<wbr>・12/25<wbr><bg-lp>（金）</bg-lp></b><bg-lp> だけ</bg-lp><!--/t--></span></p>
+          <ul class="plist">
+            <li data-app="l_chicken1"><span class="nm"><!--m:tk-limited.0.name-->炭焼ローストチキン<wbr><bg-lp>（1本）</bg-lp><!--/m--></span><span class="pr"><!--m:tk-limited.0.price-->880<!--/m--><small>円</small></span></li>
+            <li data-app="l_chicken2"><span class="nm"><!--m:tk-limited.1.name-->炭焼ローストチキン<wbr><bg-lp>（2本セット）</bg-lp><!--/m--></span><span class="pr"><!--m:tk-limited.1.price-->1,600<!--/m--><small>円</small></span></li>
+            <li data-app="l_chicken5"><span class="nm"><!--m:tk-limited.2.name-->炭焼ローストチキン<wbr><bg-lp>（5本セット）</bg-lp><!--/m--></span><span class="pr"><!--m:tk-limited.2.price-->3,800<!--/m--><small>円</small></span></li>
+          </ul>
+        </div>
+      </div>
     </div>
 
     <h3 class="sub-ttl"><!--t:takeout-13--><bg-lp>ハンバーグBOX</bg-lp><!--/t--><small><!--t:takeout-14--><bg-lp>ご飯付き</bg-lp><!--/t--></small></h3>
