@@ -50,6 +50,10 @@ SITE_URL = 'https://t3dining.github.io/baguru'  # 会社の GitHub（無料）�
 #   決めごとは 店舗アプリ/バグる/即予約の決めごと.md。★ko-dai さんが「公開して」と言うまで False（ページ/reserve.html の <!--quick-->〜<!--/quick--> を出さない）。
 #   True にしても、予約ボードのスイッチが「受付中」で、受付時間の中のときだけ出る（js/quick.js が受け口の nowAvail を見る）
 QUICK_ON = True   # 2026-11-05 ko-dai さんの「公開してください」で True にした
+# 期間限定のメニュー（テイクアウトのページのいちばん上。データ/menu.json の tk-limited。2026-11-19 ko-dai さんの指示「公式アプリを参考にして期間限定メニューをホームページにも」）。
+#   公式アプリ（js/data.js の limited。testOnly）と同じく、★まだお客さまには出さない。バグる Owner・Staff から開いたときと、管理画面の中だけ出す（js/main.js の data-test-only）。
+#   お客さまに出すときは、ここを False にする（公式アプリの data.js の testOnly も、同じときに消す）。品がぜんぶ「お休み」なら、見出しごと出ない（limited_block）
+LIMITED_TEST = True
 COMING_SOON = False   # 2026-11-04 夕方に外した（ko-dai さんの指示：「検索で出なければいいので、coming soon も外して」）。検索に出さないのは SAMPLE の noindex
 PREVIEW = 'naka-f90249acdb'
 BASE_URL = SITE_URL + '/' + PREVIEW if COMING_SOON else SITE_URL   # 中身のページの場所（canonical・OGP・管理画面が開くページ）
@@ -426,7 +430,8 @@ def mini(it, r):
 # ★id は公式アプリの js/data.js（ITEMS）と、Order受付のセッションが知らせてくれたもの
 APP_SAUCES = ('自家製肉ダレ', 'デミソース', 'オニオンソース', 'ガーリック醤油')
 APP_ACAI = {'プレーン': 'acai_plain', 'バナナ': 'acai_banana', 'ベリーベリー': 'acai_berry', 'トロピカル': 'acai_tropical', 'ベリーベリーバナナ': 'acai_bbb'}
-APP_WORDS = {'tk-teishoku': (('唐揚げ', 'karaage'), ('タコライス', 'taco')),
+APP_WORDS = {'tk-limited': (('1本）', 'l_chicken1'), ('2本', 'l_chicken2'), ('5本', 'l_chicken5')),   # 期間限定（2026-11-19。名前の「1本）」「2本」「5本」で決める）
+             'tk-teishoku': (('唐揚げ', 'karaage'), ('タコライス', 'taco')),
              'tk-side': (('唐揚げ', 's_karaage'), ('メンチ', 's_menchi'), ('ポテト', 's_potato'), ('ソーセージ', 's_sausage'), ('サラダ', 's_salad'),
                          ('ペプシ', 'd_pepsi'), ('烏龍茶', 'd_oolong'))}
 
@@ -452,7 +457,7 @@ def group_lines(g):
     items = [('%s.%d.' % (g['id'], i), it) for i, it in enumerate(g['items']) if it.get('status') != 'paused']
     k = g['type']
     if k == 'plist':
-        return [li(it, r) for r, it in items]
+        return [with_app(li(it, r), g['id'], it) for r, it in items]
     if k == 'pic-set':
         return (['<div class="pic-set">', '  <figure class="pic-fig">%s</figure>' % sized(g), '  <ul class="plist">']
                 + ['    ' + with_app(li(it, r), g['id'], it) for r, it in items] + ['  </ul>', '</div>'])
@@ -903,6 +908,21 @@ def faq_all(src):
     return src.replace('<details>', '<details open>', 1)
 
 
+def limited_block(src):
+    """<!--limited-->〜<!--/limited-->（期間限定のメニュー）。品がぜんぶお休みなら、見出しごと消す。
+    LIMITED_TEST のあいだは data-test-only hidden（main.js が Owner・Staff・管理画面でだけ出す）と「テスト用だけ」の札を残す"""
+    def rep(m):
+        g = load_data()['groups'].get('tk-limited')
+        if not g or not any(it.get('status') != 'paused' for it in g['items']):
+            return ''
+        b = m.group(1)
+        if not LIMITED_TEST:
+            b = b.replace(' data-test-only hidden', '')
+            b = re.sub(r'<!--test-->.*?<!--/test-->', '', b, flags=re.S)
+        return b.replace('<!--test-->', '').replace('<!--/test-->', '')
+    return re.sub(r'[ \t]*<!--limited-->\n?(.*?)[ \t]*<!--/limited-->[ \t]*\n?', rep, src, flags=re.S)
+
+
 def build_page(page, ver):
     p = meta(page)
     src = (SRC / (page + '.html')).read_text(encoding='utf-8')
@@ -913,7 +933,7 @@ def build_page(page, ver):
         if not m:
             raise SystemExit('ページ/%s.html に <!--cta-->〜<!--/cta--> がありません（{{CTA}} に写せません）' % page)
         src = src.replace('{{CTA}}', m.group(1).strip())
-    body = put_texts(put_data(src))
+    body = put_texts(put_data(limited_block(src)))
     robots = '<meta name="robots" content="noindex">\n' if SAMPLE else ''
     sample = ('<p class="sample">サンプルページです。価格・営業時間などは公開前にお店で確かめます。</p>\n' if SAMPLE else '')
     # 肉の日の帯（2026-11-15 ko-dai さんの指示）。ふだんは隠し、前の日は「明日は肉の日！」、当日は「本日は肉の日！」を main.js（renderNiku）が出す。

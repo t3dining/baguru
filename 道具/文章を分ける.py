@@ -37,7 +37,7 @@ COMMON = ('common', '全ページ共通（下の欄）', '下の欄')
 
 VOID = {'br', 'img', 'input', 'meta', 'link', 'hr', 'source', 'wbr', 'area', 'col', 'embed', 'param', 'track'}
 SKIP_TAGS = {'script', 'style', 'svg', 'select', 'option', 'textarea', 'button', 'noscript', 'iframe', 'template', 'title'}
-SKIP_CLASSES = {'btn', 'todo', 'hp'}
+SKIP_CLASSES = {'btn', 'todo', 'hp', 'test-tag'}   # test-tag：「テスト用だけ」の札（作る.py の LIMITED_TEST。お客さまには出ない）
 SKIP_ATTRS = ('data-days', 'data-today', 'data-off')
 SKIP_IDS = {'r-people', 'r-days', 'r-times'}         # ネット予約で、JavaScript が中身を入れかえるところ
 UI_WORDS = {'必須', '任意'}

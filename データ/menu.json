@@ -483,6 +483,26 @@
    ]
   },
   {
+   "id": "tk-limited",
+   "page": "takeout",
+   "type": "plist",
+   "title": "期間限定",
+   "items": [
+    {
+     "name": "炭焼ローストチキン（1本）",
+     "price": "880"
+    },
+    {
+     "name": "炭焼ローストチキン（2本セット）",
+     "price": "1,600"
+    },
+    {
+     "name": "炭焼ローストチキン（5本セット）",
+     "price": "3,800"
+    }
+   ]
+  },
+  {
    "id": "tk-box",
    "page": "takeout",
    "type": "pic-set",

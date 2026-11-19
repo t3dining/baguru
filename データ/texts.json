@@ -1652,6 +1652,11 @@
        "text": "テイクアウトメニュー"
       },
       {
+       "key": "takeout-25",
+       "tag": "h3",
+       "text": "期間限定"
+      },
+      {
        "key": "takeout-13",
        "tag": "h3",
        "text": "ハンバーグBOX"
