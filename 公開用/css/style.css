@@ -905,6 +905,10 @@ address{font-style:normal}
 .dessert .hint{margin:0 0 8px}
 .dessert .lbl .opt{margin-left:8px}
 .plate-msg{margin-top:12px}
+/* 当日の日を選んだとき：デザートプレートは押せない（js/reserve.js の syncDessert。2026-11-22） */
+.dessert-off{margin:0 0 8px; padding:8px 12px; border-radius:var(--r); background:#fbe9e5; border-left:4px solid var(--ember); color:#8d2412; font-size:14px; font-weight:700; line-height:1.6}
+.dessert.is-off .chk{opacity:.45}
+.dessert.is-off .chk label{cursor:not-allowed}
 .rsv .form-msg{background:#fbe9e5; border-left:4px solid var(--ember); padding:10px 14px; color:#8d2412}
 .rsv-off{background:var(--coal); color:#fff; padding:24px; border-radius:var(--r); text-align:center; line-height:2}
 .rsv-off .btn{margin-top:12px}

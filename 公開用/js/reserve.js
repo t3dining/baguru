@@ -30,7 +30,8 @@
     offline: 'つながりませんでした。電波の良い所で、もう一度お試しください。',
     no_answer: 'つながりませんでした。時間を置いてもう一度お試しいただくか、お電話でどうぞ。',
     taken_time: '選んでいた時間が、今、埋まりました。他の時間を選んでください。',
-    taken_day: '選んでいた日が、今、埋まりました。他の日を選んでください。'
+    taken_day: '選んでいた日が、今、埋まりました。他の日を選んでください。',
+    dessert_today: 'デザートプレートは、前日までのご予約で承ります。プレートを外すか、明日以降の日を選んでください。'   // 2026-11-22（受け口 2026-11-22b から）
   };
   function message(e) {
     var d = e.data || {};
@@ -180,7 +181,7 @@
       // 選んでいた日・時間が埋まっていたら外す
       var had = { date: state.date, time: state.time };
       dropUnfit();
-      renderPeople(); renderDays(); renderTimes();
+      renderPeople(); renderDays(); renderTimes(); syncDessert();
       if (quiet && had.date && !state.date) say(MSG.taken_day);
       else if (quiet && had.time && !state.time) say(MSG.taken_time);
     }).catch(function (e) {
@@ -218,8 +219,8 @@
 
   form.addEventListener('change', function (e) {
     var t = e.target;
-    if (t.name === 'people') { state.people = Number(t.value); dropUnfit(); renderDays(); renderTimes(); }
-    if (t.name === 'date') { state.date = t.value; state.time = ''; renderTimes(); $('r-times').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+    if (t.name === 'people') { state.people = Number(t.value); dropUnfit(); renderDays(); renderTimes(); syncDessert(); }
+    if (t.name === 'date') { state.date = t.value; state.time = ''; renderTimes(); syncDessert(); $('r-times').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
     if (t.name === 'time') state.time = t.value;
     if (t.name === 'dessert') { showPlate(); if (dessertOn()) $('r-plate').focus(); }
     say('');
@@ -229,6 +230,23 @@
   // デザートプレート（要予約・税込1,100円）。「注文する」にチェックを入れたときだけ、プレートに書くメッセージの欄を出す
   function dessertOn() { return $('r-dessert').checked; }
   function showPlate() { $('r-plate-box').hidden = !dessertOn(); }
+  /* 当日のデザートプレートは、ネットの予約では受けない（2026-11-22 ko-dai さんの指示「当日のデザートプレートの予約はできないようにしてください」。
+     お店が予約ボードで入れるときは入れられる）。選べるいちばん早い日は、受け口の avail の dessertFrom（明日）。
+     dessertFrom が無い（前の受け口）ときは、この端末の明日。選んだ日がそれより前なら、「注文する」を外して押せなくし、一言を出す（日を変えたら戻す） */
+  function dessertFrom() {
+    if (state.dessertFrom) return state.dessertFrom;
+    if (state.avail && /^\d{4}-\d{2}-\d{2}$/.test(state.avail.dessertFrom || '')) return state.avail.dessertFrom;
+    var t = new Date(); t.setDate(t.getDate() + 1);
+    return t.getFullYear() + '-' + ('0' + (t.getMonth() + 1)).slice(-2) + '-' + ('0' + t.getDate()).slice(-2);
+  }
+  function syncDessert() {
+    var no = !!state.date && state.date < dessertFrom(), box = $('r-dessert');
+    if (no && box.checked) box.checked = false;
+    box.disabled = no;
+    $('r-dessert-box').classList.toggle('is-off', no);
+    $('r-dessert-off').hidden = !no;
+    showPlate();
+  }
 
   function values() {
     return {
@@ -283,9 +301,17 @@
       $('r-unmailed').hidden = !!r.mailed;
       show($('r-confirm'), false); show($('r-done'), true);
       $('booking').scrollIntoView({ behavior: 'smooth' });
-      form.reset(); showPlate(); state.people = 0; state.date = ''; state.time = '';
+      form.reset(); state.people = 0; state.date = ''; state.time = ''; syncDessert();
       load();
     }).catch(function (e) {
+      if (e.code === 'dessert_today') {
+        // 当日の日でプレートを選んでいた（受け口が断った）：フォームに戻して、プレートを外す
+        if (e.data && /^\d{4}-\d{2}-\d{2}$/.test(e.data.dessertFrom || '')) state.dessertFrom = e.data.dessertFrom;
+        show($('r-confirm'), false); show(form, true);
+        syncDessert();
+        say(message(e));
+        return;
+      }
       if (e.code === 'full' || e.code === 'too_late' || e.code === 'no_slot') {
         // 枠が埋まったときは、空き状況を読み直して時間を選び直してもらう
         state.time = '';

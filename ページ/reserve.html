@@ -105,8 +105,10 @@
           <div class="full"><label for="r-email">{{t:reserve-18}}<span class="need">必須</span></label><input type="email" id="r-email" autocomplete="email" inputmode="email" maxlength="120" placeholder="確定のお知らせをお送りします"></div>
         </div>
         <div class="fgrid">
-          <fieldset class="full dessert"><legend class="lbl">{{t:reserve-19}}<span class="opt">{{t:reserve-20}}</span></legend>
+          <fieldset class="full dessert" id="r-dessert-box"><legend class="lbl">{{t:reserve-19}}<span class="opt">{{t:reserve-20}}</span></legend>
             <p class="hint">{{t:reserve-21}}</p>
+            <!-- 当日の日を選んでいるときだけ出す（js/reserve.js の syncDessert。2026-11-22 ko-dai さんの指示「当日のデザートプレートの予約はできないように」。ネットの予約だけ） -->
+            <p class="dessert-off" id="r-dessert-off" hidden>{{t:reserve-90}}</p>
             <div class="chk">
               <label><input type="checkbox" name="dessert" id="r-dessert" value="yes">{{t:reserve-22}}</label>
             </div>
